@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-xOi5V9OHbAjpj6lucgQUV+2JufetRRL4HWyfGLeyXBk='; style-src 'sha256-VdvExGOoGx8uiVvOMHrZi5CWTF8or2WiLJy0TO2KzNg='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-mJqIb/gdckp7HbXC68Qp0rVTaj10joLZUYtffx6r74w='; style-src 'sha256-Yvd97DFzA6cw3Nnrbj3bveixVBUbx/9s957g8Vo5cZ8='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -265,6 +265,20 @@ html[data-theme=night] .bk-age.warn{background:#450a0a;color:#fecaca;border-colo
 @media(max-width:480px){.topbar .brand{font-size:17px}.sheet{padding-left:14px;padding-right:14px}.item{padding:12px}.toolbar.end #btn-add{padding:10px 16px}}
 @media(max-width:420px){#btn-lock .lbl{display:none}#btn-lock{padding:9px 10px}.topbar .row.gap{gap:4px}}
 @media(prefers-reduced-motion:reduce){.savest.saving::before{animation:none}}
+.stmt{font-size:12px;line-height:1.6;color:var(--muted);background:var(--bg);border-radius:10px;padding:9px 12px;margin:10px 0}
+.autost{font-size:13px;margin:4px 0 10px;padding:9px 12px;border-radius:10px;background:var(--bg)}
+.autost small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.upwarn{font-size:12.5px;margin:8px 0 0;padding:8px 10px;border-radius:10px;background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+html[data-theme=night] .upwarn{background:#422006;color:#fde68a;border-color:#92400e}
+.vrow .vb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.vrow .lockd{font-size:11px;color:var(--muted)}
+.rbad{display:inline-block;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;margin-left:4px;vertical-align:middle}
+.rbad.high{background:#fef2f2;color:#b91c1c}.rbad.medium{background:#fffbeb;color:#b45309}.rbad.low{background:#f0fdf4;color:#15803d}
+html[data-theme=night] .rbad.high{background:#450a0a;color:#fecaca}html[data-theme=night] .rbad.medium{background:#422006;color:#fde68a}html[data-theme=night] .rbad.low{background:#052e16;color:#bbf7d0}
+.ipfl{display:inline-block;font-size:10px;padding:0 5px;border-radius:6px;margin:2px 2px 0 0;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.lrow.risk-high{background:#fef2f2}html[data-theme=night] .lrow.risk-high{background:#450a0a}
+.lrow.risk-medium{background:#fffbeb}html[data-theme=night] .lrow.risk-medium{background:#422006}
+.ipnote{font-size:11px;color:var(--muted);margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -291,7 +305,6 @@ html[data-theme=night] .bk-age.warn{background:#450a0a;color:#fecaca;border-colo
         <button class="primary block" id="owner-submit" type="submit">创建保险库</button>
       </form>
       <p class="muted tiny">⚠️ 主密码忘了就再也解不开，任何人都无法找回。</p>
-      <p class="notice">🛡️ 为了安全，这个家庭保险库会记录登录时间、设备（含设备指纹）和 IP。</p>
     </div>
     <p id="ios-tip" class="tip hidden">📱 iPhone / iPad：请在 Safari 点「分享」→「添加到主屏幕」，以后从主屏幕图标打开，数据更不容易被系统清除。</p>
     <p id="persist-tip" class="muted tiny"></p>
@@ -312,7 +325,6 @@ html[data-theme=night] .bk-age.warn{background:#450a0a;color:#fecaca;border-colo
       <button class="primary block" id="unlock-submit" type="submit">解锁</button>
     </form>
     <p id="unlock-guard" class="banner hidden"></p>
-    <p class="notice">🛡️ 为了安全，这个家庭保险库会记录登录时间、设备（含设备指纹）和 IP。</p>
     <button class="link small" id="btn-back" type="button">← 换一个用户</button>
   </div>
 </section>
@@ -388,6 +400,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 `);let e=await s.signMessage(new TextEncoder().encode(t),`utf8`);if(!e||!(e instanceof Uint8Array))throw Error(`@supabase/auth-js: Wallet signMessage() API returned an recognized value`);n=e}}try{let{data:r,error:i}=await J(this.fetch,`POST`,`${this.url}/token?grant_type=web3`,{headers:this.headers,body:Object.assign({chain:`solana`,message:t,signature:z(n)},e.options?.captchaToken?{gotrue_meta_security:{captcha_token:e.options?.captchaToken}}:null),xform:Y});if(i)throw i;if(!r||!r.session||!r.user){let e=new R;return this._returnResult({data:{user:null,session:null},error:e})}return r.session&&(await this._saveSession(r.session),await this._notifyAllSubscribers(`SIGNED_IN`,r.session)),this._returnResult({data:Object.assign({},r),error:i})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async _exchangeCodeForSession(e,t){let n=t?.flowId!=null,r=n?zr(t?.flowId):B()?zr(Dr(window.location.href)[N]):null;n&&!r&&this._debug(`#_exchangeCodeForSession()`,`provided flowId is not a valid flow id`,t?.flowId);let{verifier:i,flowId:a}=n&&!r?{verifier:null,flowId:null}:await Gr(this.storage,this.storageKey,r),[o,s]=(i??``).split(`/`);try{if(!o&&this.flowType===`pkce`)throw new ir;let{data:t,error:n}=await J(this.fetch,`POST`,`${this.url}/token?grant_type=pkce`,{headers:this.headers,body:{auth_code:e,code_verifier:o},xform:Y});if(await G(this.storage,this.storageKey,a),n)throw n;if(!t||!t.session||!t.user){let e=new R;return this._returnResult({data:{user:null,session:null,redirectType:null},error:e})}return t.session&&(await this._saveSession(t.session),await this._notifyAllSubscribers(s===`recovery`?`PASSWORD_RECOVERY`:`SIGNED_IN`,t.session)),this._returnResult({data:Object.assign(Object.assign({},t),{redirectType:s??null}),error:n})}catch(e){if(await G(this.storage,this.storageKey,a),P(e))return this._returnResult({data:{user:null,session:null,redirectType:null},error:e});throw e}}async signInWithIdToken(e){try{let{options:t,provider:n,token:r,access_token:i,nonce:a}=e,{data:o,error:s}=await J(this.fetch,`POST`,`${this.url}/token?grant_type=id_token`,{headers:this.headers,body:{provider:n,id_token:r,access_token:i,nonce:a,gotrue_meta_security:{captcha_token:t?.captchaToken}},xform:Y});if(s)return this._returnResult({data:{user:null,session:null},error:s});if(!o||!o.session||!o.user){let e=new R;return this._returnResult({data:{user:null,session:null},error:e})}return o.session&&(await this._saveSession(o.session),await this._notifyAllSubscribers(`SIGNED_IN`,o.session)),this._returnResult({data:o,error:s})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithOtp(e){let t=null;try{if(`email`in e){let{email:n,options:r}=e,i=null,a=null;this.flowType===`pkce`&&([i,a,t]=await this._getCodeChallengeAndMethod());let{error:o}=await J(this.fetch,`POST`,`${this.url}/otp`,{headers:this.headers,body:{email:n,data:r?.data??{},create_user:r?.shouldCreateUser??!0,gotrue_meta_security:{captcha_token:r?.captchaToken},code_challenge:i,code_challenge_method:a},redirectTo:this._maybeAppendFlowIdToRedirect(r?.emailRedirectTo,t)});return this._returnResult({data:{user:null,session:null},error:o})}if(`phone`in e){let{phone:t,options:n}=e,{data:r,error:i}=await J(this.fetch,`POST`,`${this.url}/otp`,{headers:this.headers,body:{phone:t,data:n?.data??{},create_user:n?.shouldCreateUser??!0,gotrue_meta_security:{captcha_token:n?.captchaToken},channel:n?.channel??`sms`}});return this._returnResult({data:{user:null,session:null,messageId:r?.message_id},error:i})}throw new er(`You must provide either an email or phone number.`)}catch(e){if(await G(this.storage,this.storageKey,t),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async verifyOtp(e){try{let t,n;`options`in e&&(t=e.options?.redirectTo,n=e.options?.captchaToken);let{data:r,error:i}=await J(this.fetch,`POST`,`${this.url}/verify`,{headers:this.headers,body:Object.assign(Object.assign({},e),{gotrue_meta_security:{captcha_token:n}}),redirectTo:t,xform:Y});if(i)throw i;if(!r)throw Error(`An error occurred on token verification.`);let a=r.session,o=r.user;return a?.access_token&&(await this._saveSession(a),await this._notifyAllSubscribers(e.type==`recovery`?`PASSWORD_RECOVERY`:`SIGNED_IN`,a)),this._returnResult({data:{user:o,session:a},error:null})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithSSO(e){let t=null;try{let n=null,r=null;this.flowType===`pkce`&&([n,r,t]=await this._getCodeChallengeAndMethod());let i=await J(this.fetch,`POST`,`${this.url}/sso`,{body:Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({},`providerId`in e?{provider_id:e.providerId}:null),`domain`in e?{domain:e.domain}:null),{redirect_to:this._maybeAppendFlowIdToRedirect(e.options?.redirectTo,t)}),e?.options?.captchaToken?{gotrue_meta_security:{captcha_token:e.options.captchaToken}}:null),{skip_http_redirect:!0,code_challenge:n,code_challenge_method:r}),headers:this.headers,xform:li});return i.data?.url&&B()&&!e.options?.skipBrowserRedirect&&window.location.assign(i.data.url),this._returnResult(i)}catch(e){if(await G(this.storage,this.storageKey,t),P(e))return this._returnResult({data:null,error:e});throw e}}async reauthenticate(){return await this.initializePromise,this.lock==null?await this._reauthenticate():await this._acquireLock(this.lockAcquireTimeout,async()=>await this._reauthenticate())}async _reauthenticate(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)throw n;if(!t)throw new L;let{error:r}=await J(this.fetch,`GET`,`${this.url}/reauthenticate`,{headers:this.headers,jwt:t.access_token});return this._returnResult({data:{user:null,session:null},error:r})})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async resend(e){let t=null;try{let n=`${this.url}/resend`;if(`email`in e){let{email:r,type:i,options:a}=e,o=null,s=null;this.flowType===`pkce`&&([o,s,t]=await this._getCodeChallengeAndMethod());let{error:c}=await J(this.fetch,`POST`,n,{headers:this.headers,body:{email:r,type:i,gotrue_meta_security:{captcha_token:a?.captchaToken},code_challenge:o,code_challenge_method:s},redirectTo:this._maybeAppendFlowIdToRedirect(a?.emailRedirectTo,t)});return c&&await G(this.storage,this.storageKey,t),this._returnResult({data:{user:null,session:null},error:c})}else if(`phone`in e){let{phone:t,type:r,options:i}=e,{data:a,error:o}=await J(this.fetch,`POST`,n,{headers:this.headers,body:{phone:t,type:r,gotrue_meta_security:{captcha_token:i?.captchaToken}}});return this._returnResult({data:{user:null,session:null,messageId:a?.message_id},error:o})}throw new er(`You must provide either an email or phone number and a type`)}catch(e){if(await G(this.storage,this.storageKey,t),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async getSession(){return await this.initializePromise,this.lock==null?await this._useSession(async e=>e):await this._acquireLock(this.lockAcquireTimeout,async()=>this._useSession(async e=>e))}async _acquireLock(e,t){this._debug(`#_acquireLock`,`begin`,e);try{if(this.lockAcquired){let e=this.pendingInLock.length?this.pendingInLock[this.pendingInLock.length-1]:Promise.resolve(),n=(async()=>(await e,await t()))();return this.pendingInLock.push((async()=>{try{await n}catch{}})()),n}return await this.lock(`lock:${this.storageKey}`,e,async()=>{this._debug(`#_acquireLock`,`lock acquired for storage key`,this.storageKey);try{this.lockAcquired=!0;let e=t();for(this.pendingInLock.push((async()=>{try{await e}catch{}})()),await e;this.pendingInLock.length;){let e=[...this.pendingInLock];await Promise.all(e),this.pendingInLock.splice(0,e.length)}return await e}finally{this._debug(`#_acquireLock`,`lock released for storage key`,this.storageKey),this.lockAcquired=!1}})}finally{this._debug(`#_acquireLock`,`end`)}}async _useSession(e){this._debug(`#_useSession`,`begin`);try{return await e(await this.__loadSession())}finally{this._debug(`#_useSession`,`end`)}}async __loadSession(){this._debug(`#__loadSession()`,`begin`),this.lock!=null&&!this.lockAcquired&&this._debug(`#__loadSession()`,`used outside of an acquired lock!`,Error().stack);try{let e=null,t=await U(this.storage,this.storageKey);if(this._debug(`#getSession()`,`session from storage`,t),t!==null&&(this._isValidSession(t)?e=t:(this._debug(`#getSession()`,`session from storage is not valid`),await this._removeSession())),!e)return{data:{session:null},error:null};let n=e.expires_at?e.expires_at*1e3-Date.now()<Gn:!1;if(this._debug(`#__loadSession()`,`session has${n?``:` not`} expired`,`expires_at`,e.expires_at),!n)return{data:{session:await this._hydrateSessionUser(e)},error:null};let{data:r,error:i}=await this._callRefreshToken(e.refresh_token);if(i){let e=await U(this.storage,this.storageKey);return e&&this._isValidSession(e)&&e.expires_at&&e.expires_at*1e3>Date.now()?this._returnResult({data:{session:await this._hydrateSessionUser(e)},error:null}):this._returnResult({data:{session:null},error:i})}return this._returnResult({data:{session:r},error:null})}finally{this._debug(`#__loadSession()`,`end`)}}async _hydrateSessionUser(e){if(this.userStorage){let t=await U(this.userStorage,this.storageKey+`-user`);e.user=t?.user?t.user:ti()}if(this.storage.isServer&&e.user&&!e.user.__isUserNotAvailableProxy){let t={value:this.suppressGetSessionWarning};e.user=ni(e.user,t),t.value&&(this.suppressGetSessionWarning=!0)}return e}async getUser(e){if(e)return await this._getUser(e);await this.initializePromise;let t;return t=this.lock==null?await this._getUser():await this._acquireLock(this.lockAcquireTimeout,async()=>await this._getUser()),t.data.user&&(this.suppressGetSessionWarning=!0),t}async _getUser(e){try{return e?await J(this.fetch,`GET`,`${this.url}/user`,{headers:this.headers,jwt:e,xform:X}):await this._useSession(async e=>{let{data:t,error:n}=e;if(n)throw n;return!t.session?.access_token&&!this.hasCustomAuthorizationHeader?{data:{user:null},error:new L}:await J(this.fetch,`GET`,`${this.url}/user`,{headers:this.headers,jwt:t.session?.access_token??void 0,xform:X})})}catch(e){if(P(e))return $n(e)&&await this._removeSession(),this._returnResult({data:{user:null},error:e});throw e}}async updateUser(e,t={}){return await this.initializePromise,this.lock==null?await this._updateUser(e,t):await this._acquireLock(this.lockAcquireTimeout,async()=>await this._updateUser(e,t))}async _updateUser(e,t={}){let n=null;try{return await this._useSession(async r=>{let{data:i,error:a}=r;if(a)throw a;if(!i.session)throw new L;let o=i.session,s=null,c=null;this.flowType===`pkce`&&e.email!=null&&([s,c,n]=await this._getCodeChallengeAndMethod());let{data:l,error:u}=await J(this.fetch,`PUT`,`${this.url}/user`,{headers:this.headers,redirectTo:this._maybeAppendFlowIdToRedirect(t?.emailRedirectTo,n),body:Object.assign(Object.assign({},e),{code_challenge:s,code_challenge_method:c}),jwt:o.access_token,xform:X});if(u)throw u;return o.user=l.user,await this._saveSession(o),await this._notifyAllSubscribers(`USER_UPDATED`,o),this._returnResult({data:{user:o.user},error:null})})}catch(e){if(await G(this.storage,this.storageKey,n),P(e))return this._returnResult({data:{user:null},error:e});throw e}}async setSession(e){return await this.initializePromise,this.lock==null?await this._setSession(e):await this._acquireLock(this.lockAcquireTimeout,async()=>await this._setSession(e))}async _setSession(e){try{if(!e.access_token||!e.refresh_token)throw new L;let t=Date.now()/1e3,n=t,r=!0,i=null,{payload:a}=jr(e.access_token);if(a.exp&&(n=a.exp,r=n<=t),r){let{data:t,error:n}=await this._callRefreshToken(e.refresh_token);if(n)return this._returnResult({data:{user:null,session:null},error:n});if(!t)return{data:{user:null,session:null},error:null};i=t}else{let{data:r,error:a}=await this._getUser(e.access_token);if(a)return this._returnResult({data:{user:null,session:null},error:a});i={access_token:e.access_token,refresh_token:e.refresh_token,user:r.user,token_type:`bearer`,expires_in:n-t,expires_at:n},await this._saveSession(i),await this._notifyAllSubscribers(`SIGNED_IN`,i)}return this._returnResult({data:{user:i.user,session:i},error:null})}catch(e){if(P(e))return this._returnResult({data:{session:null,user:null},error:e});throw e}}async refreshSession(e){return await this.initializePromise,this.lock==null?await this._refreshSession(e):await this._acquireLock(this.lockAcquireTimeout,async()=>await this._refreshSession(e))}async _refreshSession(e){try{return await this._useSession(async t=>{if(!e){let{data:n,error:r}=t;if(r)throw r;e=n.session??void 0}if(!e?.refresh_token)throw new L;let{data:n,error:r}=await this._callRefreshToken(e.refresh_token);return r?this._returnResult({data:{user:null,session:null},error:r}):n?this._returnResult({data:{user:n.user,session:n},error:null}):this._returnResult({data:{user:null,session:null},error:null})})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async _getSessionFromURL(e,t){try{if(!B())throw new tr(`No browser detected.`);if(e.error||e.error_description||e.error_code)throw new tr(e.error_description||`Error in URL with unspecified error_description`,{error:e.error||`unspecified_error`,code:e.error_code||`unspecified_code`});switch(t){case`implicit`:if(this.flowType===`pkce`)throw new rr(`Not a valid PKCE flow url.`);break;case`pkce`:if(this.flowType===`implicit`)throw new tr(`Not a valid implicit grant flow url.`);break;default:}if(t===`pkce`){if(this._debug(`#_initialize()`,`begin`,`is PKCE flow`,!0),!e.code)throw new rr(`No code detected.`);let{data:t,error:n}=await this._exchangeCodeForSession(e.code,{flowId:e[N]});if(n)throw n;let r=new URL(window.location.href);return r.searchParams.delete(`code`),r.searchParams.delete(N),window.history.replaceState(window.history.state,``,r.toString()),{data:{session:t.session,redirectType:t.redirectType??null},error:null}}let{provider_token:n,provider_refresh_token:r,access_token:i,refresh_token:a,expires_in:o,expires_at:s,token_type:c}=e;if(!i||!o||!a||!c)throw new tr(`No session defined in URL`);let l=Math.round(Date.now()/1e3),u=parseInt(o),d=l+u;s&&(d=parseInt(s));let f=d-l;f*1e3<=M&&console.warn(`@supabase/gotrue-js: Session as retrieved from URL expires in ${f}s, should have been closer to ${u}s`);let p=d-u;l-p>=120?console.warn(`@supabase/gotrue-js: Session as retrieved from URL was issued over 120s ago, URL could be stale`,p,d,l):l-p<0&&console.warn(`@supabase/gotrue-js: Session as retrieved from URL was issued in the future? Check the device clock for skew`,p,d,l);let{data:m,error:h}=await this._getUser(i);if(h)throw h;let g={provider_token:n,provider_refresh_token:r,access_token:i,expires_in:u,expires_at:d,refresh_token:a,token_type:c,user:m.user};return window.location.hash=``,this._debug(`#_getSessionFromURL()`,`clearing window.location.hash`),this._returnResult({data:{session:g,redirectType:e.type},error:null})}catch(e){if(P(e))return this._returnResult({data:{session:null,redirectType:null},error:e});throw e}}_isImplicitGrantCallback(e){return typeof this.detectSessionInUrl==`function`?this.detectSessionInUrl(new URL(window.location.href),e):!!(e.access_token||e.error||e.error_description||e.error_code)}async _isPKCECallback(e){if(!e.code)return!1;let t=zr(e[N]);return t&&await U(this.storage,Vr(this.storageKey,t))?!0:!!await U(this.storage,`${this.storageKey}-code-verifier`)}async signOut(e={scope:`global`}){return await this.initializePromise,this.lock==null?await this._signOut(e):await this._acquireLock(this.lockAcquireTimeout,async()=>await this._signOut(e))}async _signOut({scope:e}={scope:`global`}){return await this._useSession(async t=>{let n=async()=>{await this._removeSession()},{data:r,error:i}=t;if(i&&!$n(i))return this._returnResult({error:i});let a=r.session?.access_token;if(a){let{error:t}=await this.admin.signOut(a,e);if(t&&!(Qn(t)&&(t.status===404||t.status===401||t.status===403)||$n(t)))return e!==`others`&&await n(),this._returnResult({error:t})}return e!==`others`&&await n(),this._returnResult({error:null})})}onAuthStateChange(e){let t=Tr(),n={id:t,callback:e,unsubscribe:()=>{this._debug(`#unsubscribe()`,`state change callback with id removed`,t),this.stateChangeEmitters.delete(t)}};return this._debug(`#onAuthStateChange()`,`registered callback with id`,t),this.stateChangeEmitters.set(t,n),(async()=>{await this.initializePromise,this.lock==null?await this._emitInitialSession(t):await this._acquireLock(this.lockAcquireTimeout,async()=>{this._emitInitialSession(t)})})(),{data:{subscription:n}}}async _emitInitialSession(e){return await this._useSession(async t=>{try{let{data:{session:n},error:r}=t;if(r)throw r;await this.stateChangeEmitters.get(e)?.callback(`INITIAL_SESSION`,n),this._debug(`INITIAL_SESSION`,`callback id`,e,`session`,n)}catch(t){if(await this.stateChangeEmitters.get(e)?.callback(`INITIAL_SESSION`,null),this._debug(`INITIAL_SESSION`,`callback id`,e,`error`,t),lr(t))return;$n(t)||sr(t)||Qn(t)&&(t.code===`refresh_token_not_found`||t.code===`refresh_token_already_used`||t.code===`session_expired`)?console.warn(t):console.error(t)}})}async resetPasswordForEmail(e,t={}){let n=null,r=null,i=null;this.flowType===`pkce`&&([n,r,i]=await this._getCodeChallengeAndMethod(!0));try{return await J(this.fetch,`POST`,`${this.url}/recover`,{body:{email:e,code_challenge:n,code_challenge_method:r,gotrue_meta_security:{captcha_token:t.captchaToken}},headers:this.headers,redirectTo:this._maybeAppendFlowIdToRedirect(t.redirectTo,i)})}catch(e){if(await G(this.storage,this.storageKey,i),P(e))return this._returnResult({data:null,error:e});throw e}}async getUserIdentities(){try{let{data:e,error:t}=await this.getUser();if(t)throw t;return this._returnResult({data:{identities:e.user.identities??[]},error:null})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async linkIdentity(e){return`token`in e?this.linkIdentityIdToken(e):this.linkIdentityOAuth(e)}async linkIdentityOAuth(e){let t=null;try{let{data:n,error:r}=await this._useSession(async n=>{let{data:r,error:i}=n;if(i)throw i;let{url:a,flowId:o}=await this._getUrlForProvider(`${this.url}/user/identities/authorize`,e.provider,{redirectTo:e.options?.redirectTo,scopes:e.options?.scopes,queryParams:e.options?.queryParams,skipBrowserRedirect:!0});return t=o,await J(this.fetch,`GET`,a,{headers:this.headers,jwt:r.session?.access_token??void 0})});if(r)throw r;return B()&&!e.options?.skipBrowserRedirect&&window.location.assign(n?.url),this._returnResult({data:{provider:e.provider,url:n?.url,flowId:t},error:null})}catch(n){if(P(n))return this._returnResult({data:{provider:e.provider,url:null,flowId:t},error:n});throw n}}async linkIdentityIdToken(e){return await this._useSession(async t=>{try{let{error:n,data:{session:r}}=t;if(n)throw n;let{options:i,provider:a,token:o,access_token:s,nonce:c}=e,{data:l,error:u}=await J(this.fetch,`POST`,`${this.url}/token?grant_type=id_token`,{headers:this.headers,jwt:r?.access_token??void 0,body:{provider:a,id_token:o,access_token:s,nonce:c,link_identity:!0,gotrue_meta_security:{captcha_token:i?.captchaToken}},xform:Y});return u?this._returnResult({data:{user:null,session:null},error:u}):!l||!l.session||!l.user?this._returnResult({data:{user:null,session:null},error:new R}):(l.session&&(await this._saveSession(l.session),await this._notifyAllSubscribers(`USER_UPDATED`,l.session)),this._returnResult({data:l,error:u}))}catch(e){if(await G(this.storage,this.storageKey,null),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}})}async unlinkIdentity(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)throw r;return await J(this.fetch,`DELETE`,`${this.url}/user/identities/${e.identity_id}`,{headers:this.headers,jwt:n.session?.access_token??void 0})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _refreshAccessToken(e){let t=`#_refreshAccessToken()`;this._debug(t,`begin`);try{let n=Date.now();return await Nr(async n=>(n>0&&await Mr(200*2**(n-1)),this._debug(t,`refreshing attempt`,n),await J(this.fetch,`POST`,`${this.url}/token?grant_type=refresh_token`,{body:{refresh_token:e},headers:this.headers,xform:Y})),(e,t)=>{let r=200*2**e;return t&&sr(t)&&Date.now()+r-n<M})}catch(e){if(this._debug(t,`error`,e),P(e))return this._returnResult({data:{session:null,user:null},error:e});throw e}finally{this._debug(t,`end`)}}_isValidSession(e){return typeof e==`object`&&!!e&&`access_token`in e&&`refresh_token`in e&&`expires_at`in e}async _handleProviderSignIn(e,t){let{url:n,flowId:r}=await this._getUrlForProvider(`${this.url}/authorize`,e,{redirectTo:t.redirectTo,scopes:t.scopes,queryParams:t.queryParams});return this._debug(`#_handleProviderSignIn()`,`provider`,e,`options`,t,`url`,n),B()&&!t.skipBrowserRedirect&&window.location.assign(n),{data:{provider:e,url:n,flowId:r},error:null}}async _recoverAndRefresh(){let e=`#_recoverAndRefresh()`;this._debug(e,`begin`);try{let t=await U(this.storage,this.storageKey);if(t&&this.userStorage){let e=await U(this.userStorage,this.storageKey+`-user`);!this.storage.isServer&&Object.is(this.storage,this.userStorage)&&!e&&(e={user:t.user},await H(this.userStorage,this.storageKey+`-user`,e)),t.user=e?.user??ti()}else if(t&&!t.user&&!t.user){let e=await U(this.storage,this.storageKey+`-user`);e&&e?.user?(t.user=e.user,await W(this.storage,this.storageKey+`-user`),await H(this.storage,this.storageKey,t)):t.user=ti()}if(this._debug(e,`session from storage`,t),!this._isValidSession(t)){this._debug(e,`session is not valid`),t!==null&&await this._removeSession();return}let n=(t.expires_at??1/0)*1e3-Date.now()<Gn;if(this._debug(e,`session has${n?``:` not`} expired with margin of ${Gn}s`),n){if(this.autoRefreshToken&&t.refresh_token){let{error:n}=await this._callRefreshToken(t.refresh_token);n&&(lr(n)?this._debug(e,`refresh discarded by commit guard`,n):this._debug(e,`refresh failed`,n))}}else if(t.user&&t.user.__isUserNotAvailableProxy===!0)try{let{data:n,error:r}=await this._getUser(t.access_token);!r&&n?.user?(t.user=n.user,await this._saveSession(t),await this._notifyAllSubscribers(`SIGNED_IN`,t)):this._debug(e,`could not get user data, skipping SIGNED_IN notification`)}catch(t){console.error(`Error getting user data:`,t),this._debug(e,`error getting user data, skipping SIGNED_IN notification`,t)}else await this._notifyAllSubscribers(`SIGNED_IN`,t)}catch(t){this._debug(e,`error`,t),sr(t)?console.warn(t):console.error(t);return}finally{this._debug(e,`end`)}}async _callRefreshToken(e){var t,n;if(!e)throw new L;if(this.refreshingDeferred)return this.refreshingDeferred.promise;if(this.lastRefreshFailure&&this.lastRefreshFailure.refreshToken===e&&Date.now()<this.lastRefreshFailure.expiresAt)return this._debug(`#_callRefreshToken()`,`returning cached failure (cooldown active)`),this.lastRefreshFailure.result;let r=`#_callRefreshToken()`;this._debug(r,`begin`);try{this.refreshingDeferred=new Ar,this.refreshingDeferred.promise.then(void 0,()=>{});let t=await U(this.storage,this.storageKey),{data:n,error:i}=await this._refreshAccessToken(e);if(i)throw i;if(!n.session)throw new L;let a=await U(this.storage,this.storageKey);if(t!==null&&(a===null||a.refresh_token!==t.refresh_token)){this._debug(r,`commit guard: storage changed since refresh started, discarding rotated tokens`,{startedWith:`present`,nowHolds:a?`replaced`:`cleared`});let e={data:null,error:new cr};return this.refreshingDeferred.resolve(e),e}let o=this._sessionRemovalEpoch;if(await this._saveSession(n.session),this._sessionRemovalEpoch!==o){this._debug(r,`commit guard (post-save): _removeSession ran during _saveSession, undoing write`),await W(this.storage,this.storageKey),this.userStorage&&await W(this.userStorage,this.storageKey+`-user`);let e={data:null,error:new cr};return this.refreshingDeferred.resolve(e),e}await this._notifyAllSubscribers(`TOKEN_REFRESHED`,n.session);let s={data:n.session,error:null};return this.lastRefreshFailure=null,this.refreshingDeferred.resolve(s),s}catch(i){if(this._debug(r,`error`,i),P(i)){let n={data:null,error:i};if(!sr(i)){let e=await U(this.storage,this.storageKey);e?.expires_at&&e.expires_at*1e3>Date.now()?this._debug(r,`proactive refresh failed, access token still valid — preserving session`):await this._removeSession()}return this.lastRefreshFailure={refreshToken:e,result:n,expiresAt:Date.now()+6e4},(t=this.refreshingDeferred)==null||t.resolve(n),n}throw(n=this.refreshingDeferred)==null||n.reject(i),i}finally{this.refreshingDeferred=null,this._debug(r,`end`)}}async _notifyAllSubscribers(e,t,n=!0){if(this._pendingInitNotifications!==null&&n){this._pendingInitNotifications.push({event:e,session:t,broadcast:n});return}let r=`#_notifyAllSubscribers(${e})`;this._debug(r,`begin`,t,`broadcast = ${n}`);try{this.broadcastChannel&&n&&this.broadcastChannel.postMessage({event:e,session:t});let r=[],i=Array.from(this.stateChangeEmitters.values()).map(async n=>{try{await n.callback(e,t)}catch(e){r.push(e)}});if(await Promise.all(i),r.length>0){for(let e=0;e<r.length;e+=1)console.error(r[e]);throw r[0]}}finally{this._debug(r,`end`)}}async _saveSession(e){this._debug(`#_saveSession()`,e),this.suppressGetSessionWarning=!0;let t=Object.assign({},e),n=t.user&&t.user.__isUserNotAvailableProxy===!0;if(this.userStorage){!n&&t.user&&await H(this.userStorage,this.storageKey+`-user`,{user:t.user});let e=Object.assign({},t);delete e.user;let r=ri(e);await H(this.storage,this.storageKey,r)}else{let e=ri(t);await H(this.storage,this.storageKey,e)}}async _removeSession(){this._sessionRemovalEpoch+=1,this._debug(`#_removeSession()`),this.lastRefreshFailure=null,this.suppressGetSessionWarning=!1,await W(this.storage,this.storageKey),await Kr(this.storage,this.storageKey),await W(this.storage,this.storageKey+`-user`),this.userStorage&&await W(this.userStorage,this.storageKey+`-user`),await this._notifyAllSubscribers(`SIGNED_OUT`,null)}_removeVisibilityChangedCallback(){this._debug(`#_removeVisibilityChangedCallback()`);let e=this.visibilityChangedCallback;this.visibilityChangedCallback=null;try{e&&B()&&window!=null&&window.removeEventListener&&window.removeEventListener(`visibilitychange`,e)}catch(e){console.error(`removing visibilitychange callback failed`,e)}}async _startAutoRefresh(){await this._stopAutoRefresh(),this._debug(`#_startAutoRefresh()`);let e=setInterval(()=>this._autoRefreshTokenTick(),M);this.autoRefreshTicker=e,e&&typeof e==`object`&&typeof e.unref==`function`?e.unref():typeof Deno<`u`&&typeof Deno.unrefTimer==`function`&&Deno.unrefTimer(e);let t=setTimeout(async()=>{await this.initializePromise,await this._autoRefreshTokenTick()},0);this.autoRefreshTickTimeout=t,t&&typeof t==`object`&&typeof t.unref==`function`?t.unref():typeof Deno<`u`&&typeof Deno.unrefTimer==`function`&&Deno.unrefTimer(t)}async _stopAutoRefresh(){this._debug(`#_stopAutoRefresh()`);let e=this.autoRefreshTicker;this.autoRefreshTicker=null,e&&clearInterval(e);let t=this.autoRefreshTickTimeout;this.autoRefreshTickTimeout=null,t&&clearTimeout(t)}async startAutoRefresh(){this._removeVisibilityChangedCallback(),await this._startAutoRefresh()}async stopAutoRefresh(){this._removeVisibilityChangedCallback(),await this._stopAutoRefresh()}async dispose(){var e;this._removeVisibilityChangedCallback(),await this._stopAutoRefresh(),(e=this.broadcastChannel)==null||e.close(),this.broadcastChannel=null,this.stateChangeEmitters.clear()}async _autoRefreshTokenTick(){if(this._debug(`#_autoRefreshTokenTick()`,`begin`),this.lock!=null){try{await this._acquireLock(0,async()=>{try{let e=Date.now();try{return await this._useSession(async t=>{let{data:{session:n}}=t;if(!n||!n.refresh_token||!n.expires_at){this._debug(`#_autoRefreshTokenTick()`,`no session`);return}let r=Math.floor((n.expires_at*1e3-e)/M);this._debug(`#_autoRefreshTokenTick()`,`access token expires in ${r} ticks, a tick lasts ${M}ms, refresh threshold is 3 ticks`),r<=3&&await this._callRefreshToken(n.refresh_token)})}catch(e){console.error(`Auto refresh tick failed with error. This is likely a transient error.`,e)}}finally{this._debug(`#_autoRefreshTokenTick()`,`end`)}})}catch(e){if(e instanceof gi)this._debug(`auto refresh token tick lock not available`);else throw e}return}if(this.refreshingDeferred!==null){this._debug(`#_autoRefreshTokenTick()`,`refresh already in flight, skipping`);return}try{let e=Date.now();try{await this._useSession(async t=>{let{data:{session:n}}=t;if(!n||!n.refresh_token||!n.expires_at){this._debug(`#_autoRefreshTokenTick()`,`no session`);return}let r=Math.floor((n.expires_at*1e3-e)/M);this._debug(`#_autoRefreshTokenTick()`,`access token expires in ${r} ticks, a tick lasts ${M}ms, refresh threshold is 3 ticks`),r<=3&&await this._callRefreshToken(n.refresh_token)})}catch(e){console.error(`Auto refresh tick failed with error. This is likely a transient error.`,e)}}finally{this._debug(`#_autoRefreshTokenTick()`,`end`)}}async _handleVisibilityChange(){if(this._debug(`#_handleVisibilityChange()`),!B()||!(window!=null&&window.addEventListener))return this.autoRefreshToken&&this.startAutoRefresh(),!1;try{this.visibilityChangedCallback=async()=>{try{await this._onVisibilityChanged(!1)}catch(e){this._debug(`#visibilityChangedCallback`,`error`,e)}},window==null||window.addEventListener(`visibilitychange`,this.visibilityChangedCallback),await this._onVisibilityChanged(!0)}catch(e){console.error(`_handleVisibilityChange`,e)}}async _onVisibilityChanged(e){let t=`#_onVisibilityChanged(${e})`;if(this._debug(t,`visibilityState`,document.visibilityState),document.visibilityState===`visible`){if(this.autoRefreshToken&&this._startAutoRefresh(),!e)if(await this.initializePromise,this.lock!=null)await this._acquireLock(this.lockAcquireTimeout,async()=>{if(document.visibilityState!==`visible`){this._debug(t,`acquired the lock to recover the session, but the browser visibilityState is no longer visible, aborting`);return}await this._recoverAndRefresh()});else{if(document.visibilityState!==`visible`){this._debug(t,`visibilityState is no longer visible, skipping recovery`);return}await this._recoverAndRefresh()}}else document.visibilityState===`hidden`&&this.autoRefreshToken&&this._stopAutoRefresh()}async _getUrlForProvider(e,t,n){let r=n?.redirectTo,i=null,a=null,o=null;this.flowType===`pkce`&&([i,a,o]=await this._getCodeChallengeAndMethod(),r=this._maybeAppendFlowIdToRedirect(r,o));let s=[`provider=${encodeURIComponent(t)}`];if(r&&s.push(`redirect_to=${encodeURIComponent(r)}`),n?.scopes&&s.push(`scopes=${encodeURIComponent(n.scopes)}`),i!=null&&a!=null){let e=new URLSearchParams({code_challenge:`${encodeURIComponent(i)}`,code_challenge_method:`${encodeURIComponent(a)}`});s.push(e.toString())}if(n?.queryParams){let e=new URLSearchParams(n.queryParams);s.push(e.toString())}return n?.skipBrowserRedirect&&s.push(`skip_http_redirect=${n.skipBrowserRedirect}`),{url:`${e}?${s.join(`&`)}`,flowId:o}}_maybeAppendFlowIdToRedirect(e,t){return!e||!t||!this.experimental.appendPkceFlowIdToRedirects?e??void 0:qr(e,t)}async _getCodeChallengeAndMethod(e=!1){return Jr(this.storage,this.storageKey,e,e=>this._debug(`#_getCodeChallengeAndMethod()`,`evicted oldest pending PKCE verifier slot`,e))}async _unenroll(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;return r?this._returnResult({data:null,error:r}):await J(this.fetch,`DELETE`,`${this.url}/factors/${e.factorId}`,{headers:this.headers,jwt:n?.session?.access_token})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _enroll(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=Object.assign({friendly_name:e.friendlyName,factor_type:e.factorType},e.factorType===`phone`?{phone:e.phone}:e.factorType===`totp`?{issuer:e.issuer}:{}),{data:a,error:o}=await J(this.fetch,`POST`,`${this.url}/factors`,{body:i,headers:this.headers,jwt:n?.session?.access_token});return o?this._returnResult({data:null,error:o}):(e.factorType===`totp`&&a.type===`totp`&&a?.totp?.qr_code&&(a.totp.qr_code=`data:image/svg+xml;utf-8,${a.totp.qr_code}`),this._returnResult({data:a,error:null}))})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verify(e){let t=async()=>{try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=Object.assign({challenge_id:e.challengeId},`webauthn`in e?{webauthn:Object.assign(Object.assign({},e.webauthn),{credential_response:e.webauthn.type===`create`?Ni(e.webauthn.credential_response):Pi(e.webauthn.credential_response)})}:{code:e.code}),{data:a,error:o}=await J(this.fetch,`POST`,`${this.url}/factors/${e.factorId}/verify`,{body:i,headers:this.headers,jwt:n?.session?.access_token});return o?this._returnResult({data:null,error:o}):(await this._saveSession(Object.assign({expires_at:Math.round(Date.now()/1e3)+a.expires_in},a)),await this._notifyAllSubscribers(`MFA_CHALLENGE_VERIFIED`,a),this._returnResult({data:a,error:o}))})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}};return this.lock==null?t():this._acquireLock(this.lockAcquireTimeout,t)}async _challenge(e){let t=async()=>{try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=await J(this.fetch,`POST`,`${this.url}/factors/${e.factorId}/challenge`,{body:e,headers:this.headers,jwt:n?.session?.access_token});if(i.error)return i;let{data:a}=i;if(a.type!==`webauthn`)return{data:a,error:null};switch(a.webauthn.type){case`create`:return{data:Object.assign(Object.assign({},a),{webauthn:Object.assign(Object.assign({},a.webauthn),{credential_options:Object.assign(Object.assign({},a.webauthn.credential_options),{publicKey:ji(a.webauthn.credential_options.publicKey)})})}),error:null};case`request`:return{data:Object.assign(Object.assign({},a),{webauthn:Object.assign(Object.assign({},a.webauthn),{credential_options:Object.assign(Object.assign({},a.webauthn.credential_options),{publicKey:Mi(a.webauthn.credential_options.publicKey)})})}),error:null}}})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}};return this.lock==null?t():this._acquireLock(this.lockAcquireTimeout,t)}async _challengeAndVerify(e){let{data:t,error:n}=await this._challenge({factorId:e.factorId});return n?this._returnResult({data:null,error:n}):await this._verify({factorId:e.factorId,challengeId:t.id,code:e.code})}async _listFactors(){let{data:{user:e},error:t}=await this.getUser();if(t)return{data:null,error:t};let n={all:[],phone:[],totp:[],webauthn:[],recovery_code:[]};for(let t of e?.factors??[])n.all.push(t),t.status===`verified`&&t.factor_type in n&&Array.isArray(n[t.factor_type])&&n[t.factor_type].push(t);return{data:n,error:null}}async _getAuthenticatorAssuranceLevel(e){if(e)try{let{payload:t}=jr(e),n=null;t.aal&&(n=t.aal);let r=n,{data:{user:i},error:a}=await this.getUser(e);if(a)return this._returnResult({data:null,error:a});((i?.factors)?.filter(e=>e.status===`verified`)??[]).length>0&&(r=`aal2`);let o=t.amr||[];return{data:{currentLevel:n,nextLevel:r,currentAuthenticationMethods:o},error:null}}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}let{data:{session:t},error:n}=await this.getSession();if(n)return this._returnResult({data:null,error:n});if(!t)return{data:{currentLevel:null,nextLevel:null,currentAuthenticationMethods:[]},error:null};let{payload:r}=jr(t.access_token),i=null;r.aal&&(i=r.aal);let a=i;(t.user.factors?.filter(e=>e.status===`verified`)??[]).length>0&&(a=`aal2`);let o=r.amr||[];return{data:{currentLevel:i,nextLevel:a,currentAuthenticationMethods:o},error:null}}async _getRecoveryCodesStatus(){ei(this.experimental);try{return await this._useSession(async e=>{let{data:t,error:n}=e;if(n)return this._returnResult({data:null,error:n});let{data:r,error:i}=await J(this.fetch,`GET`,`${this.url}/factors/recovery-codes`,{headers:this.headers,jwt:t?.session?.access_token});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _generateRecoveryCodes(e){ei(this.experimental);try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let{data:i,error:a}=await J(this.fetch,`POST`,`${this.url}/factors/recovery-codes`,{body:e?.friendlyName?{friendly_name:e.friendlyName}:void 0,headers:this.headers,jwt:n?.session?.access_token});return a?this._returnResult({data:null,error:a}):this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verifyRecoveryCode(e){ei(this.experimental);let t=async()=>{try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let{data:i,error:a}=await J(this.fetch,`POST`,`${this.url}/factors/recovery-codes/verify`,{body:{code:e.code},headers:this.headers,jwt:n?.session?.access_token});if(a)return this._returnResult({data:null,error:a});let o=Object.assign({expires_at:wr(i.expires_in)},i);return await this._saveSession(o),await this._notifyAllSubscribers(`MFA_CHALLENGE_VERIFIED`,o),this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}};return this.lock==null?t():this._acquireLock(this.lockAcquireTimeout,t)}async _regenerateRecoveryCodes(){ei(this.experimental);try{return await this._useSession(async e=>{let{data:t,error:n}=e;if(n)return this._returnResult({data:null,error:n});let{data:r,error:i}=await J(this.fetch,`POST`,`${this.url}/factors/recovery-codes/regenerate`,{headers:this.headers,jwt:t?.session?.access_token});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _unenrollRecoveryCodes(){ei(this.experimental);try{return await this._useSession(async e=>{let{data:t,error:n}=e;if(n)return this._returnResult({data:null,error:n});let{data:r,error:i}=await J(this.fetch,`DELETE`,`${this.url}/factors/recovery-codes`,{headers:this.headers,jwt:t?.session?.access_token});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _getAuthorizationDetails(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;return r?this._returnResult({data:null,error:r}):n?await J(this.fetch,`GET`,`${this.url}/oauth/authorizations/${e}`,{headers:this.headers,jwt:n.access_token,xform:e=>({data:e,error:null})}):this._returnResult({data:null,error:new L})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _approveAuthorization(e,t){try{return await this._useSession(async n=>{let{data:{session:r},error:i}=n;if(i)return this._returnResult({data:null,error:i});if(!r)return this._returnResult({data:null,error:new L});let a=await J(this.fetch,`POST`,`${this.url}/oauth/authorizations/${e}/consent`,{headers:this.headers,jwt:r.access_token,body:{action:`approve`},xform:e=>({data:e,error:null})});return a.data&&a.data.redirect_url&&B()&&!t?.skipBrowserRedirect&&window.location.assign(a.data.redirect_url),a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _denyAuthorization(e,t){try{return await this._useSession(async n=>{let{data:{session:r},error:i}=n;if(i)return this._returnResult({data:null,error:i});if(!r)return this._returnResult({data:null,error:new L});let a=await J(this.fetch,`POST`,`${this.url}/oauth/authorizations/${e}/consent`,{headers:this.headers,jwt:r.access_token,body:{action:`deny`},xform:e=>({data:e,error:null})});return a.data&&a.data.redirect_url&&B()&&!t?.skipBrowserRedirect&&window.location.assign(a.data.redirect_url),a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _listOAuthGrants(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;return n?this._returnResult({data:null,error:n}):t?await J(this.fetch,`GET`,`${this.url}/user/oauth/grants`,{headers:this.headers,jwt:t.access_token,xform:e=>({data:e,error:null})}):this._returnResult({data:null,error:new L})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _revokeOAuthGrant(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;return r?this._returnResult({data:null,error:r}):n?(await J(this.fetch,`DELETE`,`${this.url}/user/oauth/grants`,{headers:this.headers,jwt:n.access_token,query:{client_id:e.clientId},noResolveJson:!0}),{data:{},error:null}):this._returnResult({data:null,error:new L})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async fetchJwk(e,t={keys:[]}){let n=t.keys.find(t=>t.kid===e);if(n)return n;let r=Date.now();if(n=this.jwks.keys.find(t=>t.kid===e),n&&this.jwks_cached_at+6e5>r)return n;let{data:i,error:a}=await J(this.fetch,`GET`,`${this.url}/.well-known/jwks.json`,{headers:this.headers});if(a)throw a;return!i.keys||i.keys.length===0||(this.jwks=i,this.jwks_cached_at=r,n=i.keys.find(t=>t.kid===e),!n)?null:n}async getClaims(e,t={}){try{let n=e;if(!n){let{data:e,error:t}=await this.getSession();if(t||!e.session)return this._returnResult({data:null,error:t});n=e.session.access_token}let{header:r,payload:i,signature:a,raw:{header:o,payload:s}}=jr(n);if(!t?.allowExpired)try{Zr(i.exp)}catch(e){throw new fr(e instanceof Error?e.message:`JWT validation failed`)}let c=!r.alg||r.alg.startsWith(`HS`)||!r.kid||!(`crypto`in globalThis&&`subtle`in globalThis.crypto)?null:await this.fetchJwk(r.kid,t?.keys?{keys:t.keys}:t?.jwks);if(!c){let{error:e}=await this.getUser(n);if(e)throw e;return{data:{claims:i,header:r,signature:a},error:null}}let l=Qr(r.alg),u=await crypto.subtle.importKey(`jwk`,c,l,!0,[`verify`]);if(!await crypto.subtle.verify(l,u,a,Cr(`${o}.${s}`)))throw new fr(`Invalid JWT signature`);return{data:{claims:i,header:r,signature:a},error:null}}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async signInWithPasskey(e){try{if(!Ii())return this._returnResult({data:null,error:new F(`Browser does not support WebAuthn`,null)});let{data:t,error:n}=await this._startPasskeyAuthentication({options:{captchaToken:e?.options?.captchaToken}});if(n||!t)return this._returnResult({data:null,error:n});let{data:r,error:i}=await Ri({publicKey:Mi(t.options),signal:e?.options?.signal??Ai.createNewAbortSignal(),mediation:e?.options?.mediation});if(i||!r)return this._returnResult({data:null,error:i??new F(`WebAuthn ceremony failed`,null)});let a=Pi(r);return this._verifyPasskeyAuthentication({challengeId:t.challenge_id,credential:a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async registerPasskey(e){try{if(!Ii())return this._returnResult({data:null,error:new F(`Browser does not support WebAuthn`,null)});let{data:t,error:n}=await this._startPasskeyRegistration();if(n||!t)return this._returnResult({data:null,error:n});let{data:r,error:i}=await Li({publicKey:ji(t.options),signal:e?.options?.signal??Ai.createNewAbortSignal()});if(i||!r)return this._returnResult({data:null,error:i??new F(`WebAuthn ceremony failed`,null)});let a=Ni(r);return this._verifyPasskeyRegistration({challengeId:t.challenge_id,credential:a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _startPasskeyRegistration(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)return this._returnResult({data:null,error:n});if(!t)return this._returnResult({data:null,error:new L});let{data:r,error:i}=await J(this.fetch,`POST`,`${this.url}/passkeys/registration/options`,{headers:this.headers,jwt:t.access_token,body:{}});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verifyPasskeyRegistration(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new L});let{data:i,error:a}=await J(this.fetch,`POST`,`${this.url}/passkeys/registration/verify`,{headers:this.headers,jwt:n.access_token,body:{challenge_id:e.challengeId,credential:e.credential}});return a?this._returnResult({data:null,error:a}):this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _startPasskeyAuthentication(e){try{let{data:t,error:n}=await J(this.fetch,`POST`,`${this.url}/passkeys/authentication/options`,{headers:this.headers,body:{gotrue_meta_security:{captcha_token:e?.options?.captchaToken}}});return n?this._returnResult({data:null,error:n}):this._returnResult({data:t,error:null})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verifyPasskeyAuthentication(e){try{let{data:t,error:n}=await J(this.fetch,`POST`,`${this.url}/passkeys/authentication/verify`,{headers:this.headers,body:{challenge_id:e.challengeId,credential:e.credential},xform:Y});return n?this._returnResult({data:null,error:n}):(t.session&&(await this._saveSession(t.session),await this._notifyAllSubscribers(`SIGNED_IN`,t.session)),this._returnResult({data:t,error:null}))}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _listPasskeys(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)return this._returnResult({data:null,error:n});if(!t)return this._returnResult({data:null,error:new L});let{data:r,error:i}=await J(this.fetch,`GET`,`${this.url}/passkeys`,{headers:this.headers,jwt:t.access_token,xform:e=>({data:e,error:null})});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _updatePasskey(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new L});let{data:i,error:a}=await J(this.fetch,`PATCH`,`${this.url}/passkeys/${e.passkeyId}`,{headers:this.headers,jwt:n.access_token,body:{friendly_name:e.friendlyName}});return a?this._returnResult({data:null,error:a}):this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _deletePasskey(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new L});let{error:i}=await J(this.fetch,`DELETE`,`${this.url}/passkeys/${e.passkeyId}`,{headers:this.headers,jwt:n.access_token,noResolveJson:!0});return i?this._returnResult({data:null,error:i}):this._returnResult({data:null,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}};qi.nextInstanceID={};var Ji=qi,Yi=mi,Xi=Ji,Zi=class extends Xi{constructor(e){super(e)}},Qi=class{constructor(e,t,n){this.supabaseUrl=e,this.supabaseKey=t;let r=Un(e);if(!t)throw Error(`supabaseKey is required.`);Nn(t),Vn(n),this.realtimeUrl=new URL(`realtime/v1`,r),this.realtimeUrl.protocol=this.realtimeUrl.protocol.replace(`http`,`ws`),this.authUrl=new URL(`auth/v1`,r),this.storageUrl=new URL(`storage/v1`,r),this.functionsUrl=new URL(`functions/v1`,r);let i=`sb-${r.hostname.split(`.`)[0]}-auth-token`,a={db:yn,realtime:xn,auth:{...bn,storageKey:i},global:vn,tracePropagation:Sn},o=Hn(n??{},a);this.settings=o,this.storageKey=o.auth.storageKey??``,this.headers=o.global.headers??{},o.accessToken?(this.accessToken=o.accessToken,this.auth=new Proxy({},{get:(e,t)=>{throw Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(t)} is not possible`)}})):this.auth=this._initSupabaseAuthClient(o.auth??{},this.headers,o.global.fetch),this.fetch=Pn(t,e,this._getSessionToken.bind(this),o.global.fetch,o.tracePropagation),this.functionsFetch=Pn(t,e,this._getSessionToken.bind(this),o.global.fetch,o.tracePropagation,{omitApiKeyAsBearer:!0}),this.realtime=this._initRealtimeClient({headers:this.headers,accessToken:this._getAccessToken.bind(this),fetch:this.fetch,...o.realtime}),this.accessToken&&Promise.resolve(this.accessToken()).then(e=>this.realtime.setAuth(e)).catch(e=>console.warn(`Failed to set initial Realtime auth token:`,e)),this.rest=new fe(new URL(`rest/v1`,r).href,{headers:this.headers,schema:o.db.schema,fetch:this.fetch,timeout:o.db.timeout,urlLengthLimit:o.db.urlLengthLimit,retry:o.db.retry}),this.storage=new mn(this.storageUrl.href,this.headers,this.fetch,n?.storage),o.accessToken||this._listenForAuthEvents()}get functions(){return new l(this.functionsUrl.href,{headers:this.headers,customFetch:this.functionsFetch})}from(e){return this.rest.from(e)}schema(e){return this.rest.schema(e)}getOpenApiSpec(){return this.rest.getOpenApiSpec()}rpc(e,t={},n={head:!1,get:!1,count:void 0}){return this.rest.rpc(e,t,n)}channel(e,t={config:{}}){return this.realtime.channel(e,t)}getChannels(){return this.realtime.getChannels()}removeChannel(e){return this.realtime.removeChannel(e)}removeAllChannels(){return this.realtime.removeAllChannels()}async _getSessionToken(){if(this.accessToken)return await this.accessToken();let{data:e}=await this.auth.getSession();return e.session?.access_token??null}async _getAccessToken(){return await this._getSessionToken()??this.supabaseKey}_initSupabaseAuthClient({autoRefreshToken:e,persistSession:t,detectSessionInUrl:n,storage:r,userStorage:i,storageKey:a,flowType:o,lock:s,debug:c,throwOnError:l,experimental:u,lockAcquireTimeout:d,skipAutoInitialize:f},p,m){let h={Authorization:`Bearer ${this.supabaseKey}`,apikey:`${this.supabaseKey}`};return new Zi({url:this.authUrl.href,headers:{...h,...p},storageKey:a,autoRefreshToken:e,persistSession:t,detectSessionInUrl:n,storage:r,userStorage:i,flowType:o,lock:s,debug:c,throwOnError:l,experimental:u,fetch:m,lockAcquireTimeout:d,skipAutoInitialize:f,hasCustomAuthorizationHeader:Object.keys(this.headers).some(e=>e.toLowerCase()===`authorization`)})}_initRealtimeClient(e){return new _t(this.realtimeUrl.href,{...e,params:{apikey:this.supabaseKey,...e?.params}})}_listenForAuthEvents(){return this.auth.onAuthStateChange((e,t)=>{this._handleTokenChanged(e,`CLIENT`,t?.access_token)})}_handleTokenChanged(e,t,n){(e===`TOKEN_REFRESHED`||e===`SIGNED_IN`||e===`INITIAL_SESSION`)&&this.changedAccessToken!==n?(this.changedAccessToken=n,this.realtime.setAuth(n)):e===`SIGNED_OUT`&&(this.realtime.setAuth(),t==`STORAGE`&&this.auth.signOut(),this.changedAccessToken=void 0)}};let $i=(e,t,n)=>new Qi(e,t,n);function ea(){if(typeof window<`u`||globalThis.Deno!==void 0)return!1;let e=globalThis.process;if(!e)return!1;let t=e.version;if(t==null)return!1;let n=t.match(/^v(\d+)\./);return n?parseInt(n[1],10)<=20:!1}return ea()&&console.warn(`⚠️  Node.js 20 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 22 or later. For more information, visit: https://github.com/orgs/supabase/discussions/45715`),e.AuthAdminApi=Yi,e.AuthApiError=Zn,e.AuthClient=Xi,e.AuthError=Xn,e.AuthImplicitGrantRedirectError=tr,e.AuthInvalidCredentialsError=er,e.AuthInvalidJwtError=fr,e.AuthInvalidTokenResponseError=R,e.AuthPKCECodeVerifierMissingError=ir,e.AuthPKCEGrantCodeExchangeError=rr,e.AuthRefreshDiscardedError=cr,e.AuthRetryableFetchError=or,e.AuthSessionMissingError=L,e.AuthUnknownError=F,e.AuthWeakPasswordError=ur,e.CustomAuthError=I,Object.defineProperty(e,`FunctionRegion`,{enumerable:!0,get:function(){return c}}),e.FunctionsError=i,e.FunctionsFetchError=a,e.FunctionsHttpError=s,e.FunctionsRelayError=o,e.GoTrueAdminApi=mi,e.GoTrueClient=Ji,e.NavigatorLockAcquireTimeoutError=_i,e.PostgrestError=u,e.REALTIME_CHANNEL_STATES=ut,Object.defineProperty(e,`REALTIME_LISTEN_TYPES`,{enumerable:!0,get:function(){return T}}),Object.defineProperty(e,`REALTIME_POSTGRES_CHANGES_LISTEN_EVENT`,{enumerable:!0,get:function(){return lt}}),Object.defineProperty(e,`REALTIME_PRESENCE_LISTEN_EVENTS`,{enumerable:!0,get:function(){return Xe}}),Object.defineProperty(e,`REALTIME_SUBSCRIBE_STATES`,{enumerable:!0,get:function(){return E}}),e.RealtimeChannel=dt,e.RealtimeClient=_t,e.RealtimePostgresFilterBuilder=st,e.RealtimePresence=Ze,e.SIGN_OUT_SCOPES=pi,e.StorageApiError=Pt,e.SupabaseClient=Qi,e.WebSocketFactory=pe,e.createClient=$i,e.isAuthApiError=Qn,e.isAuthError=P,e.isAuthImplicitGrantRedirectError=nr,e.isAuthPKCECodeVerifierMissingError=ar,e.isAuthRefreshDiscardedError=lr,e.isAuthRetryableFetchError=sr,e.isAuthSessionMissingError=$n,e.isAuthWeakPasswordError=dr,e.lockInternals=Z,e.navigatorLock=yi,e.postgresChangesFilter=ct,e.processLock=xi,e})({});</script>
 <script>'use strict';
 (() => {
+// ===== 防止被嵌入别的网站（CSP meta 无法设置 frame-ancestors，用脚本兜底）=====
+if (window.top !== window.self) { try { document.documentElement.innerHTML = ''; } catch {} try { window.top.location.replace(window.self.location.href); } catch {} throw new Error('framed'); }
 // ===== 配置 =====
 const SUPABASE_URL = 'https://ohuslweezdughgxhynxk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_52QHO_qTDlW6rUZ_QzgNGA_ZJXcj3t0'; // 公开 key，权限由数据库 RLS 控制
@@ -412,6 +426,8 @@ const fmtTime = t => t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) 
 const nowISO = () => new Date().toISOString();
 const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
 let toastT; function toast(msg, ms = 2800) { const t = $('#toast'); t.textContent = msg; t.classList.toggle('err', /失败|不对|错误|不一样|无法|至少|请先/.test(String(msg))); t.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hidden'), ms); }
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, String(v)); } catch {} };
 function show(id) { for (const s of ['#screen-showcase', '#screen-profiles', '#screen-unlock', '#screen-app']) $(s).classList.toggle('hidden', s !== id); document.documentElement.classList.toggle('dk', id === '#screen-showcase'); if (id === '#screen-showcase') showcaseStart(); else showcaseStop(); }
 async function busy(btn, fn, label = '处理中…') { if (!btn) return fn(); const old = btn.textContent; btn.disabled = true; btn.textContent = label; try { return await fn(); } finally { btn.disabled = false; btn.textContent = old; } }
 
@@ -530,20 +546,55 @@ async function unlockWith(p, password) {
   show('#screen-app'); render();
   startSession(p); renderNameTip();
   if (p.isOwner) ensureOwnerKeys().catch(() => {}); else cacheOwnerPub().catch(() => {});
+  autoOnUnlock();
 }
 
 // 管理员专用入口：只在管理员解锁后才创建 DOM，成员/未登录访客的页面里根本不存在
-function unmountOwnerUI() { document.querySelectorAll('#m-logs,#adash,#presence-box,#agrid,#td-box,#ov-online').forEach(el => el.remove()); clearInterval(presT); presT = null; }
+function unmountOwnerUI() { document.querySelectorAll('#m-logs,#m-notify,#adash,#presence-box,#agrid,#td-box,#ov-online').forEach(el => el.remove()); clearInterval(presT); presT = null; }
 function mountOwnerUI(p) {
   unmountOwnerUI(); if (!p?.isOwner) return;
   const b = document.createElement('button'); b.id = 'm-logs'; b.type = 'button'; b.textContent = '📜 访问日志 / 操作记录';
   b.addEventListener('click', () => openLogs());
   const anchor = $('#m-family'); anchor.after(b);
+  refreshOwnerCloudUI();
+}
+// 云端管理功能（邮件提醒开关等）：除了本机 isOwner，还要服务器 family_allowlist 里的角色是 owner
+let srvRole = { tok: null, role: null };
+async function serverRole() {
+  const tok = cloudToken(); if (!tok) return null;
+  if (srvRole.tok === tok) return srvRole.role;
+  let role = null; try { const u = await cloudUser(); if (u) { const { data } = await cloud().from('family_allowlist').select('role').eq('email', u.email.toLowerCase()).maybeSingle(); role = data?.role || null; } } catch {}
+  srvRole = { tok, role }; return role;
+}
+async function refreshOwnerCloudUI() {
+  const ok = !!(profile?.isOwner && dataKey && cloudToken()) && (await serverRole()) === 'owner';
+  const has = $('#m-notify');
+  if (!ok || !profile?.isOwner || !$('#m-logs')) { if (has) has.remove(); return; }
+  if (has) return;
+  const b = document.createElement('button'); b.id = 'm-notify'; b.type = 'button'; b.textContent = '📧 家人登录/退出邮件提醒';
+  b.addEventListener('click', () => openNotify()); $('#m-logs').after(b);
+}
+async function openNotify() {
+  if (!profile?.isOwner || !cloudToken() || (await serverRole()) !== 'owner') { refreshOwnerCloudUI(); return toast('请先用管理员账号登录云端'); }
+  openModal('📧 家人登录/退出邮件提醒', '<p class="muted small">正在读取…</p>');
+  const { data, error } = await cloud().rpc('get_owner_settings');
+  if (error) { $('#modal-body').innerHTML = `<p class="small">${esc(cloudErr(error))}</p>`; return; }
+  const on = data?.login_email_notify !== false;
+  $('#modal-body').innerHTML = `<p class="small">家人登录或退出云端时，给管理员邮箱发一封提醒邮件。设置保存在服务器上，所有设备生效。默认开启。</p>
+  <div class="radio"><label><input type="radio" name="lnt" value="on" ${on ? 'checked' : ''}> 开启</label><label><input type="radio" name="lnt" value="off" ${on ? '' : 'checked'}> 关闭</label></div>
+  <button class="primary block" id="lnt-save" type="button">保存</button>${data?.updated_at ? `<p class="muted tiny">上次修改：${esc(fmtTime(data.updated_at))}</p>` : ''}`;
+  $('#lnt-save').onclick = () => busy($('#lnt-save'), async () => {
+    const v = document.querySelector('input[name="lnt"]:checked')?.value === 'on';
+    const r = await cloud().rpc('set_login_email_notify', { on: v });
+    if (r.error) return toast('保存失败：' + cloudErr(r.error), 5000);
+    closeModal(); toast(v ? '已开启家人登录/退出邮件提醒 ✅' : '已关闭家人登录/退出邮件提醒', 4000);
+  });
 }
 // ===== 锁定 =====
 function lock(msg, reason = '手动锁定') {
   finishEditor(); // 锁定前先把正在写的日记加密存下来
   endSession(reason);
+  clearTimeout(autoT); autoT = null;
   dataKey = null; profile = null; items = []; $('#list').innerHTML = ''; $('#search').value = ''; closeModal(); unmountOwnerUI();
   renderProfiles(); if (msg) toast(msg);
 }
@@ -568,14 +619,16 @@ async function loadItems() {
 async function saveItem(category, payload, existing, file, opt = {}) {
   const id = existing?.id || opt.id || uuid(), pid = profile.id;
   let fileRow = null;
+  if (file && !SAFE_TYPES.has(file)) throw new Error('文件没有通过安全检查');
   if (file) {
     const { ct, iv } = await aesEnc(dataKey, new Uint8Array(await file.arrayBuffer()), fileAAD(pid, id));
     fileRow = { id, profileId: pid, ct, iv: b64(iv) };
-    Object.assign(payload, { fileName: file.name, fileType: file.type || 'application/octet-stream', fileSize: file.size });
+    Object.assign(payload, { fileName: file.name, fileType: SAFE_TYPES.get(file), fileSize: file.size });
   } else if (existing?.data?.fileName) Object.assign(payload, { fileName: existing.data.fileName, fileType: existing.data.fileType, fileSize: existing.data.fileSize });
   const { ct, iv } = await aesEnc(dataKey, enc.encode(JSON.stringify(payload)), itemAAD(pid, category));
   const row = { id, profileId: pid, category, ct: b64(ct), iv: b64(iv), hasFile: !!(fileRow || existing?.hasFile), created_at: existing?.created_at || nowISO(), updated_at: nowISO() };
   await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').put(row); if (fileRow) t.objectStore('files').put(fileRow); });
+  if (profile?.id === pid) markDirty();
   if (profile?.id !== pid) return null; // 保存途中已锁定：数据已加密落盘，不再把明文放回内存
   const rec = { ...row, data: payload };
   items = items.some(x => x.id === id) ? items.map(x => x.id === id ? rec : x) : [rec, ...items];
@@ -587,18 +640,62 @@ const tomb = r => ({ id: r.id, profileId: r.profileId, category: r.category, cre
 async function deleteItem(it) { await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').put(tomb(it)); t.objectStore('files').delete(it.id); }); items = items.filter(x => x.id !== it.id);
   logActivity('删除', it.category, (() => { try { return CATS[it.category].title(it.data) || ''; } catch { return ''; } })());
   if (it.hasFile) logActivity('删除文件', it.category, it.data?.fileName || ''); }
+// ===== 上传安全检查：最大 20 MB；按扩展名 + 文件头拦截可执行文件、脚本、带宏的 Office、网页和 SVG =====
+const MAX_UPLOAD = 20 * 1024 * 1024;
+const BLOCK_EXT = new Set('exe msi msp msix appx bat cmd com scr pif cpl ps1 psm1 psd1 vbs vbe js jse mjs cjs wsf wsh wsc jar class sh bash zsh csh ksh command tool app dmg pkg mpkg apk xapk aab ipa deb rpm run elf so dylib dll sys drv ocx py pyw pl rb php docm dotm xlsm xltm xlsb xlam pptm potm ppam ppsm sldm html htm xhtml xht shtml mht mhtml svg svgz hta lnk url scf reg inf chm msc gadget workflow iso img vhd vhdx'.split(' '));
+const SAFE_TYPES = new WeakMap();
+const PREVIEW_MIME = { png: 'image/png', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', pdf: 'application/pdf' };
+function sniffKind(b) {
+  const h = (...xs) => xs.every((x, i) => b[i] === x);
+  if (h(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) return 'png';
+  if (h(0xff, 0xd8, 0xff)) return 'jpeg';
+  if (h(0x47, 0x49, 0x46, 0x38)) return 'gif';
+  if (h(0x52, 0x49, 0x46, 0x46) && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return 'webp';
+  if (h(0x25, 0x50, 0x44, 0x46, 0x2d)) return 'pdf';
+  return null;
+}
+const hasAscii = (b, word) => { const w = Array.from(word, c => c.charCodeAt(0)); outer: for (let i = 0; i <= b.length - w.length; i++) { for (let j = 0; j < w.length; j++) if (b[i + j] !== w[j]) continue outer; return true; } return false; };
+function dangerHead(b) {
+  const h = (...xs) => xs.every((x, i) => b[i] === x);
+  if (h(0x4d, 0x5a)) return 'Windows 程序';
+  if (h(0x7f, 0x45, 0x4c, 0x46)) return 'Linux 程序';
+  if (h(0xfe, 0xed, 0xfa, 0xce) || h(0xfe, 0xed, 0xfa, 0xcf) || h(0xce, 0xfa, 0xed, 0xfe) || h(0xcf, 0xfa, 0xed, 0xfe) || h(0xca, 0xfe, 0xba, 0xbe)) return 'Mac 程序';
+  if (h(0x23, 0x21)) return '脚本';
+  if (h(0x4c, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00)) return 'Windows 快捷方式';
+  if (h(0x50, 0x4b, 0x03, 0x04) && hasAscii(b, 'vbaProject')) return '带宏的 Office 文件';
+  if (h(0x50, 0x4b, 0x03, 0x04) && hasAscii(b, 'classes.dex')) return '安卓安装包';
+  let t = ''; for (let i = 0; i < Math.min(b.length, 1024); i++) t += String.fromCharCode(b[i]);
+  t = t.replace(/\u0000/g, '').toLowerCase();
+  if (/<\s*(html|svg|script|iframe|object|embed)\b|<!doctype\s+html/.test(t)) return '网页 / SVG / 脚本';
+  return null;
+}
+async function checkUpload(file) {
+  if (!file) return { ok: false, msg: '没有选择文件' };
+  if (file.size > MAX_UPLOAD) return { ok: false, msg: `文件太大（${fmtSize(file.size)}），最大 20 MB` };
+  const nm = String(file.name || '').trim().replace(/[.\s]+$/, ''), ext = nm.includes('.') ? nm.split('.').pop().toLowerCase() : '';
+  if (BLOCK_EXT.has(ext)) return { ok: false, msg: `出于安全考虑，不能上传 .${ext} 文件（可执行程序、脚本、带宏的 Office、网页和 SVG 都不允许）` };
+  const b = new Uint8Array(await file.arrayBuffer());
+  const kind = sniffKind(b);
+  if (!kind) { const d = dangerHead(b); if (d) return { ok: false, msg: `出于安全考虑已拦截：文件内容看起来是${d}` }; }
+  const type = kind ? PREVIEW_MIME[kind] : 'application/octet-stream';
+  SAFE_TYPES.set(file, type); return { ok: true, type, kind };
+}
+const canPreview = d => Object.values(PREVIEW_MIME).includes(d?.fileType);
 async function openFile(it, download) {
   const f = await getOne('files', it.id); if (!f) throw new Error('找不到文件内容');
   const plain = await aesDec(dataKey, f.ct, unb64(f.iv), fileAAD(profile.id, it.id));
-  const url = URL.createObjectURL(new Blob([plain], { type: it.data.fileType || 'application/octet-stream' }));
+  // 下载一律用 application/octet-stream；预览只给文件头校验过的图片和 PDF，绝不生成 text/html、image/svg+xml 的 blob
+  let type = 'application/octet-stream';
+  if (!download) { const k = sniffKind(plain); if (!k) throw new Error('这种文件不能在页面里预览，请下载'); type = PREVIEW_MIME[k]; }
+  const url = URL.createObjectURL(new Blob([plain], { type }));
   if (download) { const a = document.createElement('a'); a.href = url; a.download = it.data.fileName || 'file'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000); }
   return url;
 }
 
 // ===== 备份文件（导出 / 导入）=====
 // 只包含密文：档案名称、分类和时间是明文，其余全部是各成员用自己的主密码加密后的数据
-async function buildExport(scopeAll) {
-  const ps = scopeAll ? await getAll('profiles') : [await getOne('profiles', profile.id)];
+async function buildExport(scopeAll, pid = profile?.id) {
+  const ps = scopeAll ? await getAll('profiles') : [await getOne('profiles', pid)];
   const ids = new Set(ps.map(p => p.id));
   const its = (await getAll('items')).filter(i => ids.has(i.profileId));
   const fs = (await getAll('files')).filter(f => ids.has(f.profileId));
@@ -616,7 +713,7 @@ $('#m-export').onclick = async () => {
   logActivity('导出', '', a.download);
   await touchProfile({ lastExportAt: nowISO() }); toast(`已导出备份文件（${fmtSize(blob.size)}），请存到 U 盘或别的地方`, 5000);
 };
-async function importVault(text) {
+async function importVault(text, opt = {}) {
   let o; try { o = JSON.parse(text); } catch { throw new Error('不是有效的备份文件'); }
   if (!o || o.format !== 'family-vault' || !Array.isArray(o.profiles)) throw new Error('不是有效的备份文件');
   const str = v => typeof v === 'string' && v.length > 0;
@@ -637,30 +734,37 @@ async function importVault(text) {
     const created_at = str(it.created_at) ? it.created_at : (str(it.updated_at) ? it.updated_at : nowISO());
     its.push({ id: it.id, profileId: it.profileId, category: it.category, ct: it.ct, iv: it.iv, hasFile: !!it.hasFile, created_at, updated_at: str(it.updated_at) ? it.updated_at : created_at });
   }
+  // 管理员身份不信任备份文件里的 isOwner（明文、可伪造）：本机已有用户保持本机的身份；新用户一律是普通成员。
+  // 唯一例外：这台设备还没有管理员时（此时首次使用页本来就能新建管理员），恢复「云端管理员账号自己的备份」或备份文件，最多恢复 1 个管理员。
   const local = await getAll('profiles');
   const localOwner = local.find(p => p.isOwner && !p.deleted_at);
-  const otherOwners = profs.filter(p => p.isOwner && localOwner && p.id !== localOwner.id && !local.some(l => l.id === p.id));
-  if (otherOwners.length && !(await askConfirm(`这台设备已经有管理员「${localOwner.name}」。\n这个备份里还有另一个管理员「${otherOwners.map(p => p.name).join('、')}」，继续导入会出现两个 👑 管理员。\n\n确定要继续导入吗？`, { title: '⚠️ 会出现两个管理员', ok: '继续导入', danger: true }))) throw new Error('已取消导入');
-  let np = 0, ni = 0;
+  const mayPromote = !localOwner && (opt.source === 'cloud' ? opt.cloudOwner === true : opt.source === 'file');
+  const promoteId = mayPromote ? (profs.find(p => p.isOwner && !p.deleted_at && !local.some(l => l.id === p.id)) || {}).id : null;
+  let np = 0, ni = 0, demoted = 0;
   await tx(['profiles', 'items', 'files'], 'readwrite', async t => {
     const P = t.objectStore('profiles'), I = t.objectStore('items'), F = t.objectStore('files');
-    for (const p of profs) { const old = await req(P.get(p.id)); if (!old || p.updated_at > (old.updated_at || '')) { P.put(p.deleted_at ? p : { lastExportAt: null, lastCloudAt: null, cloudEmail: '', ...(old || {}), ...p, deleted_at: undefined }); np++; } }
+    for (const p0 of profs) { const old = await req(P.get(p0.id));
+      if (old?.isOwner && p0.deleted_at) { skipped++; continue; } // 备份不能删除本机的管理员
+      const own = old ? !!old.isOwner : (!!promoteId && p0.id === promoteId);
+      if (p0.isOwner && !own) demoted++;
+      const p = { ...p0, isOwner: own }; if (!own) { delete p.act_pub; delete p.act_priv_ct; delete p.act_priv_iv; }
+      if (!old || p.updated_at > (old.updated_at || '')) { P.put(p.deleted_at ? p : { lastExportAt: null, lastCloudAt: null, cloudEmail: '', ...(old || {}), ...p, isOwner: own, deleted_at: undefined }); np++; } }
     const filesById = new Map((Array.isArray(o.files) ? o.files : []).filter(f => f && str(f.id) && str(f.ct) && str(f.iv)).map(f => [f.id, f]));
     for (const it of its) { const old = await req(I.get(it.id)); if (!old || it.updated_at > (old.updated_at || '')) {
       I.put(it); ni++;
       if (it.deleted_at) F.delete(it.id); else { const f = filesById.get(it.id); if (f) F.put({ id: f.id, profileId: it.profileId, iv: f.iv, ct: unb64(f.ct) }); }
     } }
   });
-  return { np, ni, skipped };
+  return { np, ni, skipped, demoted };
 }
 async function afterImport(r) {
   logActivity('导入', '', `${r.np} 个用户、${r.ni} 条记录`);
-  toast(`恢复完成：更新 ${r.np} 个用户、${r.ni} 条记录${r.skipped ? `，跳过 ${r.skipped} 条无效内容` : ''}`, 5000);
+  toast(`恢复完成：更新 ${r.np} 个用户、${r.ni} 条记录${r.skipped ? `，跳过 ${r.skipped} 条无效内容` : ''}${r.demoted ? `；备份里的管理员身份没有导入（已作为普通用户），本机管理员不变` : ''}`, 7000);
   if (dataKey) { profile = await getOne('profiles', profile.id) || profile; await loadItems(); render(); } else renderProfiles();
 }
 function pickImport() { $('#file-import').value = ''; $('#file-import').click(); }
 $('#m-import').onclick = pickImport; $('#btn-import-start').onclick = pickImport;
-$('#file-import').onchange = async () => { const f = $('#file-import').files[0]; if (!f) return; try { await afterImport(await importVault(await f.text())); } catch (e) { toast(e.message, 5000); } };
+$('#file-import').onchange = async () => { const f = $('#file-import').files[0]; if (!f) return; try { await afterImport(await importVault(await f.text(), { source: 'file' })); } catch (e) { toast(e.message, 5000); } };
 
 // ===== 云端（只有点击时才联网）=====
 let sb = null;
@@ -670,7 +774,12 @@ function cloud() {
 }
 function cloudErr(e) {
   const m = e?.message || String(e), code = e?.code || '';
-  if (/Database error/i.test(m)) return '该邮箱未获授权（不在家族名单里），请联系管理员';
+  if (/Database error saving new user|Database error/i.test(m)) return '该邮箱未被授权（不在家族名单里），请联系管理员';
+  if (e?.status === 429 || /RATE_LIMITED|rate limit|too many requests/i.test(m)) return '操作太频繁，请稍后再试';
+  if (/REAUTH_REQUIRED/.test(m)) return '请先用邮箱验证码验证' + (m.split(/REAUTH_REQUIRED:?/)[1] ? '（' + m.split(/REAUTH_REQUIRED:?\s*/)[1].trim() + '）' : '');
+  if (/OWNER_ROLE_FORBIDDEN/.test(m)) return '不能通过这里设置或修改管理员角色';
+  if (/LOCKED|锁定/.test(m)) return m.replace(/^[A-Z_]+:\s*/, '');
+  if (/TOO_MANY_DEVICES/.test(m)) return '这台账号已登记的设备太多了（最多 20 台），请管理员在访问日志里撤销旧设备后再试';
   if (code === 'email_address_not_authorized' || /not authorized/i.test(m)) return '邮箱已授权，但云端暂时发不了确认邮件：请管理员在 Supabase 后台关闭「Confirm email」后再注册';
   if (/Invalid login credentials/i.test(m)) return '邮箱或登录密码不对';
   if (/Email not confirmed/i.test(m)) return '邮箱还没确认，请先点邮件里的确认链接';
@@ -680,44 +789,80 @@ function cloudErr(e) {
   return m;
 }
 async function cloudUser() { const { data } = await cloud().auth.getSession(); return data.session?.user || null; }
+// 服务器要求 5 分钟内重新登录过才能删除：弹出云端密码框，signInWithPassword 刷新会话后重试一次
+function cloudReauth(why) {
+  return new Promise(async resolve => {
+    const u = await cloudUser(); if (!u) { toast('请先登录云端'); return resolve(false); }
+    openModal('☁️ 重新登录云端', `<p class="small">${esc(why || '删除前请重新登录云端（服务器要求 5 分钟内）')}。</p>
+    <p class="muted tiny">账号：<b>${esc(u.email)}</b>（这是云端登录密码，不是主密码）</p>
+    <form id="f-cr"><label>云端登录密码<input id="cr-pass" type="password" required minlength="8" autocomplete="current-password"></label>
+    <div class="actions"><button type="button" id="cr-cancel">取消</button><button type="submit" class="primary" id="cr-ok">重新登录</button></div></form>`);
+    $('#cr-cancel').onclick = () => { closeModal(); resolve(false); };
+    $('#f-cr').onsubmit = e => { e.preventDefault(); busy($('#cr-ok'), async () => {
+      const { error } = await cloud().auth.signInWithPassword({ email: u.email, password: $('#cr-pass').value });
+      if (error) return toast(cloudErr(error), 6000);
+      srvRole = { tok: null, role: null }; closeModal(); toast('云端已重新登录 ✅'); resolve(true);
+    }); };
+  });
+}
+async function rpcFresh(fn, args, why) {
+  let r = await cloud().rpc(fn, args);
+  if (r.error && /REAUTH_REQUIRED/.test(r.error.message || '')) {
+    if (!(await cloudReauth(why || '删除前请重新登录云端（5 分钟内）'))) return { data: null, error: r.error, cancelled: true };
+    r = await cloud().rpc(fn, args);
+  }
+  return r;
+}
 async function listVersions(uid) {
   const { data, error } = await cloud().storage.from(BUCKET).list(`${uid}/backups`, { limit: 100, sortBy: { column: 'name', order: 'desc' } });
   if (error) throw error; return (data || []).filter(f => f.name.endsWith('.vault'));
 }
-async function cloudBackup(u) {
-  const blob = await buildExport(profile.isOwner);
+async function cloudBackup(u, p = profile, auto = false) {
+  const blob = await buildExport(p.isOwner, p.id);
   const path = `${u.id}/backups/vault-${stamp()}.vault`;
   const { error } = await cloud().storage.from(BUCKET).upload(path, blob, { contentType: 'application/octet-stream', upsert: false });
   if (error) throw error;
   const vs = await listVersions(u.id);
   const old = vs.slice(KEEP_VERSIONS).map(f => `${u.id}/backups/${f.name}`);
   if (old.length) await cloud().storage.from(BUCKET).remove(old);
-  await touchProfile({ lastCloudAt: nowISO(), cloudEmail: u.email });
-  logActivity('云端备份', '', path.split('/').pop());
+  const q = await getOne('profiles', p.id); if (q) { Object.assign(q, { lastCloudAt: nowISO(), cloudEmail: u.email }); await putOne('profiles', q); if (profile?.id === p.id) { profile = q; } }
+  lsSet(autoKey('try', p.id), Date.now()); lsSet(autoKey('dirty', p.id), null); autoMsg = 'ok';
+  if (profile?.id === p.id) { renderStatus(); logActivity('云端备份', '', (auto ? '自动 · ' : '') + path.split('/').pop()); }
   return { path, size: blob.size };
 }
-async function cloudRestore(u, name) {
+async function cloudRestore(u, name, cloudOwner = false) {
   const { data, error } = await cloud().storage.from(BUCKET).download(`${u.id}/backups/${name}`); if (error) throw error;
-  const r = await importVault(await data.text()); logActivity('云端恢复', '', name); return r;
+  const r = await importVault(await data.text(), { source: 'cloud', cloudOwner }); logActivity('云端恢复', '', name); return r;
 }
 async function openCloud() {
   openModal('☁️ 云端备份', '<p class="muted small">正在读取…</p>');
+  const wasExpired = cloudExpired();
   let u; try { u = await cloudUser(); } catch (e) { u = null; }
-  if (!u) return cloudLoginForm();
+  if (!u) return cloudLoginForm(wasExpired);
   let me = null; try { const { data } = await cloud().from('family_allowlist').select('email,role').eq('email', u.email.toLowerCase()).maybeSingle(); me = data; } catch {}
   let vs = [], verr = ''; try { vs = await listVersions(u.id); } catch (e) { verr = cloudErr(e); }
   const canBackup = !!dataKey;
   let html = `<p class="small">已登录云端账号：<b>${esc(u.email)}</b>${me?.role === 'owner' ? ' <span class="tag">管理员</span>' : ''}</p>`;
   html += cloudAgeHTML(profile?.lastCloudAt || vs[0]?.created_at || vs[0]?.updated_at);
   if (!me) html += `<div class="banner">这个账号目前没有被家族授权，无法备份或恢复。</div>`;
+  if (canBackup) html += autoLineHTML();
   if (canBackup) html += `<p class="muted small">将备份：${profile.isOwner ? '整个家庭保险库（所有用户，各自加密）' : `只有「${esc(profile.name)}」这个用户的内容`}。云端只保留最近 ${KEEP_VERSIONS} 份。</p><button id="c-backup" class="primary block" type="button">⬆️ 立即云端备份</button>`;
-  html += `<div class="sec"><h3>云端版本（点「恢复」导入到本机）</h3>${verr ? `<p class="small">${esc(verr)}</p>` : vs.length ? `<div class="vlist">${vs.map(f => `<div class="vrow"><span>${esc(f.name.replace(/^vault-|\.vault$/g, ''))} · ${fmtSize(f.metadata?.size)}</span><button type="button" data-restore="${esc(f.name)}">恢复</button></div>`).join('')}</div>` : '<p class="muted small">还没有云端备份</p>'}</div>`;
+  html += BACKUP_STMT;
+  html += `<div class="sec"><h3>云端版本（点「恢复」导入到本机）</h3>${verr ? `<p class="small">${esc(verr)}</p>` : vs.length ? `<div class="vlist">${vs.map((f, i) => `<div class="vrow"><span>${esc(f.name.replace(/^vault-|\.vault$/g, ''))} · ${fmtSize(f.metadata?.size)}</span><span class="vb"><button type="button" data-restore="${esc(f.name)}">恢复</button>${canBackup ? (i < PROTECTED_N ? '<span class="lockd" title="最新的 3 份云备份受服务器保护，不能删除">🔒 受保护</span>' : `<button type="button" class="danger" data-vdel="${esc(f.name)}">删除</button>`) : ''}</span></div>`).join('')}</div>${canBackup && vs.length ? `<p class="muted tiny">最新的 ${PROTECTED_N} 份云备份受服务器保护，不能删除；更旧的可以手动删除（需要再次输入主密码）。</p>` : ''}` : '<p class="muted small">还没有云端备份</p>'}</div>`;
   if (me?.role === 'owner' && profile?.isOwner) html += `<div class="sec"><h3>👨‍👩‍👧 云端授权</h3><p class="muted tiny">只有在这里授权过的邮箱才能注册云端账号；删除后立刻失去云端访问权限。</p><div id="allow-list" class="vlist"></div><form id="f-allow" class="mt"><label>家人邮箱<input id="a-email" type="email" required></label><label>称呼（可选）<input id="a-name" maxlength="20"></label><button class="primary block" id="a-add" type="submit">授权这个邮箱</button></form></div>`;
   html += `<div class="actions"><button id="c-logout" type="button">退出云端账号</button></div>`;
   openModal('☁️ 云端备份', html);
   if ($('#c-backup')) $('#c-backup').onclick = () => busy($('#c-backup'), async () => { try { const r = await cloudBackup(u); toast(`云端备份完成 ✅（${fmtSize(r.size)}）`); openCloud(); } catch (e) { toast('备份失败：' + cloudErr(e), 6000); } });
-  $('#modal-body').querySelectorAll('[data-restore]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`用云端版本 ${b.dataset.restore} 恢复到本机？\n会合并：本机较新的记录保留。`, { title: '☁️ 从云端恢复？', ok: '恢复' }))) return; busy(b, async () => { try { const r = await cloudRestore(u, b.dataset.restore); closeModal(); await afterImport(r); } catch (e) { toast('恢复失败：' + cloudErr(e), 6000); } }); });
-  $('#c-logout').onclick = async () => { await cloud().auth.signOut({ scope: 'local' }); sessionStorage.removeItem('fv-cloud'); closeModal(); toast('已退出云端账号'); };
+  $('#modal-body').querySelectorAll('[data-restore]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`用云端版本 ${b.dataset.restore} 恢复到本机？\n会合并：本机较新的记录保留。`, { title: '☁️ 从云端恢复？', ok: '恢复' }))) return; busy(b, async () => { try { const r = await cloudRestore(u, b.dataset.restore, me?.role === 'owner'); closeModal(); await afterImport(r); } catch (e) { toast('恢复失败：' + cloudErr(e), 6000); } }); });
+  $('#modal-body').querySelectorAll('[data-vdel]').forEach(b => b.onclick = async () => { const nm = b.dataset.vdel;
+    if (!(await askConfirm(`删除云端备份 ${nm}？\n删除后无法恢复这个版本。`, { title: '🗑️ 删除云端备份？', ok: '删除', danger: true }))) return;
+    if (!(await reauth(`删除云端备份 ${nm}`))) return;
+    busy(b, async () => { const { data, error } = await cloud().storage.from(BUCKET).remove([`${u.id}/backups/${nm}`]);
+      if (error) return toast('删除失败：' + cloudErr(error), 6000);
+      if (!(data || []).length) return toast('删除失败：最新的 3 份云备份受服务器保护，不能删除', 6000);
+      logActivity('删除', '', '云端备份 ' + nm); toast('已删除这份云端备份'); openCloud(); }); });
+  $('#c-logout').onclick = async () => { await cloud().auth.signOut({ scope: 'local' }); sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; refreshOwnerCloudUI(); renderStatus(); closeModal(); toast('已退出云端账号'); };
+  refreshOwnerCloudUI();
   if ($('#f-allow')) { $('#f-allow').onsubmit = e => { e.preventDefault(); busy($('#a-add'), async () => {
     const email = $('#a-email').value.trim().toLowerCase(), name = $('#a-name').value.trim() || null;
     const { error } = await cloud().from('family_allowlist').insert({ email, display_name: name, role: 'member' });
@@ -735,9 +880,47 @@ async function renderAllow() {
     if (v && !/^\+861[3-9]\d{9}$/.test(v)) return toast('请填中国大陆手机号，例如 +8613800000000', 5000);
     const { error } = await cloud().from('family_allowlist').update({ phone: v || null }).eq('email', b.dataset.phs);
     toast(error ? '保存失败：' + cloudErr(error) : '手机号已保存（用于短信验证码，短信功能配置好后生效）', 5000); renderAllow(); }));
-  $('#allow-list').querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`取消 ${b.dataset.rm} 的云端授权？对方将立刻无法备份或恢复。`, { title: '取消云端授权？', ok: '取消授权', danger: true }))) return; busy(b, async () => { if (!(await reauth(`取消 ${b.dataset.rm} 的云端授权`))) return;
-    const { error } = await cloud().from('family_allowlist').delete().eq('email', b.dataset.rm); if (error) return toast('操作失败：' + cloudErr(error), 5000);
-    toast('已取消授权'); renderAllow(); }); });
+  $('#allow-list').querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`取消 ${b.dataset.rm} 的云端授权？对方将立刻无法备份或恢复。`, { title: '取消云端授权？', ok: '取消授权', danger: true }))) return;
+    if (!(await reauth(`取消 ${b.dataset.rm} 的云端授权`))) return; busy(b, async () => {
+    const r = await rpcFresh('remove_allowlist', { p_email: b.dataset.rm }, '取消云端授权前请重新登录云端（5 分钟内）');
+    if (r.cancelled) return; if (r.error) return toast('操作失败：' + cloudErr(r.error), 5000);
+    if (r.data === false) return toast('未找到这个邮箱'); toast('已取消授权'); renderAllow(); }); });
+}
+const PROTECTED_N = 3; // 服务器规则：每人最新 3 份云备份不能删除
+const BACKUP_STMT = '<p class="stmt">ℹ️ 云备份在你的设备上用主密码加密后才上传，服务器只存密文；档案名、分类和时间为明文。每人云端保留最近 10 份，更旧的自动删除；最新 3 份不能自行删除。忘记主密码将无法恢复。如需删除全部云备份或注销，请联系管理员。</p>';
+// ===== 自动云端备份（管理员已同意）：登录云端时，最后一次修改后约 2 分钟上传；最多每 30 分钟 1 次；解锁时超过 24 小时没备份也会上传 =====
+// 不会自动弹出密码框；云端登录过期就跳过并提示。每次上传后仍只保留最近 KEEP_VERSIONS 份，远低于服务器每人 30 个文件的上限。
+const AUTO_DELAY = 2 * 60 * 1000, AUTO_GAP = 30 * 60 * 1000, AUTO_STALE = 24 * 3600 * 1000;
+let autoT = null, autoBusy = false, autoMsg = '';
+const autoKey = (k, pid) => `fv-auto-${k}-${pid}`;
+function cloudExpired() { try { return !!sessionStorage.getItem('fv-cloud') && !cloudToken(); } catch { return false; } }
+function markDirty() { if (!profile || !dataKey) return; lsSet(autoKey('dirty', profile.id), '1'); scheduleAuto(AUTO_DELAY); }
+function scheduleAuto(ms) { clearTimeout(autoT); autoT = setTimeout(runAutoBackup, Math.max(1000, ms)); }
+async function runAutoBackup() {
+  autoT = null; const p = profile; if (!p || !dataKey || autoBusy) return;
+  if (!cloudToken()) { autoMsg = cloudExpired() ? 'expired' : ''; renderStatus(); return; }
+  const wait = +(lsGet(autoKey('try', p.id)) || 0) + AUTO_GAP - Date.now(); if (wait > 0) return scheduleAuto(wait);
+  autoBusy = true; lsSet(autoKey('try', p.id), Date.now()); renderStatus();
+  try { const u = await cloudUser(); if (!u) { autoMsg = 'expired'; return; } await cloudBackup(u, p, true); }
+  catch (e) { autoMsg = 'fail'; if (profile?.id === p.id) toast('自动云端备份失败：' + cloudErr(e), 6000); }
+  finally { autoBusy = false; if (profile?.id === p.id) renderStatus(); }
+}
+function autoOnUnlock() {
+  const p = profile; if (!p) return;
+  const stale = !p.lastCloudAt || Date.now() - new Date(p.lastCloudAt).getTime() > AUTO_STALE;
+  if (stale) scheduleAuto(5000); else if (lsGet(autoKey('dirty', p.id))) scheduleAuto(AUTO_DELAY);
+}
+function autoText() {
+  if (!profile) return '';
+  if (!cloudToken()) return cloudExpired() ? '⏸️ 云端登录已过期，自动备份暂停' : '';
+  if (autoBusy) return '☁️ 自动备份中…';
+  if (autoMsg === 'fail') return '⚠️ 自动备份失败，稍后重试';
+  return '自动备份：开';
+}
+function autoLineHTML() {
+  if (!profile) return '';
+  const t = profile.lastCloudAt, a = +(lsGet(autoKey('try', profile.id)) || 0), dirty = !!lsGet(autoKey('dirty', profile.id));
+  return `<p class="autost">🔄 自动备份：开 · 上次 ${t ? esc(fmtTime(t)) : '从未'}${autoMsg === 'fail' ? ' · ⚠️ 上次自动备份失败' : ''}${dirty ? ' · 有未备份的修改' + (a && a + AUTO_GAP > Date.now() ? `（约 ${Math.ceil((a + AUTO_GAP - Date.now()) / 60000)} 分钟后自动上传）` : '（约 2 分钟内自动上传）') : ''}<small>登录云端期间，修改后约 2 分钟自动上传一份，最多每 30 分钟一次；解锁时超过 24 小时没备份也会自动备份。成功时不打扰，失败会提示。</small></p>`;
 }
 // 云端备份对话框里显示「上次备份：X 天前」，超过 7 天用醒目的警告色（只是提示，不会自动备份）
 function cloudAgeHTML(t) {
@@ -746,8 +929,8 @@ function cloudAgeHTML(t) {
   const days = Math.max(0, Math.floor((Date.now() - new Date(t).getTime()) / 864e5)), old = days > 7;
   return `<p class="bk-age${old ? ' warn' : ''}">${old ? '⚠️' : '🕒'} 上次云端备份：${days === 0 ? '今天' : `${days} 天前`}（${esc(fmtTime(t))}）${old ? ' · 已超过 7 天，建议尽快备份' : ''}</p>`;
 }
-function cloudLoginForm() {
-  openModal('☁️ 登录云端账号', `${cloudAgeHTML(profile?.lastCloudAt)}<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。家人需要先由管理员在「云端授权」里加上邮箱，才能注册。</p>
+function cloudLoginForm(expired = false) {
+  openModal('☁️ 登录云端账号', `${expired && profile ? '<p class="bk-age warn">⏸️ 云端登录已过期，自动备份暂停。重新登录后会自动恢复。</p>' : ''}${cloudAgeHTML(profile?.lastCloudAt)}<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。家人需要先由管理员在「云端授权」里加上邮箱，才能注册。</p>
   <form id="f-cloud"><label>邮箱<input id="c-email" type="email" required value="${esc(profile?.cloudEmail || '')}" autocomplete="username"></label>
   <label>云端登录密码（不是主密码）<input id="c-pass" type="password" required minlength="8" autocomplete="current-password"></label>
   <div class="actions"><button type="submit" class="primary" id="c-login">登录</button><button type="button" id="c-signup">注册</button></div></form>`);
@@ -768,7 +951,8 @@ $('#m-cloud').onclick = openCloud; $('#btn-cloud-start').onclick = openCloud;
 function renderStatus() {
   if (!profile) return;
   const e = profile.lastExportAt, c = profile.lastCloudAt, old = t => !t || Date.now() - new Date(t).getTime() > STALE_MS;
-  $('#backup-status').textContent = `本地备份文件：${fmtTime(e)} · 云端备份：${fmtTime(c)} · ${persistText()}`;
+  if ($('#m-notify') && !cloudToken()) $('#m-notify').remove(); // 云端登录过期 / 退出后隐藏云端管理入口
+  const at = autoText(); $('#backup-status').textContent = `本地备份文件：${fmtTime(e)} · 云端备份：${fmtTime(c)}${at ? ' · ' + at : ''} · ${persistText()}`;
   const msgs = []; if (old(e)) msgs.push('本地备份文件'); if (old(c)) msgs.push('云端备份');
   $('#banner').classList.toggle('hidden', !msgs.length);
   $('#banner').textContent = msgs.length ? `⚠️ ${msgs.join('和')}已超过 3 天（或从未）备份，建议点右上角「⋯」尽快备份。` : '';
@@ -893,17 +1077,20 @@ function viewItem(it) {
   const c = CATS[it.category], d = it.data;
   let html = c.fields.filter(f => d[f.k] !== undefined && d[f.k] !== '').map(f => { const secret = f.type === 'secret';
     return `<div class="field"><div class="k">${esc(f.l)}</div><div class="v"><span data-k="${f.k}">${secret ? '••••••••' : esc(d[f.k])}</span>${secret ? `<button type="button" data-show="${f.k}">显示</button>` : ''}<button type="button" data-copy="${f.k}">复制</button></div></div>`; }).join('');
-  if (it.hasFile) html += `<div class="field"><div class="k">文件</div><div class="v"><span>${esc(d.fileName)}（${fmtSize(d.fileSize)}）</span></div><div id="preview"></div></div>`;
-  html += `<p class="muted tiny">创建 ${fmtTime(it.created_at)} · 修改 ${fmtTime(it.updated_at)}</p><div class="actions">${it.hasFile ? '<button type="button" id="v-dl" class="primary">解密下载</button>' : ''}${it.hasFile && /^image\//.test(d.fileType || '') ? '<button type="button" id="v-pv">预览</button>' : ''}<button type="button" id="v-edit">编辑</button><button type="button" id="v-del" class="danger">删除</button></div>`;
+  if (it.hasFile) html += `<div class="field"><div class="k">文件</div><div class="v"><span>${esc(d.fileName)}（${fmtSize(d.fileSize)}）</span></div>${canPreview(d) ? '' : '<p class="upwarn">⚠️ 这个文件只能下载，不能在页面里预览。打开前请确认来源可靠。</p>'}<div id="preview"></div></div>`;
+  html += `<p class="muted tiny">创建 ${fmtTime(it.created_at)} · 修改 ${fmtTime(it.updated_at)}</p><div class="actions">${it.hasFile ? '<button type="button" id="v-dl" class="primary">解密下载</button>' : ''}${it.hasFile && canPreview(d) ? `<button type="button" id="v-pv">${d.fileType === 'application/pdf' ? '打开 PDF' : '预览'}</button>` : ''}<button type="button" id="v-edit">编辑</button><button type="button" id="v-del" class="danger">删除</button></div>`;
   openModal(`${c.icon} ${c.title(d)}`, html);
   const body = $('#modal-body');
   body.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(String(d[b.dataset.copy])));
   body.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { const s = body.querySelector(`span[data-k="${b.dataset.show}"]`); const on = b.textContent === '显示'; s.textContent = on ? d[b.dataset.show] : '••••••••'; b.textContent = on ? '隐藏' : '显示'; });
   if ($('#v-dl')) $('#v-dl').onclick = () => busy($('#v-dl'), () => openFile(it, true).catch(e => toast('下载失败：' + e.message)));
-  if ($('#v-pv')) $('#v-pv').onclick = () => busy($('#v-pv'), async () => { try { const u = await openFile(it, false); $('#preview').innerHTML = `<img class="pv" alt="" src="${u}">`; } catch (e) { toast('预览失败：' + e.message); } });
+  if ($('#v-pv')) $('#v-pv').onclick = () => busy($('#v-pv'), async () => { try { const u = await openFile(it, false);
+    if (d.fileType === 'application/pdf') { const a = document.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 120000); }
+    else { const img = document.createElement('img'); img.className = 'pv'; img.alt = ''; img.src = u; $('#preview').replaceChildren(img); } } catch (e) { toast('预览失败：' + e.message); } });
   $('#v-edit').onclick = () => editItem(it.category, it);
   $('#v-del').onclick = async () => { const t = (() => { try { return c.title(d) || ''; } catch { return ''; } })();
     if (!(await askConfirm(`删除「${t}」${it.hasFile ? '和里面的文件' : ''}？\n删除后无法撤销。`, { title: '🗑️ 删除这条记录？', ok: '删除', danger: true }))) return;
+    if (!(await reauth(`删除「${t}」`))) return;
     busy($('#v-del'), async () => { await deleteItem(it); closeModal(); render(); toast('已删除'); }); };
 }
 // ===== 自动保存：日记边写边加密保存（停笔 1.2 秒），文件选好后立即加密保存；加密和存储都走原来的 saveItem =====
@@ -981,16 +1168,20 @@ function editItem(category, it) {
   form.addEventListener('compositionend', () => schedule());
   if (category === 'file') {
     const box = $('#f-filebox'), fi = $('#f-file');
-    fi.onchange = () => { const f = fi.files[0]; if (!f || !alive) return; clearTimeout(timer); timer = null;
-      $('#f-filest').classList.remove('ok'); $('#f-filest').textContent = `正在加密：${f.name}（${fmtSize(f.size)}）…`;
-      Promise.resolve(inflight).then(() => save(collect(), f, true)).then(ok => { if (ok) toast('文件已加密保存 ✅'); }); };
+    fi.onchange = async () => { const f = fi.files[0]; if (!f || !alive) return; clearTimeout(timer); timer = null;
+      $('#f-filest').classList.remove('ok'); $('#f-filest').textContent = `正在检查：${f.name}（${fmtSize(f.size)}）…`;
+      const chk = await checkUpload(f).catch(() => ({ ok: false, msg: '读取文件失败' }));
+      if (!chk.ok) { fi.value = ''; $('#f-filest').textContent = '⛔ ' + chk.msg; st('err', '文件未保存：' + chk.msg); toast(chk.msg, 6000); return; }
+      $('#f-filest').textContent = `正在加密：${f.name}（${fmtSize(f.size)}）…`;
+      Promise.resolve(inflight).then(() => save(collect(), f, true)).then(ok => { if (ok) toast(chk.kind ? '文件已加密保存 ✅' : '文件已加密保存 ✅（这种文件只能下载，不能预览）', 4000); }); };
     box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('drag'); });
     box.addEventListener('dragleave', () => box.classList.remove('drag'));
     box.addEventListener('drop', e => { e.preventDefault(); box.classList.remove('drag'); if (e.dataTransfer?.files?.length) { fi.files = e.dataTransfer.files; fi.dispatchEvent(new Event('change')); } });
   }
   $('#f-cancel').onclick = () => { const p = finishEditor(); Promise.resolve(p).then(() => { const r = rec && items.find(x => x.id === rec.id); r ? viewItem(r) : closeModal(); }); };
   form.onsubmit = e => { e.preventDefault(); busy($('#f-save'), async () => {
-    const file = category === 'file' ? $('#f-file').files[0] : null;
+    let file = category === 'file' ? $('#f-file').files[0] : null;
+    if (file && !SAFE_TYPES.has(file)) { const chk = await checkUpload(file).catch(() => ({ ok: false, msg: '读取文件失败' })); if (!chk.ok) { $('#f-file').value = ''; return toast(chk.msg, 6000); } }
     if (category === 'file' && !rec && !file) return toast('请先选择文件');
     await inflight;
     if (file && file !== upFile && !(await save(collect(), file, true))) return toast('保存失败，请重试', 5000);
@@ -1028,7 +1219,7 @@ $('#m-mp').onclick = () => {
       if ($('#cmp1').value !== $('#cmp2').value) throw new Error('两次输入的新主密码不一样');
       const raw = await unwrapRaw(profile, $('#cmp0').value).catch(() => { throw new Error('当前主密码不对'); });
       const w = await wrapDEK(profile.id, raw, $('#cmp1').value); raw.fill(0);
-      await touchProfile({ ...w, updated_at: nowISO() }); closeModal(); toast('主密码已修改 ✅ 记得重新备份');
+      await touchProfile({ ...w, updated_at: nowISO() }); markDirty(); closeModal(); toast('主密码已修改 ✅ 记得重新备份');
     } catch (err) { toast(err.message, 4000); }
   }); };
 };
@@ -1127,24 +1318,35 @@ async function renderTrusted() { if (!profile?.isOwner) return;
       renderTrusted(); });
   });
   box.querySelectorAll('[data-revoke]').forEach(b => b.onclick = async () => { const r0 = rows.find(r => r.id === b.dataset.revoke);
-    if (!(await askConfirm(`撤销「${r0?.label || r0?.device || '这台设备'}」的信任？那台设备下次登录云端要重新验证。`, { title: '撤销设备信任？', ok: '撤销', danger: true }))) return; busy(b, async () => {
-    const tok = cloudToken(); if (!tok) return toast('请先登录云端');
-    try { const r = await fetch(`${SUPABASE_URL}/rest/v1/trusted_devices?id=eq.${encodeURIComponent(b.dataset.revoke)}`, { method: 'DELETE', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}` } }); toast(r.ok ? '已撤销信任' : '撤销失败'); } catch { toast('撤销失败：连不上云端'); }
-    renderTrusted();
+    if (!(await askConfirm(`撤销「${r0?.label || r0?.device || '这台设备'}」的信任？那台设备下次登录云端要重新验证。`, { title: '撤销设备信任？', ok: '撤销', danger: true }))) return;
+    if (!(await reauth(`撤销「${r0?.label || r0?.device || '这台设备'}」的信任`))) return; busy(b, async () => {
+    if (!cloudToken()) return toast('请先登录云端');
+    const r = await rpcFresh('revoke_device', { p_id: b.dataset.revoke }, '撤销设备信任前请重新登录云端（5 分钟内）');
+    if (r.cancelled) return; if (r.error) return toast('撤销失败：' + cloudErr(r.error), 5000);
+    toast(r.data === false ? '未找到这台设备' : '已撤销信任'); renderTrusted();
   }); });
 }
 
 // ===== 解锁错误次数限制（本机威慑，不是真正的防线）=====
-const MAX_FAILS = 5, BASE_LOCK = 5 * 60 * 1000, MAX_LOCK = 60 * 60 * 1000;
-async function getGuard(id) { try { return (await getOne('guard', id)) || { id, fails: 0, level: 0, lockedUntil: 0 }; } catch { return { id, fails: 0, level: 0, lockedUntil: 0 }; } }
-async function putGuard(g) { try { await putOne('guard', g); } catch {} }
+// 连续输错 5 次锁 30 秒，之后每再错一次升级：2 分钟 → 10 分钟 → 2 小时（封顶）；解锁成功清零。
+// 状态同时存 IndexedDB 和 localStorage，读取时取更严格的一份（只清一处无法重置）。
+const MAX_FAILS = 5, LOCK_STEPS = [30e3, 120e3, 600e3, 7200e3];
+const fmtLock = ms => ms >= 3600e3 ? `${Math.round(ms / 3600e3)} 小时` : ms >= 60e3 ? `${Math.round(ms / 60e3)} 分钟` : `${Math.round(ms / 1e3)} 秒`;
+async function getGuard(id) {
+  let a = null, b = null;
+  try { a = await getOne('guard', id); } catch {}
+  try { b = JSON.parse(lsGet('fv-guard-' + id) || 'null'); } catch {}
+  const n = v => Math.max(0, Number(v) || 0), cap = Date.now() + LOCK_STEPS[LOCK_STEPS.length - 1];
+  return { id, fails: Math.max(n(a?.fails), n(b?.fails)), level: Math.max(n(a?.level), n(b?.level)), lockedUntil: Math.min(cap, Math.max(n(a?.lockedUntil), n(b?.lockedUntil))) };
+}
+async function putGuard(g) { try { await putOne('guard', g); } catch {} lsSet('fv-guard-' + g.id, JSON.stringify({ fails: g.fails, level: g.level, lockedUntil: g.lockedUntil })); }
 async function registerFail(p) {
   const g = await getGuard(p.id); g.fails = (g.fails || 0) + 1;
   logFailed(p, '主密码错误');
   if (g.fails >= MAX_FAILS) {
-    g.level = (g.level || 0) + 1; const ms = Math.min(BASE_LOCK * 2 ** (g.level - 1), MAX_LOCK);
-    g.lockedUntil = Date.now() + ms; g.fails = 0;
-    logFailed(p, `连续 ${MAX_FAILS} 次错误，锁定 ${Math.round(ms / 60000)} 分钟`);
+    const ms = LOCK_STEPS[Math.min(g.fails - MAX_FAILS, LOCK_STEPS.length - 1)];
+    g.level = g.fails - MAX_FAILS + 1; g.lockedUntil = Date.now() + ms;
+    logFailed(p, `连续 ${g.fails} 次错误，锁定 ${fmtLock(ms)}`);
   }
   await putGuard(g);
   if (g.lockedUntil > Date.now()) showGuard(); else toast(`主密码不对（还可以再试 ${MAX_FAILS - g.fails} 次）`);
@@ -1156,8 +1358,8 @@ async function showGuard() {
   const tick = () => {
     const left = g.lockedUntil - Date.now();
     if (left <= 0 || $('#screen-unlock').classList.contains('hidden')) { el.classList.add('hidden'); $('#unlock-submit').disabled = false; clearInterval(guardT); return; }
-    const m = Math.floor(left / 60000), sec = Math.floor(left % 60000 / 1000);
-    el.textContent = `🔒 主密码连续输错 ${MAX_FAILS} 次，这个用户已暂时锁定，请 ${m} 分 ${String(sec).padStart(2, '0')} 秒后再试。（这是本机的防乱试措施；真正保护你的是足够长的主密码和 60 万次密钥派生）`;
+    const h = Math.floor(left / 3600e3), m = Math.floor(left % 3600e3 / 60000), sec = Math.floor(left % 60000 / 1000);
+    el.textContent = `🔒 主密码已连续输错 ${g.fails} 次，这个用户已暂时锁定，请 ${h ? h + ' 小时 ' : ''}${m} 分 ${String(sec).padStart(2, '0')} 秒后再试。再输错会锁得更久（30 秒 → 2 分钟 → 10 分钟 → 2 小时）。（这是本机的防乱试措施；真正保护你的是足够长的主密码和 60 万次密钥派生）`;
     el.classList.remove('hidden'); $('#unlock-submit').disabled = true;
   };
   tick(); if (g.lockedUntil > Date.now()) guardT = setInterval(tick, 1000);
@@ -1198,7 +1400,7 @@ async function afterCloudSignIn(email) {
   // 设备记录和指纹始终保存；只有用户自己打开了「两步验证」，新设备才需要验证码
   const verified = await registerDevice();
   const st = await mySettings();
-  if (!st.two_step || verified) { if (verified) { try { localStorage.setItem('fv-trusted-' + email.toLowerCase(), '1'); } catch {} } flushLogs(); presenceBeat(true); return openCloud(); }
+  if (!st.two_step || verified) { if (verified) { try { localStorage.setItem('fv-trusted-' + email.toLowerCase(), '1'); } catch {} } flushLogs(); presenceBeat(true); autoOnUnlock(); renderStatus(); return openCloud(); }
   const sms = await smsEnabled();
   try { await cloud().auth.signOut({ scope: 'local' }); } catch {} sessionStorage.removeItem('fv-cloud');
   openModal('📧 新设备验证', `<p class="muted small">你打开了两步验证，这台设备第一次登录云端账号 <b>${esc(email)}</b>，需要输入验证码，验证后这台设备才会被信任。</p>
@@ -1225,7 +1427,7 @@ async function afterCloudSignIn(email) {
     if (error) return toast(otpErr(error), 6000);
     if (!(await registerDevice())) return toast('验证成功，但记录信任设备失败，请稍后重试', 6000);
     try { localStorage.setItem('fv-trusted-' + email.toLowerCase(), '1'); } catch {}
-    toast('这台设备已验证并被信任 ✅', 4000); flushLogs(); presenceBeat(true); openCloud();
+    toast('这台设备已验证并被信任 ✅', 4000); flushLogs(); presenceBeat(true); autoOnUnlock(); renderStatus(); openCloud();
   }); };
 }
 
@@ -1241,23 +1443,49 @@ $('#m-2fa').onclick = async () => {
   <p class="small">验证方式</p>
   <div class="radio"><label><input type="radio" name="tsm" value="email" ${st.method !== 'sms' || !sms ? 'checked' : ''}> 邮箱验证码</label><label class="${sms ? '' : 'off'}"><input type="radio" name="tsm" value="sms" ${sms ? '' : 'disabled'} ${sms && st.method === 'sms' ? 'checked' : ''}> 短信验证码${sms ? '' : '（短信未配置）'}</label></div>
   <button class="primary block" id="tsw-save" type="button">保存</button>
-  <p class="muted tiny">关闭两步验证需要再次输入主密码。设备记录和设备指纹不论开关都会保留，管理员可在「📜 访问日志」里查看和撤销。本机离线解锁只用主密码，无法用邮箱验证。</p>`;
+  <p class="muted tiny">关闭两步验证需要先输入发到你云端邮箱的验证码（服务器要求 15 分钟内用验证码验证过）。设备记录和设备指纹不论开关都会保留，管理员可在「📜 访问日志」里查看和撤销。本机离线解锁只用主密码，无法用邮箱验证。</p>`;
   $('#tsw-save').onclick = () => busy($('#tsw-save'), async () => {
     const on = document.querySelector('input[name="tsw"]:checked').value === 'on', method = document.querySelector('input[name="tsm"]:checked')?.value || 'email';
-    if (st.two_step && !on && !(await reauth('关闭两步验证'))) return;
-    const uid = cloudUid(); if (!uid) return toast('请先登录云端');
-    const body = { two_step: on, method, updated_at: nowISO() };
-    let r = await cloud().from('user_settings').update(body).eq('user_id', uid).select('user_id');
-    if (!r.error && !(r.data || []).length) r = await cloud().from('user_settings').insert({ user_id: uid, ...body });
-    if (r.error) return toast('保存失败：' + cloudErr(r.error), 5000);
+    if (!cloudUid()) return toast('请先登录云端');
+    if (st.two_step && !on) return twoStepOff(method);
+    const r = await cloud().rpc('set_two_step', { p_on: on, p_method: method });
+    if (r.error) return toast(/REAUTH_REQUIRED/.test(r.error.message || '') ? '请先用邮箱验证码验证' : '保存失败：' + cloudErr(r.error), 5000);
     if (on) await registerDevice();
     closeModal(); toast(on ? '两步验证已开启 ✅ 新设备登录云端时需要验证码' : '两步验证已关闭', 5000);
   });
 };
 
 
+// 关闭两步验证：服务器要求 15 分钟内用邮箱验证码验证过 → 发码、验证（会换成带验证码的新会话），再调用 set_two_step
+async function twoStepOff(method) {
+  const u = await cloudUser(); if (!u) return toast('请先登录云端');
+  const email = u.email;
+  openModal('🛡️ 关闭两步验证', `<p class="small">为了确认是你本人，关闭两步验证前，要先输入发到 <b>${esc(email)}</b> 的邮箱验证码。</p>
+  <div class="actions"><button type="button" class="primary" id="tso-send">发送验证码</button></div>
+  <form id="f-tso" class="sec hidden"><label>收到的验证码<input id="tso-code" class="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required></label>
+  <button class="primary block" id="tso-ok" type="submit">验证并关闭两步验证</button></form>
+  <p class="muted tiny">收不到邮件？看看垃圾邮件；Supabase 自带邮件每小时只能发几封。</p>`);
+  $('#tso-send').onclick = () => busy($('#tso-send'), async () => {
+    const r = await cloud().auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    if (r.error) return toast(otpErr(r.error), 7000);
+    toast('验证码已发送，请查看邮箱', 5000); $('#f-tso').classList.remove('hidden'); $('#tso-code').focus(); $('#tso-send').textContent = '重新发送';
+  });
+  $('#f-tso').onsubmit = e => { e.preventDefault(); busy($('#tso-ok'), async () => {
+    const v = await cloud().auth.verifyOtp({ email, token: $('#tso-code').value.trim(), type: 'email' });
+    if (v.error) return toast(otpErr(v.error), 6000);
+    srvRole = { tok: null, role: null };
+    const r = await cloud().rpc('set_two_step', { p_on: false, p_method: method });
+    if (r.error) return toast(/REAUTH_REQUIRED/.test(r.error.message || '') ? '请先用邮箱验证码验证' : '保存失败：' + cloudErr(r.error), 6000);
+    closeModal(); toast('两步验证已关闭', 5000); renderStatus();
+  }); };
+}
+
 // ===== 操作记录（标题等用管理员的 ECDH P-256 公钥加密：HKDF-SHA256 → AES-256-GCM；只有管理员能解密）=====
 const ACT_KEEP = 1000;
+const NO_DIRTY = new Set(['云端备份', '导出']); // 这些操作本身不改动保险库内容，不触发自动备份
+// 服务器 activity_log 只接受这些操作 / 分类名；不在名单里的映射成「其他」/ 空，避免整批上传被拒
+const ACT_OK = new Set(['新增', '编辑', '删除', '删除文件', '上传文件', '导入', '导出', '云端备份', '云端恢复', '新增用户', '删除用户', '改名', '修改设置', '其他']);
+const CAT_OK = new Set(['账号密码', '联系人', '日记', '文件', '财务记录', '用户']);
 const actAAD = id => enc.encode(`fv1|activity|${id}`);
 const actKeyAAD = pid => `fv1|actkey|${pid}`;
 async function ensureOwnerKeys() {
@@ -1323,6 +1551,7 @@ async function logActivity(action, category, title) {
     const sealed = await encForOwner(id, { title: String(title || '').slice(0, 300) });
     if (sealed) Object.assign(e, sealed); else e.nokey = true;
     await putOne('activity', e);
+    if (!NO_DIRTY.has(action)) markDirty();
     const all = await getAll('activity'); if (all.length > ACT_KEEP) { all.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))); await tx(['activity'], 'readwrite', t => { for (const x of all.slice(ACT_KEEP)) t.objectStore('activity').delete(x.id); }); }
     flushActivity();
   } catch {}
@@ -1332,7 +1561,7 @@ async function flushActivity() {
   const tok = cloudToken(); if (actFlushing || !tok || !navigator.onLine) return; actFlushing = true;
   try {
     const pend = (await getAll('activity')).filter(e => e.dirty).slice(0, 200); if (!pend.length) return;
-    const rows = pend.map(e => ({ id: e.id, profile_name: e.profileName, action: e.action, category: e.category || null, created_at: e.created_at, eph: e.eph || null, iv: e.iv || null, ct: e.ct || null, device: e.device, fp: e.fp }));
+    const rows = pend.map(e => ({ id: e.id, profile_name: e.profileName, action: ACT_OK.has(e.action) ? e.action : '其他', category: CAT_OK.has(e.category) ? e.category : null, created_at: e.created_at, eph: e.eph || null, iv: e.iv || null, ct: e.ct || null, device: e.device, fp: e.fp }));
     const r = await fetch(`${SUPABASE_URL}/rest/v1/activity_log`, { method: 'POST', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates,return=minimal' }, body: JSON.stringify(rows) });
     if (r.ok) await tx(['activity'], 'readwrite', t => { for (const e of pend) t.objectStore('activity').put({ ...e, dirty: false }); });
   } catch {} finally { actFlushing = false; }
@@ -1395,6 +1624,7 @@ async function renderAccessDash(realRows, cloudRows, labels, opt = {}) { if (!pr
   const avg = ended.length ? ended.reduce((a, r) => a + (+r.dur || 0), 0) / ended.length : 0;
   const allIps = new Set(rows.flatMap(ipsOf));
   const online = presence ? presence.filter(isOnline).length : sess.filter(r => r.live).length;
+  const suspects = rows.filter(isSuspect).length;
   // trend
   const dayKey = t => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
   const trend = n => { const lab = [], a = [], f = []; for (let i = n - 1; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5), k = dayKey(d); lab.push(`${d.getMonth() + 1}/${d.getDate()}`); a.push(sess.filter(r => dayKey(r.start) === k).length); f.push(fails.filter(r => dayKey(r.start) === k).length); } return lineChartSVG([a, f], lab, { label: `近 ${n} 天登录趋势` }); };
@@ -1409,7 +1639,8 @@ async function renderAccessDash(realRows, cloudRows, labels, opt = {}) { if (!pr
   const devMap = new Map(); for (const r of rows) { const k = devKey(r); const e = devMap.get(k) || { fp: r.fp, device: r.device, n: 0, last: '' }; e.n++; if (String(r.start) > e.last) e.last = r.start; devMap.set(k, e); }
   const devs = [...devMap.values()].sort((a, b) => b.n - a.n).slice(0, 8);
   // ips
-  const ipMap = new Map(); for (const r of rows) for (const ip of new Set(ipsOf(r))) { const e = ipMap.get(ip) || { ip, n: 0, first: r.start, last: r.start }; e.n++; if (r.start < e.first) e.first = r.start; if (r.start > e.last) e.last = r.start; ipMap.set(ip, e); }
+  const riskRank = r => r === 'high' ? 3 : r === 'medium' ? 2 : r === 'low' ? 1 : 0;
+  const ipMap = new Map(); for (const r of rows) for (const ip of new Set(ipsOf(r))) { const e = ipMap.get(ip) || { ip, n: 0, first: r.start, last: r.start, risk: null, flags: [] }; e.n++; if (r.start < e.first) e.first = r.start; if (r.start > e.last) e.last = r.start; if (riskRank(r.risk) > riskRank(e.risk)) e.risk = r.risk; for (const f of r.ip_flags || []) if (!e.flags.includes(f)) e.flags.push(f); ipMap.set(ip, e); }
   const ipl = [...ipMap.values()].sort((a, b) => String(b.last).localeCompare(String(a.last))).slice(0, 12);
   // users
   const uMap = new Map(); for (const r of rows) { const e = uMap.get(r.name) || { name: r.name, n: 0, f: 0, dur: 0, last: '', devs: new Set() }; if (r.kind === 'failed') e.f++; else { e.n++; e.dur += +r.dur || 0; if (String(r.start) > e.last) e.last = r.start; } e.devs.add(devKey(r)); uMap.set(r.name, e); }
@@ -1417,17 +1648,18 @@ async function renderAccessDash(realRows, cloudRows, labels, opt = {}) { if (!pr
   const devName = d => (d.fp && labels?.get?.(d.fp)) || '';
   box.innerHTML = head + `
     <div class="kpis">${kpiHTML('ad-k1', '总登录次数', '次')}${kpiHTML('ad-k2', '用户数', '人')}${kpiHTML('ad-k3', '设备数', '台')}${kpiHTML('ad-k4', 'IP 数', '个')}</div>
-    <div class="kpis mt"><div class="kpi"><div class="k">平均停留</div><div class="n">${esc(fmtDur(avg))}</div></div>${kpiHTML('ad-k6', '解锁失败', '次')}${kpiHTML('ad-k7', '当前在线', '人')}</div>
+    <div class="kpis mt"><div class="kpi"><div class="k">平均停留</div><div class="n">${esc(fmtDur(avg))}</div></div>${kpiHTML('ad-k6', '解锁失败', '次')}${kpiHTML('ad-k7', '当前在线', '人')}${kpiHTML('ad-k8', '可疑登录', '次')}</div>
+    <p class="ipnote">可疑登录按服务器给 IP 标的风险等级统计（中 / 高），IP 仅供参考。</p>
     <div class="pgrid"><div class="pnl"><h4>登录趋势 <span class="seg2" role="group" aria-label="范围"><button type="button" data-rng="7" class="on">7 天</button><button type="button" data-rng="30">30 天</button></span></h4><div id="ad-trend">${trend(7)}</div><div class="legend"><span><b class="c0"></b>登录</span><span><b class="c1"></b>失败</span></div></div>
       <div class="pnl"><h4>退出方式</h4><div class="donutwrap">${donutSVG(exits, String(sess.length), '次登录')}<div class="legend">${EXIT_KEYS.map((k, i) => `<span><b class="c${i}"></b>${esc(k)} ${exits[i]}</span>`).join('')}</div></div></div></div>
     <div class="pgrid"><div class="pnl"><h4>24 小时分布（几点登录）</h4>${barSVG(hours, hours.map((_, h) => h % 3 === 0 ? String(h) : ''))}</div>
       <div class="pnl"><h4>停留时长分布</h4>${barSVG(dist, bk.map(b => b[1]))}</div></div>
     <div class="pgrid3">
       <div class="pnl"><h4>常用设备 TOP</h4><div class="scroll-x"><table class="dtab"><tr><th>设备</th><th class="num">次数</th></tr>${devs.map(d => `<tr><td>${devCell(d.device, d.fp, '', labels)}</td><td class="num">${d.n}</td></tr>`).join('')}</table></div></div>
-      <div class="pnl"><h4>IP 地址</h4>${ipl.length ? `<div class="scroll-x"><table class="dtab"><tr><th>IP</th><th class="num">次数</th><th>最近</th></tr>${ipl.map(e => `<tr><td>${esc(e.ip)}${Date.now() - new Date(e.first).getTime() < 864e5 ? '<span class="newtag">新</span>' : ''}<br><small class="dsub">首次 ${esc(fmtTime(e.first))}</small></td><td class="num">${e.n}</td><td>${esc(fmtTime(e.last))}</td></tr>`).join('')}</table></div>` : '<div class="dempty">还没有 IP 记录：登录云端并联网后，新的登录会记录 IP。</div>'}</div>
+      <div class="pnl"><h4>IP 地址 <small class="dsub">仅供参考</small></h4>${ipl.length ? `<div class="scroll-x"><table class="dtab"><tr><th>IP</th><th class="num">次数</th><th>最近</th></tr>${ipl.map(e => `<tr><td>${esc(e.ip)}${Date.now() - new Date(e.first).getTime() < 864e5 ? '<span class="newtag">新</span>' : ''}${riskBadge(e.risk)}<br><small class="dsub">首次 ${esc(fmtTime(e.first))}</small>${e.flags?.length ? `<div>${flagHTML(e.flags)}</div>` : ''}</td><td class="num">${e.n}</td><td>${esc(fmtTime(e.last))}</td></tr>`).join('')}</table></div>` : '<div class="dempty">还没有 IP 记录：登录云端并联网后，新的登录会记录 IP。</div>'}</div>
       <div class="pnl"><h4>每个用户</h4><div class="scroll-x"><table class="dtab"><tr><th>用户</th><th class="num">登录</th><th class="num">失败</th><th class="num">总时长</th><th>最近</th></tr>${users.map(u => `<tr><td>${esc(u.name || '')}<br><small class="dsub">${u.devs.size} 台设备</small></td><td class="num">${u.n}</td><td class="num">${u.f}</td><td class="num">${esc(fmtDur(u.dur))}</td><td>${u.last ? esc(fmtTime(u.last)) : '—'}</td></tr>`).join('')}</table></div></div>
     </div>`;
-  countUp($('#ad-k1'), sess.length, 900); countUp($('#ad-k2'), uMap.size, 900); countUp($('#ad-k3'), devMap.size, 900); countUp($('#ad-k4'), allIps.size, 900); countUp($('#ad-k6'), fails.length, 900); countUp($('#ad-k7'), online, 900);
+  countUp($('#ad-k1'), sess.length, 900); countUp($('#ad-k2'), uMap.size, 900); countUp($('#ad-k3'), devMap.size, 900); countUp($('#ad-k4'), allIps.size, 900); countUp($('#ad-k6'), fails.length, 900); countUp($('#ad-k7'), online, 900); countUp($('#ad-k8'), suspects, 900);
   box.querySelectorAll('[data-rng]').forEach(b => b.onclick = () => { box.querySelectorAll('[data-rng]').forEach(x => x.classList.toggle('on', x === b)); $('#ad-trend').innerHTML = trend(+b.dataset.rng); });
   if ($('#ad-real')) $('#ad-real').onclick = () => renderAccessDash(realRows, cloudRows, labels);
 }
@@ -1554,10 +1786,15 @@ function fmtDur(s) {
   if (s < 86400) return `${Math.floor(s / 3600)} 小时 ${Math.floor(s % 3600 / 60)} 分`;
   return `${Math.floor(s / 86400)} 天 ${Math.floor(s % 86400 / 3600)} 小时`;
 }
+const RISK_LABEL = { high: '高风险', medium: '可疑', low: '正常' };
+const FLAG_LABEL = { no_ip: '无 IP', private_range: '内网段', xff_multi_hop: '多跳代理', xff_mismatch: '代理不一致', new_ip_for_user: '新 IP', new_ip_known_device: '已知设备新 IP', shared_ip_users: '多人共用', many_failures_ip: '同 IP 多次失败', tor_exit: 'Tor 出口' };
+const isSuspect = r => r.risk === 'high' || r.risk === 'medium';
+function riskBadge(risk) { return risk && risk !== 'low' ? `<span class="rbad ${esc(risk)}" title="IP 仅供参考">${esc(RISK_LABEL[risk] || risk)}</span>` : ''; }
+function flagHTML(flags) { return (flags || []).map(f => `<span class="ipfl" title="IP 仅供参考">${esc(FLAG_LABEL[f] || f)}</span>`).join(''); }
 async function fetchCloudLogs() {
   const tok = cloudToken(); if (!tok || !navigator.onLine || !profile?.isOwner) return null;
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/access_log?select=client_id,profile_name,event,device,fp,started_at,ended_at,duration_s,end_reason,ip_login,ip_logout,ip_sync&order=started_at.desc&limit=${LOG_KEEP}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}` } });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/access_log?select=client_id,profile_name,event,device,fp,started_at,ended_at,duration_s,end_reason,ip_login,ip_logout,ip_sync,ip_flags,risk&order=started_at.desc&limit=${LOG_KEEP}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}` } });
     if (!r.ok) return null; return await r.json();
   } catch { return null; }
 }
@@ -1569,17 +1806,20 @@ async function openLogs() {
   const cloudRows = own ? await fetchCloudLogs() : null;
   const byId = new Map();
   const labels = own ? await fpLabels() : new Map();
-  for (const l of local) byId.set(l.id, { id: l.id, kind: l.kind, name: l.profileName, device: l.device, fp: l.fp, fpSummary: l.fpSummary, start: l.started_at, end: l.kind === 'failed' ? null : l.ended_at, dur: l.kind === 'failed' ? null : l.duration_s, reason: l.end_reason, live: !!(sess && sess.id === l.id), local: true, cloud: null });
+  for (const l of local) byId.set(l.id, { id: l.id, kind: l.kind, name: l.profileName, device: l.device, fp: l.fp, fpSummary: l.fpSummary, start: l.started_at, end: l.kind === 'failed' ? null : l.ended_at, dur: l.kind === 'failed' ? null : l.duration_s, reason: l.end_reason, live: !!(sess && sess.id === l.id), local: true, cloud: null, risk: null, ip_flags: null });
   for (const c of cloudRows || []) { const e = byId.get(c.client_id);
-    if (e) e.cloud = c; else byId.set(c.client_id, { id: c.client_id, kind: c.event, name: c.profile_name, device: c.device + '（其他设备）', fp: c.fp, fpSummary: '', start: c.started_at, end: c.event === 'failed' ? null : c.ended_at, dur: c.duration_s, reason: c.end_reason, live: false, local: false, cloud: c }); }
+    if (e) { e.cloud = c; e.risk = c.risk || e.risk; e.ip_flags = c.ip_flags || e.ip_flags; }
+    else byId.set(c.client_id, { id: c.client_id, kind: c.event, name: c.profile_name, device: c.device + '（其他设备）', fp: c.fp, fpSummary: '', start: c.started_at, end: c.event === 'failed' ? null : c.ended_at, dur: c.duration_s, reason: c.end_reason, live: false, local: false, cloud: c, risk: c.risk || null, ip_flags: c.ip_flags || null }); }
   const rows = [...byId.values()].sort((a, b) => String(b.start).localeCompare(String(a.start)));
   const names = [...new Set(rows.map(r => r.name))];
   $('#modal .sheet').classList.add('wide');
   openModal('📜 访问日志', `<p class="muted tiny">${own ? '管理员可以看到这台设备上所有用户的登录记录' : '你只能看到自己的登录记录'}${cloudRows ? ' · ☁️ 已合并云端记录（含 IP）' : ' · 未登录云端或离线：IP 显示为「离线/未登录云端」，登录云端后会自动补传'}。日志只记时间、设备和用户名，不含任何密码或内容。</p>
   <div class="lfilters"><select id="lf-name" aria-label="用户"><option value="">全部用户</option>${names.map(n => `<option>${esc(n)}</option>`).join('')}</select>
   <select id="lf-kind" aria-label="类型"><option value="">全部类型</option><option value="session">登录记录</option><option value="failed">密码错误 / 锁定</option></select>
+  <select id="lf-risk" aria-label="风险"><option value="">全部风险</option><option value="suspect">只看可疑</option><option value="high">高风险</option><option value="medium">可疑</option></select>
   <select id="lf-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select>
   <select id="lf-dev" aria-label="设备"><option value="">全部设备</option>${devOptions(rows, labels)}</select><button type="button" class="fclear hidden" id="lf-clear">清除筛选</button></div>
+  <p class="ipnote">IP 风险标记仅供参考（由服务器根据 IP、代理头、历史登录等粗略估算），不能单独当作证据。</p>
   <div id="lg-count" class="muted tiny"></div><div class="lgrid" id="lgrid"></div>
   ${own ? `<div class="lsec"><h3>🗂️ 操作记录</h3><p class="muted tiny">新增 / 编辑 / 删除 / 上传或删除文件 / 导入 / 导出等操作。标题用管理员公钥加密，只有管理员能解开。</p>
   <div class="lfilters"><select id="af-user" aria-label="用户"><option value="">全部用户</option></select><select id="af-act" aria-label="操作"><option value="">全部操作</option></select><select id="af-cat" aria-label="分类"><option value="">全部分类</option></select><select id="af-dev" aria-label="设备"><option value="">全部设备</option></select><select id="af-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select><button type="button" class="fclear hidden" id="af-clear">清除筛选</button></div>
@@ -1593,20 +1833,21 @@ async function openLogs() {
   const ipCell = (r, which) => {
     if (!r.cloud) return '<i class="ipoff">离线/未登录云端</i>';
     const v = which === 'in' ? r.cloud.ip_login : r.cloud.ip_logout;
-    if (v) return esc(v);
-    if (which === 'in' && r.cloud.ip_sync) return `${esc(r.cloud.ip_sync)}<i class="ipoff">（补传时）</i>`;
-    return '<i class="ipoff">—</i>';
+    let core = v ? esc(v) : (which === 'in' && r.cloud.ip_sync ? `${esc(r.cloud.ip_sync)}<i class="ipoff">（补传时）</i>` : '<i class="ipoff">—</i>');
+    if (which === 'in') core += riskBadge(r.risk) + (r.ip_flags?.length ? `<div>${flagHTML(r.ip_flags)}</div>` : '');
+    return core;
   };
   const draw = any => {
-    const fn = $('#lf-name').value, fk = $('#lf-kind').value, ft = +$('#lf-time').value, fd = $('#lf-dev').value;
+    const fn = $('#lf-name').value, fk = $('#lf-kind').value, fr = $('#lf-risk').value, ft = +$('#lf-time').value, fd = $('#lf-dev').value;
     const since = ft ? (ft === 1 ? new Date(new Date().toDateString()).getTime() : Date.now() - ft * 864e5) : 0;
-    const list = rows.filter(r => (!fn || r.name === fn) && (!fk || r.kind === fk) && (!fd || devKeyOf(r) === fd) && (!since || new Date(r.start).getTime() >= since));
+    const list = rows.filter(r => (!fn || r.name === fn) && (!fk || r.kind === fk) && (!fd || devKeyOf(r) === fd) && (!since || new Date(r.start).getTime() >= since)
+      && (!fr || (fr === 'suspect' ? isSuspect(r) : r.risk === fr)));
     $('#lg-count').textContent = any ? `筛选出 ${list.length} / ${rows.length} 条` : `共 ${list.length} 条`;
     $('#lgrid').innerHTML = `<div class="lhead"><span>登录时间</span><span>退出时间</span><span>停留时长</span><span>设备</span><span>登录IP</span><span>退出IP</span><span>用户</span><span>退出方式</span></div>` +
       (list.map(r => { const f = r.kind === 'failed';
-        return `<div class="lrow${f ? ' fail' : ''}${r.live ? ' live' : ''}"><span data-l="${f ? '尝试时间' : '登录时间'}">${esc(fmtTime(r.start))}</span><span data-l="退出时间">${f ? '—' : r.live ? '—（进行中）' : esc(fmtTime(r.end))}</span><span data-l="停留时长">${f ? '—' : esc(fmtDur(r.dur))}</span><span data-l="设备">${devCell(r.device, r.fp, r.fpSummary, labels)}</span><span data-l="登录IP">${ipCell(r, 'in')}</span><span data-l="退出IP">${f ? '—' : ipCell(r, 'out')}</span><span data-l="用户">${esc(r.name || '')}</span><span data-l="退出方式">${f ? '❌ ' + esc(r.reason || '主密码错误') : r.live ? '🟢 进行中' : esc(r.reason || '关闭页面')}</span></div>`; }).join('') || '<div class="empty">没有符合条件的记录</div>');
+        return `<div class="lrow${f ? ' fail' : ''}${r.live ? ' live' : ''}${isSuspect(r) ? ' risk-' + r.risk : ''}"><span data-l="${f ? '尝试时间' : '登录时间'}">${esc(fmtTime(r.start))}</span><span data-l="退出时间">${f ? '—' : r.live ? '—（进行中）' : esc(fmtTime(r.end))}</span><span data-l="停留时长">${f ? '—' : esc(fmtDur(r.dur))}</span><span data-l="设备">${devCell(r.device, r.fp, r.fpSummary, labels)}</span><span data-l="登录IP">${ipCell(r, 'in')}</span><span data-l="退出IP">${f ? '—' : ipCell(r, 'out')}</span><span data-l="用户">${esc(r.name || '')}</span><span data-l="退出方式">${f ? '❌ ' + esc(r.reason || '主密码错误') : r.live ? '🟢 进行中' : esc(r.reason || '关闭页面')}</span></div>`; }).join('') || '<div class="empty">没有符合条件的记录</div>');
   };
-  bindFilters(['#lf-name', '#lf-kind', '#lf-time', '#lf-dev'], '#lf-clear', draw);
+  bindFilters(['#lf-name', '#lf-kind', '#lf-risk', '#lf-time', '#lf-dev'], '#lf-clear', draw);
 }
 
 // ===== 主题：自动（本机时间 6:00–18:00 白天）/ 白天 / 夜间 =====
