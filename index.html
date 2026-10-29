@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-EwpX/2z3XM1LQstZIukjBqm4oB7MB6RqasRorTC28qo='; style-src 'sha256-Yvd97DFzA6cw3Nnrbj3bveixVBUbx/9s957g8Vo5cZ8='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-4FPExPMnCTgdRAa18DcJumiEK334zectOIAWhiqAsJc='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -28,6 +28,9 @@ button:disabled{opacity:.6;cursor:wait}
 .ghost{background:transparent;border-color:transparent}
 .link{background:none;border:none;color:var(--pri);padding:6px 0}
 .block{width:100%;margin-top:16px;padding:12px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--fg);margin:0}
+.chip input{width:auto;margin:0}
 .row{display:flex;align-items:center}.between{justify-content:space-between}.gap{gap:6px}
 .tabs2{display:flex;gap:6px;margin:16px 0 4px;background:var(--bg);padding:4px;border-radius:12px}
 .tabs2 button{flex:1;border:none;background:transparent}.tabs2 button.active{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.08);font-weight:600}
@@ -823,12 +826,73 @@ function cloudErr(e) {
   if (code === 'email_address_not_authorized' || /not authorized/i.test(m)) return '邮箱已授权，但云端暂时发不了确认邮件：请管理员在 Supabase 后台关闭「Confirm email」后再注册';
   if (/Invalid login credentials/i.test(m)) return '邮箱或登录密码不对';
   if (/Email not confirmed/i.test(m)) return '邮箱还没确认，请先点邮件里的确认链接';
+  if (/EMAIL_BLACKLISTED|BLACKLISTED/i.test(m)) return '该账号已被管理员拉黑，无法使用云端（本机离线解锁不受影响）';
+  if (/REGION_BLOCKED|REGION_UNKNOWN|REGION_LOCK_EMPTY/i.test(m)) return m.replace(/^[A-Z_]+:\s*/, '') || '当前登录地区不在允许名单内';
+  if (/CANNOT_BLACKLIST_SELF/i.test(m)) return '不能拉黑当前登录的管理员邮箱';
   if (/User already registered/i.test(m)) return '这个邮箱已经注册过了，请直接登录';
   if (/row-level security|Unauthorized|permission denied|403/i.test(m)) return '没有云端权限（可能还没授权，或已被管理员取消授权）';
   if (/Failed to fetch|NetworkError/i.test(m)) return '连不上云端，请检查网络';
   return m;
 }
 async function cloudUser() { const { data } = await cloud().auth.getSession(); return data.session?.user || null; }
+async function checkCloudAccess() {
+  try {
+    const { data, error } = await cloud().rpc('check_cloud_access', { p_fp: FP?.hash || null });
+    if (error) return { ok: false, reason: 'RPC', message: cloudErr(error) };
+    return data || { ok: true };
+  } catch (e) { return { ok: false, reason: 'RPC', message: cloudErr(e) }; }
+}
+const REGION_PRESETS = [
+  ['CN','中国大陆'],['HK','香港'],['MO','澳门'],['TW','台湾'],
+  ['SG','新加坡'],['JP','日本'],['KR','韩国'],['US','美国'],['GB','英国'],['AU','澳大利亚'],['CA','加拿大'],['DE','德国']
+];
+async function openCloudSecurity() {
+  if (!(await isCloudOwner())) return toast('请先用授权过的云端管理员账号登录');
+  openModal('🛡️ 云端黑名单 / 地区锁', '<p class="muted small">正在读取…</p>');
+  const st = await cloud().rpc('get_owner_settings');
+  const bl = await cloud().rpc('list_blacklist');
+  if (st.error) { $('#modal-body').innerHTML = `<p class="small">${esc(cloudErr(st.error))}</p>`; return; }
+  if (bl.error) { $('#modal-body').innerHTML = `<p class="small">${esc(cloudErr(bl.error))}</p>`; return; }
+  const s = st.data || {};
+  const rows = Array.isArray(bl.data) ? bl.data : [];
+  const allowed = new Set((s.allowed_countries || []).map(c => String(c).toUpperCase()));
+  const en = !!s.region_lock_enabled;
+  $('#modal-body').innerHTML = `
+  <div class="sec"><h3>🚫 云端黑名单</h3>
+  <p class="muted tiny">拉黑后立即无法云端登录/备份/恢复；本机主密码离线解锁不受影响。匹配邮箱，或（若填写）IP / 设备指纹。</p>
+  <div id="bl-list" class="vlist">${rows.length ? rows.map(r => `<div class="vrow"><span>⛔ ${esc(r.email)}${r.ip ? ' · IP '+esc(r.ip) : ''}${r.fingerprint ? ' · 指纹 '+esc(String(r.fingerprint).slice(0,8))+'…' : ''}${r.reason ? ' · '+esc(r.reason) : ''}</span><button type="button" class="danger" data-blrm="${esc(r.id)}">移除</button></div>`).join('') : '<p class="muted small">暂无黑名单</p>'}</div>
+  <form id="f-bl" class="mt"><label>邮箱（必填）<input id="bl-email" type="email" required></label>
+  <label>IP（可选）<input id="bl-ip" placeholder="例如 203.0.113.10"></label>
+  <label>设备指纹（可选）<input id="bl-fp" placeholder="访问日志里的 fp"></label>
+  <label>原因（可选）<input id="bl-reason" maxlength="200"></label>
+  <button class="primary block" id="bl-add" type="submit">加入黑名单</button></form></div>
+  <div class="sec"><h3>🌏 登录地区锁（国家/地区白名单）</h3>
+  <p class="muted tiny">按登录 IP 识别国家（优先 Cloudflare 等边缘头）。白名单模式：只允许勾选的国家/地区使用云端。VPN 可能导致误判，可暂时关闭。</p>
+  <div class="radio"><label><input type="radio" name="rl" value="on" ${en ? 'checked' : ''}> 开启</label><label><input type="radio" name="rl" value="off" ${en ? '' : 'checked'}> 关闭</label></div>
+  <div class="chiprow" id="rl-countries">${REGION_PRESETS.map(([c,n]) => `<label class="chip"><input type="checkbox" value="${c}" ${allowed.has(c)?'checked':''}> ${n} (${c})</label>`).join('')}</div>
+  <label>额外国家代码（逗号分隔，ISO 两位）<input id="rl-extra" placeholder="例如 MY,TH" value="${esc([...allowed].filter(c => !REGION_PRESETS.some(([x]) => x===c)).join(','))}"></label>
+  <button class="primary block" id="rl-save" type="button">保存地区锁</button>
+  <p class="muted tiny">管理员在名单外时仍可打开本页关闭地区锁；备份等敏感操作仍会按白名单拒绝。</p></div>`;
+  $('#f-bl').onsubmit = e => { e.preventDefault(); busy($('#bl-add'), async () => {
+    const r = await cloud().rpc('add_blacklist', { p_email: $('#bl-email').value.trim(), p_ip: $('#bl-ip').value.trim() || null, p_fingerprint: $('#bl-fp').value.trim() || null, p_reason: $('#bl-reason').value.trim() || null });
+    if (r.error) return toast(cloudErr(r.error), 6000);
+    toast('已加入黑名单'); openCloudSecurity();
+  }); };
+  $('#modal-body').querySelectorAll('[data-blrm]').forEach(b => b.onclick = () => busy(b, async () => {
+    if (!(await askConfirm('确定从黑名单移除？', { title: '取消拉黑', ok: '移除' }))) return;
+    const r = await cloud().rpc('remove_blacklist', { p_id: b.dataset.blrm });
+    if (r.error) return toast(cloudErr(r.error), 6000);
+    toast('已移除'); openCloudSecurity();
+  }));
+  $('#rl-save').onclick = () => busy($('#rl-save'), async () => {
+    const on = document.querySelector('input[name="rl"]:checked')?.value === 'on';
+    const set = new Set([...$('#rl-countries').querySelectorAll('input:checked')].map(i => i.value));
+    ($('#rl-extra').value || '').split(/[\s,，]+/).map(x => x.trim().toUpperCase()).filter(x => /^[A-Z]{2}$/.test(x)).forEach(x => set.add(x));
+    const r = await cloud().rpc('set_region_lock', { p_enabled: on, p_countries: [...set] });
+    if (r.error) return toast(cloudErr(r.error), 7000);
+    toast(on ? '地区锁已开启 ✅' : '地区锁已关闭'); openCloudSecurity();
+  });
+}
 // 服务器要求 5 分钟内重新登录过才能删除：弹出云端密码框，signInWithPassword 刷新会话后重试一次
 function cloudReauth(why) {
   return new Promise(async resolve => {
@@ -889,6 +953,7 @@ async function openCloud() {
   if (canBackup) html += `<p class="muted small">将备份：${profile.isOwner ? '整个家庭保险库（所有用户，各自加密）' : `只有「${esc(profile.name)}」这个用户的内容`}。云端只保留最近 ${KEEP_VERSIONS} 份。</p><button id="c-backup" class="primary block" type="button">⬆️ 立即云端备份</button>`;
   html += BACKUP_STMT;
   html += `<div class="sec"><h3>云端版本（点「恢复」导入到本机）</h3>${verr ? `<p class="small">${esc(verr)}</p>` : vs.length ? `<div class="vlist">${vs.map((f, i) => `<div class="vrow"><span>${esc(f.name.replace(/^vault-|\.vault$/g, ''))} · ${fmtSize(f.metadata?.size)}</span><span class="vb"><button type="button" data-restore="${esc(f.name)}">恢复</button>${canBackup ? (i < PROTECTED_N ? '<span class="lockd" title="最新的 3 份云备份受服务器保护，不能删除">🔒 受保护</span>' : `<button type="button" class="danger" data-vdel="${esc(f.name)}">删除</button>`) : ''}</span></div>`).join('')}</div>${canBackup && vs.length ? `<p class="muted tiny">最新的 ${PROTECTED_N} 份云备份受服务器保护，不能删除；更旧的可以手动删除（需要再次输入主密码）。</p>` : ''}` : '<p class="muted small">还没有云端备份</p>'}</div>`;
+  if (me?.role === 'owner') html += `<div class="sec"><button type="button" class="block" id="c-security">🛡️ 云端黑名单 / 地区锁</button></div>`;
   if (me?.role === 'owner' && profile?.isOwner) html += `<div class="sec"><h3>👨‍👩‍👧 云端授权</h3><p class="muted tiny">只有在这里授权过的邮箱才能注册云端账号；删除后立刻失去云端访问权限。</p><div id="allow-list" class="vlist"></div><form id="f-allow" class="mt"><label>家人邮箱<input id="a-email" type="email" required></label><label>称呼（可选）<input id="a-name" maxlength="20"></label><button class="primary block" id="a-add" type="submit">授权这个邮箱</button></form></div>`;
   html += `<div class="actions"><button id="c-logout" type="button">退出云端账号</button></div>`;
   openModal('☁️ 云端备份', html);
@@ -902,7 +967,17 @@ async function openCloud() {
       if (!(data || []).length) return toast('删除失败：最新的 3 份云备份受服务器保护，不能删除', 6000);
       logActivity('删除', '', '云端备份 ' + nm); toast('已删除这份云端备份'); openCloud(); }); });
   $('#c-logout').onclick = async () => { await cloud().auth.signOut({ scope: 'local' }); sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; refreshOwnerCloudUI(); renderStatus(); closeModal(); toast('已退出云端账号'); };
+  if ($('#c-security')) $('#c-security').onclick = () => openCloudSecurity();
   refreshOwnerCloudUI();
+  if (u) { const gate = await checkCloudAccess(); if (gate && gate.ok === false && gate.reason !== 'SESSION') {
+    const ownerEscape = me?.role === 'owner' && (gate.reason === 'REGION_BLOCKED' || gate.reason === 'REGION_UNKNOWN');
+    if (!ownerEscape) {
+      try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
+      sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; refreshOwnerCloudUI(); renderStatus();
+      return toast(gate.message || '云端访问被拒绝', 9000);
+    }
+    toast(gate.message + '（你是管理员，仍可打开「黑名单/地区锁」关闭限制）', 9000);
+  }}
   if ($('#f-allow')) { $('#f-allow').onsubmit = e => { e.preventDefault(); busy($('#a-add'), async () => {
     const email = $('#a-email').value.trim().toLowerCase(), name = $('#a-name').value.trim() || null;
     const { error } = await cloud().from('family_allowlist').insert({ email, display_name: name, role: 'member' });
@@ -1467,6 +1542,13 @@ async function registerDevice() { try { const { data, error } = await cloud().rp
 async function afterCloudSignIn(email) {
   const u0 = await cloudUser();
   if (await rejectUnverifiedCloud(u0)) return;
+  const gate = await checkCloudAccess();
+  if (gate && gate.ok === false) {
+    try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
+    sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null };
+    refreshOwnerCloudUI();
+    return toast(gate.message || '云端访问被拒绝', 9000);
+  }
   // 设备记录和指纹始终保存；只有用户自己打开了「两步验证」，新设备才需要验证码
   const verified = await registerDevice();
   const st = await mySettings();
