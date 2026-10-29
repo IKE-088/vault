@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-9zDxqc6LZQfqhmGDPCpsHTD+YuiCYH8j5cKjm4kadmE='; style-src 'sha256-5ZZ4Za/ox9yHOb+OBq/439eJz7+x4XREYWGTI8xmt+U='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-xOi5V9OHbAjpj6lucgQUV+2JufetRRL4HWyfGLeyXBk='; style-src 'sha256-VdvExGOoGx8uiVvOMHrZi5CWTF8or2WiLJy0TO2KzNg='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
-:root{--bg:#f1f5f9;--card:#fff;--fg:#0f172a;--muted:#64748b;--line:#e2e8f0;--pri:#2563eb;--pri2:#1d4ed8;--danger:#dc2626;--r:14px}
+:root{--bg:#f1f5f9;--card:#fff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--pri:#2563eb;--pri2:#1d4ed8;--danger:#dc2626;--r:14px}
 html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
 .hidden{display:none!important}
 .screen{min-height:100vh;max-width:860px;margin:0 auto;padding:12px 14px 40px}
@@ -19,7 +19,7 @@ html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-sys
 .muted{color:var(--muted)}.small{font-size:13px}.tiny{font-size:12px}
 label{display:block;margin:12px 0 0;font-size:13px;color:var(--muted)}
 input,textarea,select{display:block;width:100%;margin-top:4px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--fg);background:var(--card)}
-input:focus,textarea:focus,select:focus{outline:2px solid #bfdbfe;border-color:var(--pri)}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--pri);outline-offset:1px;border-color:var(--pri)}
 textarea{min-height:90px;resize:vertical}
 button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);padding:9px 14px;color:var(--fg)}
 button:disabled{opacity:.6;cursor:wait}
@@ -37,7 +37,7 @@ button:disabled{opacity:.6;cursor:wait}
 .cats{display:flex;gap:8px;overflow-x:auto;padding:6px 0 10px;scrollbar-width:none}
 .cats button{white-space:nowrap;border-radius:999px;padding:8px 14px}
 .cats button.active{background:var(--fg);color:var(--card);border-color:var(--fg)}
-.cats .count{opacity:.6;margin-left:4px;font-size:12px}
+.cats .count{opacity:.8;margin-left:4px;font-size:12px}
 .toolbar{display:flex;gap:8px}.toolbar input{margin:0}
 .summary{margin-top:10px;background:var(--card);border-radius:12px;padding:10px 14px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap}
 .list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
@@ -49,7 +49,7 @@ button:disabled{opacity:.6;cursor:wait}
 .item .s{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .r{font-size:13px;color:var(--muted);white-space:nowrap}
 .badge{font-size:11px;background:var(--bg);border-radius:6px;padding:1px 6px;margin-right:6px;color:var(--muted)}
-.empty{text-align:center;color:var(--muted);padding:40px 0}
+.empty{text-align:center;color:var(--muted);padding:36px 16px}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
 .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 18px 24px}
 @media(min-width:640px){.modal{align-items:center}.sheet{border-radius:18px}}
@@ -157,7 +157,7 @@ html[data-theme=night] .banner{background:#3b2a07;color:#fde68a}
 html[data-theme=night] .tip{background:#0c2d48;color:#bae6fd}
 html[data-theme=night] .tag{background:#1e3a8a;color:#bfdbfe}
 html[data-theme=night] .danger{border-color:#7f1d1d}
-html[data-theme=night] input:focus,html[data-theme=night] textarea:focus,html[data-theme=night] select:focus{outline-color:#1e40af}
+html[data-theme=night] input:focus,html[data-theme=night] textarea:focus,html[data-theme=night] select:focus{outline-color:#60a5fa}
 html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,rgba(37,99,235,.06),transparent)}
 .dash svg text{fill:var(--d-dim)}.dash svg text.ctr{fill:var(--d-fg)}.dash svg text.bv{fill:var(--d-muted)}
 .dash svg line{stroke:var(--d-grid)}
@@ -210,10 +210,65 @@ html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,
 .scroll-x{overflow-x:auto}
 @media(max-width:420px){.themesw button{padding:4px 7px}#btn-lock{padding:9px 8px}}
 @media(prefers-reduced-motion:reduce){.dash *,.dash::before,.dash::after{animation:none!important;transition:none!important}.dash::after{display:none}}
+/* ===== 体验优化 ===== */
+.screen{padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+html[data-theme=night] :focus-visible{outline-color:#60a5fa}
+.menu button:focus-visible{outline-offset:-3px}
+html[data-theme=night] .primary{background:#2563eb;border-color:#2563eb}html[data-theme=night] .primary:hover{background:#1d4ed8}
+#btn-lock,#btn-menu{white-space:nowrap}
+#btn-menu{font-size:18px;line-height:1;min-width:40px}
+.item{transition:border-color .15s,background-color .15s}.item:focus-visible{border-color:var(--pri);outline-offset:1px}
+.item .t{font-size:15px}
+.empty .em-ic{font-size:34px;line-height:1;margin-bottom:8px}
+.empty .em-t{margin:0;font-size:16px;font-weight:600;color:var(--fg)}
+.empty .em-s{margin:6px auto 14px;font-size:13px;max-width:360px}
+.sheet{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.sheet-head{position:sticky;top:-16px;z-index:3;background:var(--card);margin:-4px 0 4px;padding:4px 0 8px;gap:8px}
+.sheet-head h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.35}
+#modal-close,#ra-close{flex-shrink:0;width:40px;height:40px;padding:0;font-size:18px;border-radius:999px;color:var(--muted)}
+#modal-close:hover,#ra-close:hover{background:var(--bg);color:var(--fg)}
+.actions button{min-height:44px}
+.lsec h3,.sec h3{font-size:15px}
+.toast{box-shadow:0 8px 30px rgba(15,23,42,.25);bottom:calc(24px + env(safe-area-inset-bottom));text-align:center}
+.toast.err{background:#b91c1c;color:#fff}
+.modal.top2{z-index:45;align-items:center;padding:16px}
+#confirm .sheet{max-width:420px;border-radius:18px;padding:20px}
+#cf-title{margin:0;font-size:18px}
+.cf-msg{white-space:pre-wrap;margin:10px 0 0;color:var(--fg);font-size:14.5px}
+.primary.danger-btn,html[data-theme=night] .primary.danger-btn{background:#dc2626;border-color:#dc2626;color:#fff}.primary.danger-btn:hover,html[data-theme=night] .primary.danger-btn:hover{background:#b91c1c}
+.savest{margin-right:auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);min-height:32px}
+.savest::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0}
+.savest.pending::before{background:#f59e0b}.savest.saving::before{background:#3b82f6;animation:pulse 1s ease-in-out infinite}
+.savest.saved{color:var(--fg)}.savest.saved::before{background:#22c55e}
+.savest.err{color:var(--danger)}.savest.err::before{background:var(--danger)}
+.actions.auto{align-items:center}.actions.auto button{flex:0 0 auto;min-height:40px}
+.btn-sm{padding:7px 14px;font-size:14px}
+.filebox{margin-top:14px;border:1.5px dashed var(--line);border-radius:12px;padding:16px 14px;text-align:center;background:var(--bg);color:var(--muted);cursor:pointer}
+.filebox:hover,.filebox.drag{border-color:var(--pri)}.filebox.drag{background:var(--card)}
+.filebox .fb-t{display:block;font-weight:600;color:var(--fg);font-size:14.5px}
+.filebox .fb-s{display:block;margin-top:4px;font-size:12.5px;word-break:break-all}
+.filebox .fb-s.ok{color:var(--fg)}
+.filebox input{margin:10px auto 0;max-width:100%;width:auto;background:transparent;border:none;padding:0}
+.devc{display:flex;flex-direction:column;gap:1px;min-width:0}
+.devc .dn{font-weight:600;color:var(--fg)}
+.devc .dt i{font-style:normal;margin-right:4px}
+.devc .dt small{color:var(--muted);font-size:11px;margin-left:2px}
+.devc .dt small.other{border:1px solid var(--line);border-radius:6px;padding:0 4px}
+.dash .devc .dn{color:var(--d-fg)}
+.lfilters select.on{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri)}
+.lfilters .fclear{flex:0 0 auto;padding:6px 12px;font-size:13px}
+.fatal{padding:20px}
+.bk-age{font-size:13.5px;margin:4px 0 10px;padding:9px 12px;border-radius:10px;background:var(--bg);color:var(--fg)}
+.bk-age.warn{background:#fef2f2;color:#b91c1c;font-weight:600;border:1px solid #fecaca}
+html[data-theme=night] .bk-age.warn{background:#450a0a;color:#fecaca;border-color:#991b1b}
+@media(max-width:480px){.topbar .brand{font-size:17px}.sheet{padding-left:14px;padding-right:14px}.item{padding:12px}.toolbar.end #btn-add{padding:10px 16px}}
+@media(max-width:420px){#btn-lock .lbl{display:none}#btn-lock{padding:9px 10px}.topbar .row.gap{gap:4px}}
+@media(prefers-reduced-motion:reduce){.savest.saving::before{animation:none}}
 </style>
 </head>
 <body>
-<div id="toast" class="toast hidden"></div>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
 <!-- 展示面板（演示数据） -->
 <section id="screen-showcase" class="screen hidden">
@@ -228,7 +283,7 @@ html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,
     <div id="profile-list" class="plist"></div>
     <div id="first-run" class="hidden">
       <p class="small">还没有<b>管理员</b>用户：请先创建（就是你自己）。上面列出的用户（如「示例」）可以直接点开。</p>
-      <p class="tip">💡 已经有备份？请先点下面的「📂 从备份文件恢复」或「☁️ 从云端恢复」，不要再新建管理员，否则会出现两个 👑。</p>
+      <p class="tip">💡 换了手机、或清理过浏览器后，这里会是空的，但数据还在备份里：有备份文件（.vault）就点下面的「📂 从备份文件恢复」选中它；做过云端备份就点「☁️ 从云端恢复」，用家里授权过的邮箱登录后选一个版本。恢复后用原来的主密码解锁，<b>不要再新建管理员</b>，否则会出现两个 👑。</p>
       <form id="form-owner">
         <label>用户名<input id="owner-name" required maxlength="32" placeholder="例如：baba" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"><small class="hint" id="owner-name-hint"></small></label>
         <label>主密码（至少 12 位）<input id="owner-mp1" type="password" required minlength="12" autocomplete="off"></label>
@@ -253,7 +308,7 @@ html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,
     <div class="brand">🔑 <span id="unlock-name"></span></div>
     <p class="muted small">请输入这个用户的主密码。主密码只在本机使用。</p>
     <form id="form-unlock">
-      <label>主密码<input id="mp1" type="password" required autocomplete="off"></label>
+      <label>主密码<input id="mp1" type="password" required autocomplete="off" aria-describedby="unlock-err"></label><p id="unlock-err" class="hint bad hidden" role="alert"></p>
       <button class="primary block" id="unlock-submit" type="submit">解锁</button>
     </form>
     <p id="unlock-guard" class="banner hidden"></p>
@@ -268,8 +323,8 @@ html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,
     <div class="brand">🔐 <span id="who"></span></div>
     <div class="row gap">
       <span class="themesw" role="group" aria-label="主题"><button type="button" data-theme-set="auto" title="按本机时间自动（6:00–18:00 白天）">自动</button><button type="button" data-theme-set="day">白天</button><button type="button" data-theme-set="night">夜间</button></span>
-      <button id="btn-lock" class="ghost" type="button">🔒 锁定</button>
-      <button id="btn-menu" class="ghost" type="button" title="更多">⋯</button>
+      <button id="btn-lock" class="ghost" type="button" aria-label="锁定" title="锁定">🔒<span class="lbl"> 锁定</span></button>
+      <button id="btn-menu" class="ghost" type="button" title="更多" aria-label="更多" aria-haspopup="true" aria-expanded="false" aria-controls="menu">⋯</button>
     </div>
     <div id="menu" class="menu hidden">
       <button id="m-export" type="button">💾 导出备份文件</button>
@@ -302,15 +357,20 @@ html[data-theme=day] .dash::after{background:linear-gradient(180deg,transparent,
 <input id="file-import" type="file" accept=".vault,application/json" class="hidden">
 
 <div id="reauth" class="modal top hidden" role="dialog" aria-modal="true">
-  <div class="sheet narrow"><div class="sheet-head"><h2 id="ra-title">🔐 请再次输入主密码</h2><button id="ra-close" class="ghost" type="button">✕</button></div>
+  <div class="sheet narrow"><div class="sheet-head"><h2 id="ra-title">🔐 请再次输入主密码</h2><button id="ra-close" class="ghost" type="button" aria-label="关闭" title="关闭（Esc）">✕</button></div>
     <p class="muted small" id="ra-desc"></p>
     <form id="f-ra"><label>当前用户的主密码<input id="ra-pw" type="password" required autocomplete="off"></label><p id="ra-err" class="hint bad hidden"></p>
     <div class="actions"><button type="button" id="ra-cancel">取消</button><button type="submit" class="primary" id="ra-ok">确认</button></div></form>
   </div>
 </div>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+<div id="confirm" class="modal top2 hidden" role="alertdialog" aria-modal="true" aria-labelledby="cf-title" aria-describedby="cf-msg">
+  <div class="sheet narrow"><h2 id="cf-title">请确认</h2><p id="cf-msg" class="cf-msg"></p>
+    <label id="cf-inwrap" class="hidden"><span id="cf-inlabel"></span><input id="cf-input" maxlength="40" autocomplete="off"></label>
+    <div class="actions"><button type="button" id="cf-cancel">取消</button><button type="button" id="cf-ok" class="primary">确定</button></div></div>
+</div>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="modal-title"></h2><button id="modal-close" class="ghost" type="button">✕</button></div>
+    <div class="sheet-head"><h2 id="modal-title"></h2><button id="modal-close" class="ghost" type="button" aria-label="关闭" title="关闭（Esc）">✕</button></div>
     <div id="modal-body"></div>
   </div>
 </div>
@@ -351,9 +411,9 @@ function fmtSize(n) { if (!n && n !== 0) return ''; const u = ['B', 'KB', 'MB', 
 const fmtTime = t => t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) : '从未';
 const nowISO = () => new Date().toISOString();
 const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
-let toastT; function toast(msg, ms = 2800) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hidden'), ms); }
+let toastT; function toast(msg, ms = 2800) { const t = $('#toast'); t.textContent = msg; t.classList.toggle('err', /失败|不对|错误|不一样|无法|至少|请先/.test(String(msg))); t.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hidden'), ms); }
 function show(id) { for (const s of ['#screen-showcase', '#screen-profiles', '#screen-unlock', '#screen-app']) $(s).classList.toggle('hidden', s !== id); document.documentElement.classList.toggle('dk', id === '#screen-showcase'); if (id === '#screen-showcase') showcaseStart(); else showcaseStop(); }
-async function busy(btn, fn) { if (!btn) return fn(); const old = btn.textContent; btn.disabled = true; btn.textContent = '处理中…'; try { return await fn(); } finally { btn.disabled = false; btn.textContent = old; } }
+async function busy(btn, fn, label = '处理中…') { if (!btn) return fn(); const old = btn.textContent; btn.disabled = true; btn.textContent = label; try { return await fn(); } finally { btn.disabled = false; btn.textContent = old; } }
 
 // ===== 本地数据库（IndexedDB）=====
 let db;
@@ -442,7 +502,7 @@ async function renderProfiles() {
   const ps = (await getAll('profiles')).filter(p => !p.deleted_at).sort((a, b) => (b.isOwner - a.isOwner) || String(a.created_at || '').localeCompare(String(b.created_at || '')));
   $('#first-run').classList.toggle('hidden', ps.some(p => p.isOwner));
   $('#profile-list').innerHTML = ps.map(p => `<button type="button" data-id="${esc(p.id)}"><span>${p.isOwner ? '👑' : '🙂'} ${esc(p.name)}</span>${p.isOwner ? '<span class="tag">管理员</span>' : ''}</button>`).join('');
-  $('#profile-list').querySelectorAll('button').forEach(b => b.onclick = () => { pendingProfile = ps.find(p => p.id === b.dataset.id); $('#unlock-name').textContent = pendingProfile.name; $('#mp1').value = ''; show('#screen-unlock'); $('#mp1').focus(); showGuard(); });
+  $('#profile-list').querySelectorAll('button').forEach(b => b.onclick = () => { pendingProfile = ps.find(p => p.id === b.dataset.id); $('#unlock-name').textContent = pendingProfile.name; $('#mp1').value = ''; $('#unlock-err').classList.add('hidden'); show('#screen-unlock'); $('#mp1').focus(); showGuard(); });
   show('#screen-profiles');
 }
 $('#btn-back').onclick = () => renderProfiles();
@@ -454,12 +514,13 @@ $('#form-owner').onsubmit = e => { e.preventDefault(); busy($('#owner-submit'), 
   if (p1.length < 12) return toast('主密码至少 12 位');
   const p = await newProfile(name, p1, true); $('#owner-mp1').value = $('#owner-mp2').value = '';
   toast('保险库已创建 ✅ 请牢记主密码'); await unlockWith(p, p1);
-}); };
+}, '正在创建…'); };
 $('#form-unlock').onsubmit = e => { e.preventDefault(); busy($('#unlock-submit'), async () => {
   const g = await getGuard(pendingProfile.id); if (g.lockedUntil > Date.now()) { showGuard(); return; }
   try { await unlockWith(pendingProfile, $('#mp1').value); $('#mp1').value = ''; await putGuard({ id: pendingProfile.id, fails: 0, level: 0, lockedUntil: 0 }); }
-  catch (err) { if (err?.message === '主密码不对') { await registerFail(pendingProfile); $('#mp1').value = ''; } else toast(err.message || String(err)); }
-}); };
+  catch (err) { if (err?.message === '主密码不对') { await registerFail(pendingProfile); $('#mp1').value = ''; const ue = $('#unlock-err'); ue.textContent = '主密码不对，请检查大小写和输入法后再试'; ue.classList.remove('hidden'); $('#mp1').focus(); } else toast(err.message || String(err)); }
+}, '正在解锁…'); };
+$('#mp1').addEventListener('input', () => $('#unlock-err').classList.add('hidden'));
 async function unlockWith(p, password) {
   const raw = await unwrapRaw(p, password); dataKey = await importDEK(raw); raw.fill(0);
   profile = p; lastActive = Date.now(); cur = 'overview';
@@ -481,6 +542,7 @@ function mountOwnerUI(p) {
 }
 // ===== 锁定 =====
 function lock(msg, reason = '手动锁定') {
+  finishEditor(); // 锁定前先把正在写的日记加密存下来
   endSession(reason);
   dataKey = null; profile = null; items = []; $('#list').innerHTML = ''; $('#search').value = ''; closeModal(); unmountOwnerUI();
   renderProfiles(); if (msg) toast(msg);
@@ -503,8 +565,8 @@ async function loadItems() {
   for (const r of rows) { try { out.push({ ...r, data: JSON.parse(dec.decode(await aesDec(dataKey, unb64(r.ct), unb64(r.iv), itemAAD(profile.id, r.category)))) }); } catch { bad++; } }
   items = out.sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))); if (bad) toast(`有 ${bad} 条记录无法解密，已跳过`);
 }
-async function saveItem(category, payload, existing, file) {
-  const id = existing?.id || uuid(), pid = profile.id;
+async function saveItem(category, payload, existing, file, opt = {}) {
+  const id = existing?.id || opt.id || uuid(), pid = profile.id;
   let fileRow = null;
   if (file) {
     const { ct, iv } = await aesEnc(dataKey, new Uint8Array(await file.arrayBuffer()), fileAAD(pid, id));
@@ -514,11 +576,12 @@ async function saveItem(category, payload, existing, file) {
   const { ct, iv } = await aesEnc(dataKey, enc.encode(JSON.stringify(payload)), itemAAD(pid, category));
   const row = { id, profileId: pid, category, ct: b64(ct), iv: b64(iv), hasFile: !!(fileRow || existing?.hasFile), created_at: existing?.created_at || nowISO(), updated_at: nowISO() };
   await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').put(row); if (fileRow) t.objectStore('files').put(fileRow); });
+  if (profile?.id !== pid) return null; // 保存途中已锁定：数据已加密落盘，不再把明文放回内存
   const rec = { ...row, data: payload };
-  items = existing ? items.map(x => x.id === id ? rec : x) : [rec, ...items];
+  items = items.some(x => x.id === id) ? items.map(x => x.id === id ? rec : x) : [rec, ...items];
   const ttl = (() => { try { return CATS[category].title(payload) || ''; } catch { return ''; } })();
-  logActivity(existing ? '编辑' : '新增', category, ttl);
-  if (file) logActivity('上传文件', category, file.name);
+  if (!opt.quiet) { logActivity(existing ? '编辑' : '新增', category, ttl); if (file) logActivity('上传文件', category, file.name); }
+  return rec;
 }
 const tomb = r => ({ id: r.id, profileId: r.profileId, category: r.category, created_at: r.created_at || nowISO(), updated_at: nowISO(), deleted_at: nowISO() });
 async function deleteItem(it) { await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').put(tomb(it)); t.objectStore('files').delete(it.id); }); items = items.filter(x => x.id !== it.id);
@@ -577,7 +640,7 @@ async function importVault(text) {
   const local = await getAll('profiles');
   const localOwner = local.find(p => p.isOwner && !p.deleted_at);
   const otherOwners = profs.filter(p => p.isOwner && localOwner && p.id !== localOwner.id && !local.some(l => l.id === p.id));
-  if (otherOwners.length && !confirm(`这台设备已经有管理员「${localOwner.name}」。\n这个备份里还有另一个管理员「${otherOwners.map(p => p.name).join('、')}」，继续导入会出现两个 👑 管理员。\n\n确定要继续导入吗？`)) throw new Error('已取消导入');
+  if (otherOwners.length && !(await askConfirm(`这台设备已经有管理员「${localOwner.name}」。\n这个备份里还有另一个管理员「${otherOwners.map(p => p.name).join('、')}」，继续导入会出现两个 👑 管理员。\n\n确定要继续导入吗？`, { title: '⚠️ 会出现两个管理员', ok: '继续导入', danger: true }))) throw new Error('已取消导入');
   let np = 0, ni = 0;
   await tx(['profiles', 'items', 'files'], 'readwrite', async t => {
     const P = t.objectStore('profiles'), I = t.objectStore('items'), F = t.objectStore('files');
@@ -645,6 +708,7 @@ async function openCloud() {
   let vs = [], verr = ''; try { vs = await listVersions(u.id); } catch (e) { verr = cloudErr(e); }
   const canBackup = !!dataKey;
   let html = `<p class="small">已登录云端账号：<b>${esc(u.email)}</b>${me?.role === 'owner' ? ' <span class="tag">管理员</span>' : ''}</p>`;
+  html += cloudAgeHTML(profile?.lastCloudAt || vs[0]?.created_at || vs[0]?.updated_at);
   if (!me) html += `<div class="banner">这个账号目前没有被家族授权，无法备份或恢复。</div>`;
   if (canBackup) html += `<p class="muted small">将备份：${profile.isOwner ? '整个家庭保险库（所有用户，各自加密）' : `只有「${esc(profile.name)}」这个用户的内容`}。云端只保留最近 ${KEEP_VERSIONS} 份。</p><button id="c-backup" class="primary block" type="button">⬆️ 立即云端备份</button>`;
   html += `<div class="sec"><h3>云端版本（点「恢复」导入到本机）</h3>${verr ? `<p class="small">${esc(verr)}</p>` : vs.length ? `<div class="vlist">${vs.map(f => `<div class="vrow"><span>${esc(f.name.replace(/^vault-|\.vault$/g, ''))} · ${fmtSize(f.metadata?.size)}</span><button type="button" data-restore="${esc(f.name)}">恢复</button></div>`).join('')}</div>` : '<p class="muted small">还没有云端备份</p>'}</div>`;
@@ -652,7 +716,7 @@ async function openCloud() {
   html += `<div class="actions"><button id="c-logout" type="button">退出云端账号</button></div>`;
   openModal('☁️ 云端备份', html);
   if ($('#c-backup')) $('#c-backup').onclick = () => busy($('#c-backup'), async () => { try { const r = await cloudBackup(u); toast(`云端备份完成 ✅（${fmtSize(r.size)}）`); openCloud(); } catch (e) { toast('备份失败：' + cloudErr(e), 6000); } });
-  $('#modal-body').querySelectorAll('[data-restore]').forEach(b => b.onclick = () => { if (!confirm(`用云端版本 ${b.dataset.restore} 恢复到本机？（会合并：本机较新的记录保留）`)) return; busy(b, async () => { try { const r = await cloudRestore(u, b.dataset.restore); closeModal(); await afterImport(r); } catch (e) { toast('恢复失败：' + cloudErr(e), 6000); } }); });
+  $('#modal-body').querySelectorAll('[data-restore]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`用云端版本 ${b.dataset.restore} 恢复到本机？\n会合并：本机较新的记录保留。`, { title: '☁️ 从云端恢复？', ok: '恢复' }))) return; busy(b, async () => { try { const r = await cloudRestore(u, b.dataset.restore); closeModal(); await afterImport(r); } catch (e) { toast('恢复失败：' + cloudErr(e), 6000); } }); });
   $('#c-logout').onclick = async () => { await cloud().auth.signOut({ scope: 'local' }); sessionStorage.removeItem('fv-cloud'); closeModal(); toast('已退出云端账号'); };
   if ($('#f-allow')) { $('#f-allow').onsubmit = e => { e.preventDefault(); busy($('#a-add'), async () => {
     const email = $('#a-email').value.trim().toLowerCase(), name = $('#a-name').value.trim() || null;
@@ -671,12 +735,19 @@ async function renderAllow() {
     if (v && !/^\+861[3-9]\d{9}$/.test(v)) return toast('请填中国大陆手机号，例如 +8613800000000', 5000);
     const { error } = await cloud().from('family_allowlist').update({ phone: v || null }).eq('email', b.dataset.phs);
     toast(error ? '保存失败：' + cloudErr(error) : '手机号已保存（用于短信验证码，短信功能配置好后生效）', 5000); renderAllow(); }));
-  $('#allow-list').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { if (!confirm(`取消 ${b.dataset.rm} 的云端授权？对方将立刻无法备份或恢复。`)) return; busy(b, async () => { if (!(await reauth(`取消 ${b.dataset.rm} 的云端授权`))) return;
+  $('#allow-list').querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`取消 ${b.dataset.rm} 的云端授权？对方将立刻无法备份或恢复。`, { title: '取消云端授权？', ok: '取消授权', danger: true }))) return; busy(b, async () => { if (!(await reauth(`取消 ${b.dataset.rm} 的云端授权`))) return;
     const { error } = await cloud().from('family_allowlist').delete().eq('email', b.dataset.rm); if (error) return toast('操作失败：' + cloudErr(error), 5000);
     toast('已取消授权'); renderAllow(); }); });
 }
+// 云端备份对话框里显示「上次备份：X 天前」，超过 7 天用醒目的警告色（只是提示，不会自动备份）
+function cloudAgeHTML(t) {
+  if (!profile) return '';
+  if (!t) return '<p class="bk-age warn">⚠️ 上次云端备份：从未 · 建议现在备份一次</p>';
+  const days = Math.max(0, Math.floor((Date.now() - new Date(t).getTime()) / 864e5)), old = days > 7;
+  return `<p class="bk-age${old ? ' warn' : ''}">${old ? '⚠️' : '🕒'} 上次云端备份：${days === 0 ? '今天' : `${days} 天前`}（${esc(fmtTime(t))}）${old ? ' · 已超过 7 天，建议尽快备份' : ''}</p>`;
+}
 function cloudLoginForm() {
-  openModal('☁️ 登录云端账号', `<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。家人需要先由管理员在「云端授权」里加上邮箱，才能注册。</p>
+  openModal('☁️ 登录云端账号', `${cloudAgeHTML(profile?.lastCloudAt)}<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。家人需要先由管理员在「云端授权」里加上邮箱，才能注册。</p>
   <form id="f-cloud"><label>邮箱<input id="c-email" type="email" required value="${esc(profile?.cloudEmail || '')}" autocomplete="username"></label>
   <label>云端登录密码（不是主密码）<input id="c-pass" type="password" required minlength="8" autocomplete="current-password"></label>
   <div class="actions"><button type="submit" class="primary" id="c-login">登录</button><button type="button" id="c-signup">注册</button></div></form>`);
@@ -723,9 +794,15 @@ function render() {
     sum.innerHTML = Object.entries(t).map(([cc, v]) => `<span><b>${esc(cc)}</b> 收入 ${v.in.toLocaleString('zh-CN')} · 支出 ${v.out.toLocaleString('zh-CN')} · 结余 ${(v.in - v.out).toLocaleString('zh-CN')}</span>`).join('');
     sum.classList.remove('hidden');
   } else sum.classList.add('hidden');
-  if (!list.length) { $('#list').innerHTML = `<div class="empty">${q ? '没有找到' : `还没有${c.label}，点「＋ 新增」添加第一条`}</div>`; return; }
-  $('#list').innerHTML = list.map(i => { const cc = CATS[i.category]; return `<div class="item" data-id="${esc(i.id)}"><div class="ic">${cc.icon}</div><div class="tx"><div class="t">${q ? `<span class="badge">${cc.label}</span>` : ''}${esc(cc.title(i.data))}</div><div class="s">${esc(cc.sub(i.data))}</div></div>${cc.right ? `<div class="r">${esc(cc.right(i.data))}</div>` : ''}</div>`; }).join('');
-  $('#list').querySelectorAll('.item').forEach(el => el.onclick = () => viewItem(items.find(x => x.id === el.dataset.id)));
+  if (!list.length) {
+    $('#list').innerHTML = q ? `<div class="empty"><div class="em-ic" aria-hidden="true">🔍</div><p class="em-t">没有找到「${esc($('#search').value.trim())}」</p><p class="em-s">换个关键词试试（密码字段不参与搜索）。</p><button type="button" id="empty-clear">清除搜索</button></div>`
+      : `<div class="empty"><div class="em-ic" aria-hidden="true">${c.icon}</div><p class="em-t">还没有${esc(c.label)}</p><p class="em-s">内容会用你的主密码加密，只保存在这台设备上。</p><button type="button" class="primary" id="empty-add">＋ 新增${esc(c.label)}</button></div>`;
+    if ($('#empty-clear')) $('#empty-clear').onclick = () => { clearSearch(); $('#search').focus(); };
+    if ($('#empty-add')) $('#empty-add').onclick = () => editItem(cur, null);
+    return;
+  }
+  $('#list').innerHTML = list.map(i => { const cc = CATS[i.category]; return `<div class="item" data-id="${esc(i.id)}" role="button" tabindex="0"><div class="ic">${cc.icon}</div><div class="tx"><div class="t">${q ? `<span class="badge">${cc.label}</span>` : ''}${esc(cc.title(i.data))}</div><div class="s">${esc(cc.sub(i.data))}</div></div>${cc.right ? `<div class="r">${esc(cc.right(i.data))}</div>` : ''}</div>`; }).join('');
+  $('#list').querySelectorAll('.item').forEach(el => { el.onclick = () => viewItem(items.find(x => x.id === el.dataset.id)); el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } }; });
 }
 // 搜索：只在内存中对已解密数据搜索，不含密码字段，不保存、不发送
 function normQ(v) { return String(v ?? '').normalize('NFKC').toLowerCase().trim(); }
@@ -743,12 +820,66 @@ $('#search').addEventListener('compositionend', render);
 $('#search').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); clearSearch(); $('#search').blur(); } else if (e.key === 'Enter') { e.preventDefault(); $('#search').blur(); } });
 $('#search-clear').onclick = () => { clearSearch(); $('#search').focus(); };
 $('#btn-add').onclick = () => editItem(cur, null);
-$('#btn-menu').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('hidden'); };
-document.addEventListener('click', () => $('#menu').classList.add('hidden'));
+function syncMenu() { $('#btn-menu').setAttribute('aria-expanded', String(!$('#menu').classList.contains('hidden'))); }
+$('#btn-menu').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('hidden'); syncMenu(); if (!$('#menu').classList.contains('hidden') && e.detail === 0) [...$('#menu').querySelectorAll('button')].find(x => x.offsetParent !== null)?.focus(); };
+document.addEventListener('click', () => { $('#menu').classList.add('hidden'); syncMenu(); });
 
-function openModal(title, html) { $('#modal-title').textContent = title; $('#modal-body').innerHTML = html; $('#modal').classList.remove('hidden'); }
-function closeModal() { $('#modal').classList.add('hidden'); $('#modal-body').innerHTML = ''; $('#modal-title').textContent = ''; $('#modal .sheet').classList.remove('wide'); }
-$('#modal-close').onclick = closeModal; $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+let modalPrev = null;
+function openModal(title, html) {
+  finishEditor();
+  if ($('#modal').classList.contains('hidden')) modalPrev = document.activeElement;
+  $('#modal-title').textContent = title; $('#modal-body').innerHTML = html; $('#modal').classList.remove('hidden');
+  const f = $('#modal-body').querySelector('form input:not([type=file]):not([type=hidden]),form textarea,form select');
+  try { ((matchMedia('(pointer:fine)').matches && f) ? f : $('#modal-close')).focus({ preventScroll: true }); } catch {}
+  $('#modal .sheet').scrollTop = 0;
+}
+function closeModal() {
+  const wasOpen = !$('#modal').classList.contains('hidden');
+  const fin = finishEditor(); if (fin && profile) fin.then(n => { if (n) toast('已自动加密保存 ✅'); });
+  $('#modal').classList.add('hidden'); $('#modal-body').innerHTML = ''; $('#modal-title').textContent = ''; $('#modal .sheet').classList.remove('wide');
+  if (wasOpen && modalPrev && document.contains(modalPrev) && modalPrev.offsetParent !== null) { try { modalPrev.focus({ preventScroll: true }); } catch {} } modalPrev = null; }
+$('#modal-close').onclick = closeModal;
+
+// ===== 应用内确认框（替代浏览器自带的 confirm / prompt；危险操作二次确认）=====
+let cfDone = null;
+function askConfirm(msg, { title = '请确认', ok = '确定', danger = false, input = null } = {}) {
+  return new Promise(resolve => {
+    if (cfDone) cfDone(input ? null : false);
+    const m = $('#confirm'), prev = document.activeElement;
+    $('#cf-title').textContent = title; $('#cf-msg').textContent = msg;
+    $('#cf-ok').textContent = ok; $('#cf-ok').classList.toggle('danger-btn', !!danger);
+    $('#cf-inwrap').classList.toggle('hidden', !input);
+    if (input) { $('#cf-inlabel').textContent = input.label || ''; $('#cf-input').value = input.value || ''; $('#cf-input').placeholder = input.placeholder || ''; }
+    m.classList.remove('hidden');
+    cfDone = v => { cfDone = null; m.classList.add('hidden'); const val = $('#cf-input').value; $('#cf-input').value = ''; $('#cf-ok').onclick = $('#cf-cancel').onclick = m.onclick = $('#cf-input').onkeydown = null;
+      try { if (prev && document.contains(prev)) prev.focus({ preventScroll: true }); } catch {} resolve(v === 'input' ? val : v); };
+    $('#cf-ok').onclick = () => cfDone(input ? 'input' : true);
+    $('#cf-cancel').onclick = () => cfDone(input ? null : false);
+    m.onclick = e => { if (e.target === m) cfDone(input ? null : false); };
+    $('#cf-input').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('#cf-ok').click(); } };
+    setTimeout(() => { try { (input ? $('#cf-input') : danger ? $('#cf-cancel') : $('#cf-ok')).focus(); } catch {} }, 30);
+  });
+}
+
+// ===== 键盘：Esc 关闭最上层的窗口 / 菜单；Tab 焦点留在窗口内 =====
+const topLayer = () => ['#confirm', '#reauth', '#modal'].map(s => $(s)).find(m => m && !m.classList.contains('hidden'));
+document.addEventListener('keydown', e => {
+  if (e.isComposing) return;
+  if (e.key === 'Escape') {
+    const m = topLayer();
+    if (m) { e.preventDefault(); if (m.id === 'confirm') $('#cf-cancel').click(); else if (m.id === 'reauth') $('#ra-cancel').click(); else closeModal(); return; }
+    if (!$('#menu').classList.contains('hidden')) { $('#menu').classList.add('hidden'); syncMenu(); $('#btn-menu').focus(); }
+    return;
+  }
+  if (e.key === 'Tab') {
+    const m = topLayer(); if (!m) return;
+    const f = [...m.querySelectorAll('button,input,select,textarea,summary,a[href],[tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && x.offsetParent !== null);
+    if (!f.length) return; const a = f[0], z = f[f.length - 1];
+    if (!m.contains(document.activeElement)) { e.preventDefault(); a.focus(); }
+    else if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+    else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+  }
+}); $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
 
 function genPassword(n = 20) { const cs = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*-_=+?'; const r = crypto.getRandomValues(new Uint32Array(n)); return Array.from(r, x => cs[x % cs.length]).join(''); }
 let clipT = null;
@@ -771,10 +902,19 @@ function viewItem(it) {
   if ($('#v-dl')) $('#v-dl').onclick = () => busy($('#v-dl'), () => openFile(it, true).catch(e => toast('下载失败：' + e.message)));
   if ($('#v-pv')) $('#v-pv').onclick = () => busy($('#v-pv'), async () => { try { const u = await openFile(it, false); $('#preview').innerHTML = `<img class="pv" alt="" src="${u}">`; } catch (e) { toast('预览失败：' + e.message); } });
   $('#v-edit').onclick = () => editItem(it.category, it);
-  $('#v-del').onclick = () => { if (!confirm('确定删除这条记录吗？')) return; busy($('#v-del'), async () => { await deleteItem(it); closeModal(); render(); toast('已删除'); }); };
+  $('#v-del').onclick = async () => { const t = (() => { try { return c.title(d) || ''; } catch { return ''; } })();
+    if (!(await askConfirm(`删除「${t}」${it.hasFile ? '和里面的文件' : ''}？\n删除后无法撤销。`, { title: '🗑️ 删除这条记录？', ok: '删除', danger: true }))) return;
+    busy($('#v-del'), async () => { await deleteItem(it); closeModal(); render(); toast('已删除'); }); };
 }
+// ===== 自动保存：日记边写边加密保存（停笔 1.2 秒），文件选好后立即加密保存；加密和存储都走原来的 saveItem =====
+const AUTO_CATS = new Set(['diary', 'file']), AUTO_MS = 1200;
+let EDITOR = null; // 当前打开的编辑器：关闭 / 锁定 / 切到后台前先把没存的内容存下来
+function finishEditor() { const e = EDITOR; EDITOR = null; return e ? e.finish() : null; }
+document.addEventListener('visibilitychange', () => { if (document.hidden) EDITOR?.flush(); });
+addEventListener('pagehide', () => EDITOR?.flush());
 function editItem(category, it) {
-  const c = CATS[category], d = it?.data || {};
+  finishEditor();
+  const c = CATS[category], d = it?.data || {}, auto = AUTO_CATS.has(category);
   let html = '<form id="f-edit">' + c.fields.map(f => {
     const v = d[f.k] ?? (it ? '' : (f.def ? f.def() : '')), id = `f-${f.k}`, rq = f.req ? 'required' : '';
     let input;
@@ -783,15 +923,79 @@ function editItem(category, it) {
     else input = `<input id="${id}" type="${f.type === 'secret' ? 'text' : (f.type || 'text')}" ${f.type === 'number' ? 'step="any" inputmode="decimal"' : ''} value="${esc(v)}" ${rq} autocomplete="off" spellcheck="false">`;
     return f.gen ? `<label>${esc(f.l)}<div class="inline">${input}<button type="button" id="g-${f.k}">生成</button></div></label>` : `<label>${esc(f.l)}${input}</label>`;
   }).join('');
-  if (category === 'file') html += `<label>${it ? '替换文件（可不选）' : '选择文件'}<input id="f-file" type="file" ${it ? '' : 'required'}></label>`;
-  html += `<div class="actions"><button type="button" id="f-cancel">取消</button><button type="submit" class="primary" id="f-save">保存（加密）</button></div></form>`;
+  if (category === 'file') html += `<label class="filebox" id="f-filebox"><span class="fb-t">📎 ${it ? '替换文件（可不选）' : '选择要加密保存的文件'}</span><span class="fb-s" id="f-filest">${it?.data?.fileName ? `当前文件：${esc(it.data.fileName)}（${esc(fmtSize(it.data.fileSize))}）` : '点这里选择，或把文件拖到这里'} · 选好后立即加密保存</span><input id="f-file" type="file" ${it ? '' : 'required'}></label>`;
+  html += auto ? `<div class="actions auto"><span class="savest" id="f-savest" role="status" aria-live="polite">${it ? '修改会自动加密保存' : category === 'diary' ? '开始写就会自动加密保存' : '选好文件后会立即加密保存'}</span><button type="button" id="f-cancel" class="btn-sm">关闭</button><button type="submit" class="primary btn-sm" id="f-save" title="立即保存并关闭（不点也不会丢）">保存</button></div></form>`
+    : `<div class="actions"><button type="button" id="f-cancel">取消</button><button type="submit" class="primary" id="f-save">保存（加密）</button></div></form>`;
   openModal(`${it ? '编辑' : '新增'}${c.label}`, html);
   c.fields.filter(f => f.gen).forEach(f => $(`#g-${f.k}`).onclick = () => { $(`#f-${f.k}`).value = genPassword(); });
-  $('#f-cancel').onclick = () => it ? viewItem(it) : closeModal();
-  $('#f-edit').onsubmit = e => { e.preventDefault(); busy($('#f-save'), async () => {
-    const payload = {}; for (const f of c.fields) { const v = $(`#f-${f.k}`).value; if (v !== '') payload[f.k] = f.type === 'number' ? Number(v) : v; }
+  const collect = () => { const payload = {}; for (const f of c.fields) { const el = $(`#f-${f.k}`); if (!el) return null; const v = el.value; if (v !== '') payload[f.k] = f.type === 'number' ? Number(v) : v; } return payload; };
+  if (!auto) {
+    $('#f-cancel').onclick = () => it ? viewItem(it) : closeModal();
+    $('#f-edit').onsubmit = e => { e.preventDefault(); busy($('#f-save'), async () => {
+      const payload = collect();
+      try { await saveItem(category, payload, it, null); closeModal(); cur = category; render(); toast('已加密保存 ✅'); } catch (err) { toast('保存失败：' + err.message, 5000); }
+    }); };
+    return;
+  }
+  const newId = it ? it.id : uuid();
+  let rec = it || null, last = it ? JSON.stringify(collect()) : null, timer = null, inflight = null, again = false, alive = true, upFile = null, saves = 0, loggedTitle = null;
+  const titleOf = pl => { try { return c.title(pl || {}) || ''; } catch { return ''; } };
+  const st = (cls, txt) => { const el = $('#f-savest'); if (!el || !alive) return; el.className = 'savest ' + cls; el.textContent = txt; };
+  const hms = () => new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  // 返回 Promise<boolean>：true = 已保存或无需保存
+  const save = (payload, file, now) => {
+    if (!payload || !dataKey || !profile) return Promise.resolve(!payload);
+    const js = JSON.stringify(payload);
+    if (!file && js === last) return Promise.resolve(true);
+    if (!file && !rec && (category === 'file' || !(payload.title || payload.content || payload.mood))) return Promise.resolve(true);
+    const miss = c.fields.find(f => f.req && payload[f.k] === undefined);
+    if (miss) { st('err', `请先填写「${miss.l}」，填好后会自动保存`); return Promise.resolve(false); }
+    if (inflight && !now) { again = true; return inflight; }
+    // 操作记录：本次编辑的第一次保存（以及每次上传文件）立即记一条；之后的自动保存不再重复记
+    const quiet = !file && saves > 0; saves++; if (!quiet) loggedTitle = titleOf(payload);
+    last = js;
+    st('saving', file ? '正在加密保存文件…' : '正在加密保存…');
+    const p = saveItem(category, payload, rec, file || null, { id: newId, quiet }).then(r => {
+      if (r) rec = r; if (file) upFile = file;
+      st('saved', `${file ? '文件已加密保存' : '已自动保存'} · ${hms()}`);
+      if (file && $('#f-filest')) { $('#f-filest').textContent = `✅ 已加密保存：${file.name}（${fmtSize(file.size)}）`; $('#f-filest').classList.add('ok'); }
+      if (profile && !$('#screen-app').classList.contains('hidden')) render();
+      return true;
+    }).catch(err => { last = null; st('err', `保存失败：${err?.message || err}（内容还在，请点「保存」重试）`); return false; })
+      .finally(() => { if (inflight === p) inflight = null; if (again && alive) { again = false; schedule(0); } });
+    inflight = p; return p;
+  };
+  const schedule = (ms = AUTO_MS) => { clearTimeout(timer); timer = setTimeout(() => { timer = null; if (alive) save(collect()); }, ms); };
+  const flush = () => { if (alive && timer) { clearTimeout(timer); timer = null; save(collect(), null, true); } };
+  // 关闭编辑器：同步收集并开始最后一次保存；如果标题和已记录的不同，再补记一条「编辑」（用最终标题）
+  const finish = () => {
+    if (!alive) return null;
+    const payload = collect(); clearTimeout(timer); timer = null;
+    const before = saves, p = save(payload, null, true); alive = false;
+    if (saves && payload && loggedTitle !== null && titleOf(payload) !== loggedTitle) logActivity('编辑', category, titleOf(payload));
+    return p.then(ok => ok && saves > before);
+  };
+  EDITOR = { finish, flush };
+  const form = $('#f-edit');
+  form.addEventListener('input', e => { if (e.target.id === 'f-file' || e.isComposing) return; st('pending', '有改动，停笔后自动保存…'); schedule(); });
+  form.addEventListener('compositionend', () => schedule());
+  if (category === 'file') {
+    const box = $('#f-filebox'), fi = $('#f-file');
+    fi.onchange = () => { const f = fi.files[0]; if (!f || !alive) return; clearTimeout(timer); timer = null;
+      $('#f-filest').classList.remove('ok'); $('#f-filest').textContent = `正在加密：${f.name}（${fmtSize(f.size)}）…`;
+      Promise.resolve(inflight).then(() => save(collect(), f, true)).then(ok => { if (ok) toast('文件已加密保存 ✅'); }); };
+    box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('drag'); });
+    box.addEventListener('dragleave', () => box.classList.remove('drag'));
+    box.addEventListener('drop', e => { e.preventDefault(); box.classList.remove('drag'); if (e.dataTransfer?.files?.length) { fi.files = e.dataTransfer.files; fi.dispatchEvent(new Event('change')); } });
+  }
+  $('#f-cancel').onclick = () => { const p = finishEditor(); Promise.resolve(p).then(() => { const r = rec && items.find(x => x.id === rec.id); r ? viewItem(r) : closeModal(); }); };
+  form.onsubmit = e => { e.preventDefault(); busy($('#f-save'), async () => {
     const file = category === 'file' ? $('#f-file').files[0] : null;
-    try { await saveItem(category, payload, it, file); closeModal(); cur = category; render(); toast('已加密保存 ✅'); } catch (err) { toast('保存失败：' + err.message, 5000); }
+    if (category === 'file' && !rec && !file) return toast('请先选择文件');
+    await inflight;
+    if (file && file !== upFile && !(await save(collect(), file, true))) return toast('保存失败，请重试', 5000);
+    if (!(await save(collect(), null, true))) return toast('保存失败：请检查必填项后重试', 5000);
+    await finishEditor(); closeModal(); cur = category; render(); toast('已加密保存 ✅');
   }); };
 }
 
@@ -805,8 +1009,8 @@ $('#m-family').onclick = async () => {
   <label>再输一次<input id="nm-mp2" type="password" required autocomplete="off"></label><button class="primary block" id="nm-add" type="submit">添加用户</button></form>`);
   bindNameHint($('#nm-name'), $('#nm-name-hint'));
   $('#modal-body').querySelectorAll('[data-ren]').forEach(b => b.onclick = () => openRename(b.dataset.ren, () => $('#m-family').onclick()));
-  $('#modal-body').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const p = ps.find(x => x.id === b.dataset.del);
-    if (!confirm(`删除用户「${p.name}」和他的全部内容？此操作无法撤销。`)) return;
+  $('#modal-body').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { const p = ps.find(x => x.id === b.dataset.del);
+    if (!(await askConfirm(`删除用户「${p.name}」和他的全部内容？此操作无法撤销。`, { title: '🗑️ 删除用户？', ok: '删除用户', danger: true }))) return;
     busy(b, async () => { if (!(await reauth(`删除用户「${p.name}」`))) return; const its = await getAll('items', p.id); await tx(['profiles', 'items', 'files'], 'readwrite', t => { t.objectStore('profiles').put({ id: p.id, name: p.name, isOwner: false, created_at: p.created_at, updated_at: nowISO(), deleted_at: nowISO() }); for (const i of its) { if (!i.deleted_at) t.objectStore('items').put(tomb(i)); t.objectStore('files').delete(i.id); } }); logActivity('删除用户', 'user', p.name); toast('已删除'); $('#m-family').onclick(); }); });
   $('#f-member').onsubmit = e => { e.preventDefault(); busy($('#nm-add'), async () => {
     if ($('#nm-mp1').value !== $('#nm-mp2').value) return toast('两次输入的主密码不一样');
@@ -856,6 +1060,26 @@ function fpCell(h, summary, labels) {
   const lb = labels?.get?.(h);
   return `<details class="fpd"><summary>${esc(fpShort(h))}${lb ? ' · ' + esc(lb) : ''}${FP && FP.hash === h ? '（本机）' : ''}</summary><small>${esc(summary || '指纹由这些信息计算：浏览器与版本、系统、屏幕、时区、语言、CPU/内存、触屏、本机随机设备号')}</small></details>`;
 }
+// 设备显示：管理员起的名字 + 设备类型图标 + 系统 · 浏览器 + 指纹码
+const devIcon = dv => /手机/.test(dv) ? '📱' : /平板/.test(dv) ? '📲' : /电脑/.test(dv) ? '💻' : '🖥️';
+function devParts(dev) { const raw = String(dev || ''), other = /（其他设备）$/.test(raw), base = raw.replace(/（其他设备）$/, ''), ps = base.split(' · ');
+  return { base, other, type: ps.length === 3 ? ps[2] : '', osbr: (ps.length === 3 ? ps.slice(0, 2) : ps).join(' · ') }; }
+function devCell(dev, h, summary, labels) {
+  const d = devParts(dev), lb = h && labels?.get?.(h);
+  return `<span class="devc">${lb ? `<b class="dn">🏷️ ${esc(lb)}</b>` : ''}<span class="dt"><i aria-hidden="true">${devIcon(d.base)}</i>${esc(d.osbr || '未知设备')}${d.type ? `<small>${esc(d.type)}</small>` : ''}${d.other ? '<small class="other">其他设备</small>' : ''}</span>${fpCell(h, summary, null)}</span>`;
+}
+const devKeyOf = r => r.fp || String(r.device || '').replace(/（其他设备）$/, '');
+function devOptions(rows, labels) {
+  const m = new Map(); for (const r of rows) { const k = devKeyOf(r); if (!k) continue; const e = m.get(k) || { fp: r.fp, dev: r.device, n: 0 }; e.n++; m.set(k, e); }
+  return [...m.entries()].sort((a, b) => b[1].n - a[1].n).map(([k, e]) => { const d = devParts(e.dev), lb = e.fp && labels?.get?.(e.fp);
+    return `<option value="${esc(k)}">${esc(`${devIcon(d.base)} ${lb ? lb + ' · ' : ''}${d.osbr || '未知设备'}${e.fp ? ' · ' + fpShort(e.fp) : ''}${FP && e.fp && FP.hash === e.fp ? '（本机）' : ''}（${e.n} 条）`)}</option>`; }).join('');
+}
+function bindFilters(ids, clearSel, draw) {
+  const upd = () => { let any = false; for (const id of ids) { const el = $(id); if (!el) continue; const on = !!el.value; el.classList.toggle('on', on); any ||= on; } $(clearSel)?.classList.toggle('hidden', !any); draw(any); };
+  ids.forEach(id => { if ($(id)) $(id).onchange = upd; });
+  if ($(clearSel)) $(clearSel).onclick = () => { ids.forEach(id => { if ($(id)) $(id).value = ''; }); upd(); };
+  upd();
+}
 async function fpLabels() {
   const rows = await restGet('trusted_devices?select=fp,label&label=not.is.null');
   return new Map((rows || []).filter(r => r.fp && r.label).map(r => [r.fp, r.label]));
@@ -895,18 +1119,19 @@ async function renderTrusted() { if (!profile?.isOwner) return;
   if (!rows) { box.innerHTML = '<p class="muted tiny">需要联网并登录云端才能查看。</p>'; return; }
   const mine = deviceId();
   box.innerHTML = rows.map(r => `<div class="prow"><span>${r.label ? `<b>${esc(r.label)}</b> · ` : ''}${esc(r.email || '')} · ${esc(r.device || '')}${r.device_id === mine ? ' <span class="tag">本机</span>' : ''} <span class="tag">${r.verified ? '已验证' : '仅记录'}</span> ${fpCell(r.fp, r.device_id === mine ? FP?.summary : '', new Map())}</span><span class="muted">信任于 ${esc(fmtTime(r.created_at))} · 最近 ${esc(fmtTime(r.last_used))}${r.ip ? ' · IP ' + esc(r.ip) : ''} <button type="button" data-label="${esc(r.id)}">命名</button> <button type="button" class="danger" data-revoke="${esc(r.id)}">撤销</button></span></div>`).join('') || '<p class="muted tiny">还没有已信任的设备。</p>';
-  box.querySelectorAll('[data-label]').forEach(b => b.onclick = () => {
-    const cur0 = rows.find(r => r.id === b.dataset.label)?.label || '';
-    const v = prompt('给这台设备起个名字（如：爸爸的iPhone，最多 40 字）', cur0); if (v === null) return;
+  box.querySelectorAll('[data-label]').forEach(b => b.onclick = async () => {
+    const r0 = rows.find(r => r.id === b.dataset.label), cur0 = r0?.label || '';
+    const v = await askConfirm(`给这台设备起个名字，方便在记录里认出来。\n${r0?.device || ''} · ${fpShort(r0?.fp)}（留空 = 清除名字）`, { title: '🏷️ 设备命名', ok: '保存', input: { label: '设备名（最多 40 字）', value: cur0, placeholder: '例如：爸爸的iPhone' } }); if (v === null) return;
     busy(b, async () => { const tok = cloudToken(); if (!tok) return toast('请先登录云端');
       try { const r = await fetch(`${SUPABASE_URL}/rest/v1/trusted_devices?id=eq.${encodeURIComponent(b.dataset.label)}`, { method: 'PATCH', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ label: v.trim().slice(0, 40) || null }) }); toast(r.ok ? '已保存名字' : '保存失败（只有管理员能命名）'); } catch { toast('保存失败：连不上云端'); }
       renderTrusted(); });
   });
-  box.querySelectorAll('[data-revoke]').forEach(b => b.onclick = () => busy(b, async () => {
+  box.querySelectorAll('[data-revoke]').forEach(b => b.onclick = async () => { const r0 = rows.find(r => r.id === b.dataset.revoke);
+    if (!(await askConfirm(`撤销「${r0?.label || r0?.device || '这台设备'}」的信任？那台设备下次登录云端要重新验证。`, { title: '撤销设备信任？', ok: '撤销', danger: true }))) return; busy(b, async () => {
     const tok = cloudToken(); if (!tok) return toast('请先登录云端');
     try { const r = await fetch(`${SUPABASE_URL}/rest/v1/trusted_devices?id=eq.${encodeURIComponent(b.dataset.revoke)}`, { method: 'DELETE', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${tok}` } }); toast(r.ok ? '已撤销信任' : '撤销失败'); } catch { toast('撤销失败：连不上云端'); }
     renderTrusted();
-  }));
+  }); });
 }
 
 // ===== 解锁错误次数限制（本机威慑，不是真正的防线）=====
@@ -1125,18 +1350,19 @@ async function renderActivity() { if (!profile?.isOwner) return;
   let priv = null; try { priv = await ownerPrivKey(); } catch {}
   for (const r of rows) { const o = priv ? await decAsOwner(priv, r) : null; r.title = o ? o.title : (r.nokey ? '（记录时本机没有管理员公钥，标题未保存）' : '（无法解密）'); }
   const labels = await fpLabels();
-  const devKey = r => (r.fp && labels.get(r.fp)) || (r.fp ? fpShort(r.fp) : '') || r.device || '';
+  const devKey = devKeyOf;
   const fill = (sel, vals) => { const el = $(sel); if (!el) return; const first = el.options[0].outerHTML; el.innerHTML = first + [...new Set(vals.filter(Boolean))].map(v => `<option>${esc(v)}</option>`).join(''); };
-  fill('#af-user', rows.map(r => r.user)); fill('#af-act', rows.map(r => r.action)); fill('#af-cat', rows.map(r => r.cat)); fill('#af-dev', rows.map(devKey));
-  const draw = () => {
+  fill('#af-user', rows.map(r => r.user)); fill('#af-act', rows.map(r => r.action)); fill('#af-cat', rows.map(r => r.cat));
+  if ($('#af-dev')) $('#af-dev').innerHTML = '<option value="">全部设备</option>' + devOptions(rows, labels);
+  const draw = any => {
     if (!$('#agrid')) return;
     const fu = $('#af-user').value, fa = $('#af-act').value, fc = $('#af-cat').value, fd = $('#af-dev').value, ft = +$('#af-time').value;
     const since = ft ? (ft === 1 ? new Date(new Date().toDateString()).getTime() : Date.now() - ft * 864e5) : 0;
     const list = rows.filter(r => (!fu || r.user === fu) && (!fa || r.action === fa) && (!fc || r.cat === fc) && (!fd || devKey(r) === fd) && (!since || new Date(r.at).getTime() >= since));
-    $('#ac-count').textContent = `共 ${list.length} 条${cloudRows ? ' · ☁️ 已合并云端记录' : ''}`;
-    $('#agrid').innerHTML = '<div class="ahead"><span>时间</span><span>用户</span><span>操作</span><span>分类</span><span>标题 / 文件名</span><span>设备</span></div>' + (list.map(r => `<div class="arow"><span data-l="时间">${esc(fmtTime(r.at))}</span><span data-l="用户">${esc(r.user || '')}</span><span data-l="操作">${esc(r.action)}</span><span data-l="分类">${esc(r.cat || '—')}</span><span data-l="标题 / 文件名" class="tt">${esc(r.title)}</span><span data-l="设备">${esc(r.device || '')}${fpCell(r.fp, r.fp && FP?.hash === r.fp ? FP.summary : '', labels)}</span></div>`).join('') || '<div class="empty">没有符合条件的记录</div>');
+    $('#ac-count').textContent = `${any ? `筛选出 ${list.length} / ${rows.length} 条` : `共 ${list.length} 条`}${cloudRows ? ' · ☁️ 已合并云端记录' : ''}`;
+    $('#agrid').innerHTML = '<div class="ahead"><span>时间</span><span>用户</span><span>操作</span><span>分类</span><span>标题 / 文件名</span><span>设备</span></div>' + (list.map(r => `<div class="arow"><span data-l="时间">${esc(fmtTime(r.at))}</span><span data-l="用户">${esc(r.user || '')}</span><span data-l="操作">${esc(r.action)}</span><span data-l="分类">${esc(r.cat || '—')}</span><span data-l="标题 / 文件名" class="tt">${esc(r.title)}</span><span data-l="设备">${devCell(r.device, r.fp, r.fp && FP?.hash === r.fp ? FP.summary : '', labels)}</span></div>`).join('') || '<div class="empty">没有符合条件的记录</div>');
   };
-  ['#af-user', '#af-act', '#af-cat', '#af-dev', '#af-time'].forEach(id => { if ($(id)) $(id).onchange = draw; }); draw();
+  bindFilters(['#af-user', '#af-act', '#af-cat', '#af-dev', '#af-time'], '#af-clear', draw);
 }
 
 
@@ -1197,7 +1423,7 @@ async function renderAccessDash(realRows, cloudRows, labels, opt = {}) { if (!pr
     <div class="pgrid"><div class="pnl"><h4>24 小时分布（几点登录）</h4>${barSVG(hours, hours.map((_, h) => h % 3 === 0 ? String(h) : ''))}</div>
       <div class="pnl"><h4>停留时长分布</h4>${barSVG(dist, bk.map(b => b[1]))}</div></div>
     <div class="pgrid3">
-      <div class="pnl"><h4>常用设备 TOP</h4><div class="scroll-x"><table class="dtab"><tr><th>设备</th><th class="num">次数</th></tr>${devs.map(d => `<tr><td>${devName(d) ? `<b>${esc(devName(d))}</b><br>` : ''}${esc(d.device || '')}${fpCell(d.fp, '', labels)}</td><td class="num">${d.n}</td></tr>`).join('')}</table></div></div>
+      <div class="pnl"><h4>常用设备 TOP</h4><div class="scroll-x"><table class="dtab"><tr><th>设备</th><th class="num">次数</th></tr>${devs.map(d => `<tr><td>${devCell(d.device, d.fp, '', labels)}</td><td class="num">${d.n}</td></tr>`).join('')}</table></div></div>
       <div class="pnl"><h4>IP 地址</h4>${ipl.length ? `<div class="scroll-x"><table class="dtab"><tr><th>IP</th><th class="num">次数</th><th>最近</th></tr>${ipl.map(e => `<tr><td>${esc(e.ip)}${Date.now() - new Date(e.first).getTime() < 864e5 ? '<span class="newtag">新</span>' : ''}<br><small class="dsub">首次 ${esc(fmtTime(e.first))}</small></td><td class="num">${e.n}</td><td>${esc(fmtTime(e.last))}</td></tr>`).join('')}</table></div>` : '<div class="dempty">还没有 IP 记录：登录云端并联网后，新的登录会记录 IP。</div>'}</div>
       <div class="pnl"><h4>每个用户</h4><div class="scroll-x"><table class="dtab"><tr><th>用户</th><th class="num">登录</th><th class="num">失败</th><th class="num">总时长</th><th>最近</th></tr>${users.map(u => `<tr><td>${esc(u.name || '')}<br><small class="dsub">${u.devs.size} 台设备</small></td><td class="num">${u.n}</td><td class="num">${u.f}</td><td class="num">${esc(fmtDur(u.dur))}</td><td>${u.last ? esc(fmtTime(u.last)) : '—'}</td></tr>`).join('')}</table></div></div>
     </div>`;
@@ -1352,10 +1578,11 @@ async function openLogs() {
   openModal('📜 访问日志', `<p class="muted tiny">${own ? '管理员可以看到这台设备上所有用户的登录记录' : '你只能看到自己的登录记录'}${cloudRows ? ' · ☁️ 已合并云端记录（含 IP）' : ' · 未登录云端或离线：IP 显示为「离线/未登录云端」，登录云端后会自动补传'}。日志只记时间、设备和用户名，不含任何密码或内容。</p>
   <div class="lfilters"><select id="lf-name" aria-label="用户"><option value="">全部用户</option>${names.map(n => `<option>${esc(n)}</option>`).join('')}</select>
   <select id="lf-kind" aria-label="类型"><option value="">全部类型</option><option value="session">登录记录</option><option value="failed">密码错误 / 锁定</option></select>
-  <select id="lf-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select></div>
+  <select id="lf-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select>
+  <select id="lf-dev" aria-label="设备"><option value="">全部设备</option>${devOptions(rows, labels)}</select><button type="button" class="fclear hidden" id="lf-clear">清除筛选</button></div>
   <div id="lg-count" class="muted tiny"></div><div class="lgrid" id="lgrid"></div>
   ${own ? `<div class="lsec"><h3>🗂️ 操作记录</h3><p class="muted tiny">新增 / 编辑 / 删除 / 上传或删除文件 / 导入 / 导出等操作。标题用管理员公钥加密，只有管理员能解开。</p>
-  <div class="lfilters"><select id="af-user" aria-label="用户"><option value="">全部用户</option></select><select id="af-act" aria-label="操作"><option value="">全部操作</option></select><select id="af-cat" aria-label="分类"><option value="">全部分类</option></select><select id="af-dev" aria-label="设备"><option value="">全部设备</option></select><select id="af-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select></div>
+  <div class="lfilters"><select id="af-user" aria-label="用户"><option value="">全部用户</option></select><select id="af-act" aria-label="操作"><option value="">全部操作</option></select><select id="af-cat" aria-label="分类"><option value="">全部分类</option></select><select id="af-dev" aria-label="设备"><option value="">全部设备</option></select><select id="af-time" aria-label="时间"><option value="">全部时间</option><option value="1">今天</option><option value="7">近 7 天</option><option value="30">近 30 天</option></select><button type="button" class="fclear hidden" id="af-clear">清除筛选</button></div>
   <div id="ac-count" class="muted tiny"></div><div class="lgrid" id="agrid"></div></div>` : ''}
   ${own ? `<div class="lsec"><h3>🔐 云端登录设备</h3><p class="muted tiny">所有登录过云端的设备都会记录（含设备指纹）。打开两步验证的用户，新设备要输入验证码才算「已验证」。撤销后，那台设备下次登录要重新验证。</p><div id="td-box" class="presence"></div></div>` : ''}`);
   if (own) { $('#modal-body').insertAdjacentHTML('afterbegin', '<div class="dash adash" id="adash"></div>'); renderAccessDash(rows, cloudRows, labels); }
@@ -1370,16 +1597,16 @@ async function openLogs() {
     if (which === 'in' && r.cloud.ip_sync) return `${esc(r.cloud.ip_sync)}<i class="ipoff">（补传时）</i>`;
     return '<i class="ipoff">—</i>';
   };
-  const draw = () => {
-    const fn = $('#lf-name').value, fk = $('#lf-kind').value, ft = +$('#lf-time').value;
+  const draw = any => {
+    const fn = $('#lf-name').value, fk = $('#lf-kind').value, ft = +$('#lf-time').value, fd = $('#lf-dev').value;
     const since = ft ? (ft === 1 ? new Date(new Date().toDateString()).getTime() : Date.now() - ft * 864e5) : 0;
-    const list = rows.filter(r => (!fn || r.name === fn) && (!fk || r.kind === fk) && (!since || new Date(r.start).getTime() >= since));
-    $('#lg-count').textContent = `共 ${list.length} 条`;
+    const list = rows.filter(r => (!fn || r.name === fn) && (!fk || r.kind === fk) && (!fd || devKeyOf(r) === fd) && (!since || new Date(r.start).getTime() >= since));
+    $('#lg-count').textContent = any ? `筛选出 ${list.length} / ${rows.length} 条` : `共 ${list.length} 条`;
     $('#lgrid').innerHTML = `<div class="lhead"><span>登录时间</span><span>退出时间</span><span>停留时长</span><span>设备</span><span>登录IP</span><span>退出IP</span><span>用户</span><span>退出方式</span></div>` +
       (list.map(r => { const f = r.kind === 'failed';
-        return `<div class="lrow${f ? ' fail' : ''}${r.live ? ' live' : ''}"><span data-l="${f ? '尝试时间' : '登录时间'}">${esc(fmtTime(r.start))}</span><span data-l="退出时间">${f ? '—' : r.live ? '—（进行中）' : esc(fmtTime(r.end))}</span><span data-l="停留时长">${f ? '—' : esc(fmtDur(r.dur))}</span><span data-l="设备">${esc(r.device || '')}${fpCell(r.fp, r.fpSummary, labels)}</span><span data-l="登录IP">${ipCell(r, 'in')}</span><span data-l="退出IP">${f ? '—' : ipCell(r, 'out')}</span><span data-l="用户">${esc(r.name || '')}</span><span data-l="退出方式">${f ? '❌ ' + esc(r.reason || '主密码错误') : r.live ? '🟢 进行中' : esc(r.reason || '关闭页面')}</span></div>`; }).join('') || '<div class="empty">没有符合条件的记录</div>');
+        return `<div class="lrow${f ? ' fail' : ''}${r.live ? ' live' : ''}"><span data-l="${f ? '尝试时间' : '登录时间'}">${esc(fmtTime(r.start))}</span><span data-l="退出时间">${f ? '—' : r.live ? '—（进行中）' : esc(fmtTime(r.end))}</span><span data-l="停留时长">${f ? '—' : esc(fmtDur(r.dur))}</span><span data-l="设备">${devCell(r.device, r.fp, r.fpSummary, labels)}</span><span data-l="登录IP">${ipCell(r, 'in')}</span><span data-l="退出IP">${f ? '—' : ipCell(r, 'out')}</span><span data-l="用户">${esc(r.name || '')}</span><span data-l="退出方式">${f ? '❌ ' + esc(r.reason || '主密码错误') : r.live ? '🟢 进行中' : esc(r.reason || '关闭页面')}</span></div>`; }).join('') || '<div class="empty">没有符合条件的记录</div>');
   };
-  ['#lf-name', '#lf-kind', '#lf-time'].forEach(id => $(id).onchange = draw); draw();
+  bindFilters(['#lf-name', '#lf-kind', '#lf-time', '#lf-dev'], '#lf-clear', draw);
 }
 
 // ===== 主题：自动（本机时间 6:00–18:00 白天）/ 白天 / 夜间 =====
@@ -1405,9 +1632,12 @@ const PAL = ['#06b6d4', '#818cf8', '#34d399', '#fbbf24', '#f472b6'];
 let gid = 0;
 function lineChartSVG(series, labels, opt = {}) {
   const W = 600, H = 220, L = 34, R = 10, T = 12, B = 26, n = series[0].length;
-  const max = Math.max(1, ...series.flat()) * 1.15, x = i => L + (W - L - R) * i / (n - 1), y = v => T + (H - T - B) * (1 - v / max);
+  // Y 轴：整数刻度、不重复（数值很小时也不会出现 0,0,1,1）
+  const vmax = Math.max(1, ...series.flat()), niceStep = r => { const p = 10 ** Math.floor(Math.log10(r)), f = r / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
+  const step = vmax <= 4 ? 1 : niceStep(vmax / 4), max = Math.ceil(vmax * 1.1 / step) * step, ticks = Math.round(max / step);
+  const x = i => L + (W - L - R) * i / (n - 1), y = v => T + (H - T - B) * (1 - v / max);
   let g = '';
-  for (let k = 0; k <= 4; k++) { const yy = T + (H - T - B) * k / 4; g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="rgba(148,163,184,.12)"/><text x="${L - 6}" y="${yy + 4}" fill="#64748b" font-size="10" text-anchor="end">${Math.round(max * (1 - k / 4))}</text>`; }
+  for (let k = 0; k <= ticks; k++) { const v = k * step, yy = y(v); g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="rgba(148,163,184,.12)"/><text x="${L - 6}" y="${yy + 4}" fill="#64748b" font-size="10" text-anchor="end">${v}</text>`; }
   labels.forEach((t, i) => { if (i % Math.ceil(n / 8) === 0 || i === n - 1) g += `<text x="${x(i)}" y="${H - 8}" fill="#64748b" font-size="10" text-anchor="middle">${esc(t)}</text>`; });
   let defs = '', paths = '';
   series.forEach((sv, si) => {
@@ -1527,8 +1757,8 @@ document.addEventListener('visibilitychange', () => { const d = $('#showcase'); 
 
 // ===== 启动 =====
 (async () => {
-  if (!window.crypto?.subtle) { document.body.innerHTML = '<p style="padding:20px">当前浏览器不支持加密功能，请用最新版 Chrome 打开。</p>'; return; }
-  try { db = await openDB(); } catch { document.body.innerHTML = '<p style="padding:20px">这个浏览器不允许本地文件保存数据。请用 <b>Google Chrome</b> 打开这个文件。</p>'; return; }
+  if (!window.crypto?.subtle) { document.body.innerHTML = '<p class="fatal">当前浏览器不支持加密功能，请用最新版 Chrome 打开。</p>'; return; }
+  try { db = await openDB(); } catch { document.body.innerHTML = '<p class="fatal">这个浏览器不允许本地文件保存数据。请用 <b>Google Chrome</b> 打开这个文件。</p>'; return; }
   try { persisted = !!(await navigator.storage?.persisted?.()) || !!(await navigator.storage?.persist?.()); } catch { persisted = false; }
   $('#persist-tip').textContent = persistText();
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
