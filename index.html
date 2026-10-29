@@ -183,7 +183,7 @@ function b64(buf) { const b = buf instanceof Uint8Array ? buf : new Uint8Array(b
 function unb64(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return b; }
 const rnd = n => crypto.getRandomValues(new Uint8Array(n));
 const uuid = () => crypto.randomUUID();
-function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": '&#39;' }[c])); }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '\x26amp;', '<': '\x26lt;', '>': '\x26gt;', '"': '\x26quot;', "'": '\x26#39;' }[c])); }
 function fmtSize(n) { if (!n && n !== 0) return ''; const u = ['B', 'KB', 'MB', 'GB']; let i = 0; while (n >= 1024 && i < 3) { n /= 1024; i++; } return `${n.toFixed(i ? 1 : 0)} ${u[i]}`; }
 const fmtTime = t => t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) : '从未';
 const nowISO = () => new Date().toISOString();
