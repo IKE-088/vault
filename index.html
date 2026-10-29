@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-e5lrTHc0KK6XIrHOKaGHRE8ldo0T7WfF9A0ax39pWAs='; style-src 'sha256-SQ2VA0p2yQKXEIDBWojcsoJWV6JUy4ITD5jO1j77N04='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-IKSgsmwVdK9dDkXT9EP9fByjYfTd6YoSgcYYPrlQVis='; style-src 'sha256-TFelonbZGbhx6yOLk5auOCQ35+2Ij1gyLDrT9aeHT3M='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -75,6 +75,14 @@ button:disabled{opacity:.6;cursor:wait}
 .vlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 10px;font-size:13px}
 .vrow button{padding:4px 10px;font-size:12px}
+.searchbar{position:relative;margin:6px 0 2px}
+.searchbar input{margin:0;padding:12px 44px 12px 40px;border-radius:12px;font-size:16px;background:#fff}
+.searchbar input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.searchbar .sic{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.55}
+.searchbar .sx{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:var(--bg);border-radius:999px;width:30px;height:30px;padding:0;line-height:30px;color:var(--muted)}
+.search-info{margin:4px 2px 0}
+.toolbar.end{justify-content:flex-end;margin-top:4px}
+.searching .cats,.searching .toolbar.end{display:none}
 </style>
 </head>
 <body>
@@ -134,9 +142,14 @@ button:disabled{opacity:.6;cursor:wait}
   </header>
   <div id="banner" class="banner hidden"></div>
   <div id="backup-status" class="muted tiny status"></div>
+  <div class="searchbar" role="search">
+    <span class="sic" aria-hidden="true">🔍</span>
+    <input id="search" type="search" placeholder="搜索全部：账号、联系人、日记、文件、财务…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜索全部分类">
+    <button id="search-clear" class="sx hidden" type="button" title="清除搜索（Esc）" aria-label="清除搜索">✕</button>
+  </div>
+  <div id="search-info" class="muted tiny search-info hidden"></div>
   <nav id="cats" class="cats"></nav>
-  <div class="toolbar">
-    <input id="search" type="search" placeholder="搜索（只在本机解密后搜索）" autocomplete="off">
+  <div class="toolbar end">
     <button id="btn-add" class="primary" type="button">＋ 新增</button>
   </div>
   <div id="summary" class="summary hidden"></div>
@@ -475,10 +488,13 @@ function renderStatus() {
 // ===== 界面 =====
 function render() {
   renderStatus();
-  const q = $('#search').value.trim().toLowerCase();
+  const q = normQ($('#search').value);
+  $('#screen-app').classList.toggle('searching', !!q); $('#search-clear').classList.toggle('hidden', !$('#search').value);
   $('#cats').innerHTML = Object.entries(CATS).map(([k, c]) => `<button type="button" data-c="${k}" class="${k === cur && !q ? 'active' : ''}">${c.icon} ${c.label}<span class="count">${items.filter(i => i.category === k).length}</span></button>`).join('');
   $('#cats').querySelectorAll('button').forEach(b => b.onclick = () => { cur = b.dataset.c; $('#search').value = ''; render(); });
-  let list = q ? items.filter(i => JSON.stringify(Object.values(i.data)).toLowerCase().includes(q)) : items.filter(i => i.category === cur);
+  let list = q ? items.filter(i => searchText(i).includes(q)) : items.filter(i => i.category === cur);
+  if (q) list = [...list].sort((a, b) => Object.keys(CATS).indexOf(a.category) - Object.keys(CATS).indexOf(b.category));
+  const info = $('#search-info'); info.classList.toggle('hidden', !q); info.textContent = q ? (list.length ? `在全部分类中找到 ${list.length} 条（只在本机内存中搜索，不保存、不上传）` : '') : '';
   const c = CATS[cur];
   if (!q && c.sort) list = [...list].sort((a, b) => String(c.sort(b.data) || '').localeCompare(String(c.sort(a.data) || '')));
   const sum = $('#summary');
@@ -487,11 +503,25 @@ function render() {
     sum.innerHTML = Object.entries(t).map(([cc, v]) => `<span><b>${esc(cc)}</b> 收入 ${v.in.toLocaleString('zh-CN')} · 支出 ${v.out.toLocaleString('zh-CN')} · 结余 ${(v.in - v.out).toLocaleString('zh-CN')}</span>`).join('');
     sum.classList.remove('hidden');
   } else sum.classList.add('hidden');
-  if (!list.length) { $('#list').innerHTML = `<div class="empty">${q ? '没有找到匹配的内容' : `还没有${c.label}，点「＋ 新增」添加第一条`}</div>`; return; }
+  if (!list.length) { $('#list').innerHTML = `<div class="empty">${q ? '没有找到' : `还没有${c.label}，点「＋ 新增」添加第一条`}</div>`; return; }
   $('#list').innerHTML = list.map(i => { const cc = CATS[i.category]; return `<div class="item" data-id="${i.id}"><div class="ic">${cc.icon}</div><div class="tx"><div class="t">${q ? `<span class="badge">${cc.label}</span>` : ''}${esc(cc.title(i.data))}</div><div class="s">${esc(cc.sub(i.data))}</div></div>${cc.right ? `<div class="r">${esc(cc.right(i.data))}</div>` : ''}</div>`; }).join('');
   $('#list').querySelectorAll('.item').forEach(el => el.onclick = () => viewItem(items.find(x => x.id === el.dataset.id)));
 }
-$('#search').oninput = render;
+// 搜索：只在内存中对已解密数据搜索，不含密码字段，不保存、不发送
+function normQ(v) { return String(v ?? '').normalize('NFKC').toLowerCase().trim(); }
+function searchText(i) {
+  const c = CATS[i.category]; if (!c) return '';
+  const secret = new Set(c.fields.filter(f => f.type === 'secret').map(f => f.k)); secret.add('password');
+  const d = i.data || {}, parts = [c.label];
+  for (const [k, v] of Object.entries(d)) { if (secret.has(k) || v == null || typeof v === 'object') continue; parts.push(String(v)); }
+  try { parts.push(c.title(d) || '', c.sub(d) || '', c.right ? c.right(d) : ''); } catch {}
+  return normQ(parts.join('\n'));
+}
+function clearSearch() { $('#search').value = ''; render(); }
+$('#search').addEventListener('input', e => { if (!e.isComposing) render(); });
+$('#search').addEventListener('compositionend', render);
+$('#search').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); clearSearch(); $('#search').blur(); } else if (e.key === 'Enter') { e.preventDefault(); $('#search').blur(); } });
+$('#search-clear').onclick = () => { clearSearch(); $('#search').focus(); };
 $('#btn-add').onclick = () => editItem(cur, null);
 $('#btn-menu').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('hidden'); };
 document.addEventListener('click', () => $('#menu').classList.add('hidden'));
