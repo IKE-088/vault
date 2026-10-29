@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-4FPExPMnCTgdRAa18DcJumiEK334zectOIAWhiqAsJc='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-XaZpWIHznltsU/6mDPLN14bHNWP9rnLx5bt0PcqJGKs='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -1544,10 +1544,14 @@ async function afterCloudSignIn(email) {
   if (await rejectUnverifiedCloud(u0)) return;
   const gate = await checkCloudAccess();
   if (gate && gate.ok === false) {
-    try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
-    sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null };
-    refreshOwnerCloudUI();
-    return toast(gate.message || '云端访问被拒绝', 9000);
+    const ownerEscape = gate.is_owner && (gate.reason === 'REGION_BLOCKED' || gate.reason === 'REGION_UNKNOWN');
+    if (!ownerEscape) {
+      try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
+      sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null };
+      refreshOwnerCloudUI();
+      return toast(gate.message || '云端访问被拒绝', 9000);
+    }
+    toast((gate.message || '地区受限') + '（管理员仍可进入并关闭地区锁；备份等仍会被拒绝）', 9000);
   }
   // 设备记录和指纹始终保存；只有用户自己打开了「两步验证」，新设备才需要验证码
   const verified = await registerDevice();
