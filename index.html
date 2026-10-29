@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-IKSgsmwVdK9dDkXT9EP9fByjYfTd6YoSgcYYPrlQVis='; style-src 'sha256-TFelonbZGbhx6yOLk5auOCQ35+2Ij1gyLDrT9aeHT3M='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-hej2V2gyb7w9Q5UPpR9kRuMvW698SOVt7J1zgpVFyLQ='; style-src 'sha256-gao9prXjk3iOY3lNnAavJ8ytR/1JG3XAxE7SZZiDU3g='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -83,27 +83,102 @@ button:disabled{opacity:.6;cursor:wait}
 .search-info{margin:4px 2px 0}
 .toolbar.end{justify-content:flex-end;margin-top:4px}
 .searching .cats,.searching .toolbar.end{display:none}
+input,textarea,select{font-size:16px}
+#btn-add{white-space:nowrap;flex-shrink:0}
+.tip{background:#e0f2fe;color:#075985;border-radius:10px;padding:8px 10px;font-size:12.5px;margin:8px 0 0}
+.ov .toolbar.end{display:none}
+html.dk,html.dk body{background:#030712}
+#screen-showcase{max-width:1180px;padding-top:16px}
+.dash{position:relative;overflow:hidden;border-radius:20px;padding:18px;color:#e2e8f0;background:radial-gradient(1200px 500px at 10% -10%,rgba(37,99,235,.35),transparent 60%),radial-gradient(900px 500px at 110% 120%,rgba(168,85,247,.25),transparent 60%),#060b1a;border:1px solid rgba(56,189,248,.18);box-shadow:0 10px 40px rgba(2,6,23,.5),inset 0 0 60px rgba(56,189,248,.05)}
+.dash::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(56,189,248,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.07) 1px,transparent 1px);background-size:32px 32px;animation:gridmove 14s linear infinite;mask-image:radial-gradient(ellipse at center,#000 40%,transparent 85%);-webkit-mask-image:radial-gradient(ellipse at center,#000 40%,transparent 85%)}
+.dash::after{content:"";position:absolute;left:-30%;right:-30%;height:120px;top:-120px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(56,189,248,.10),transparent);animation:scan 7s linear infinite}
+.dash>*{position:relative;z-index:1}
+@keyframes gridmove{to{background-position:32px 32px,32px 32px}}
+@keyframes scan{to{top:110%}}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+@keyframes draw{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes glowbtn{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.5),0 8px 30px rgba(37,99,235,.45)}50%{box-shadow:0 0 0 8px rgba(56,189,248,0),0 8px 30px rgba(37,99,235,.65)}}
+.dhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.dtitle{font-size:20px;font-weight:700;letter-spacing:.5px;background:linear-gradient(90deg,#67e8f9,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dsub{font-size:12px;color:#94a3b8}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8;font-variant-numeric:tabular-nums}
+.live i{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;animation:pulse 1.8s ease-in-out infinite}
+.demo-tag{font-size:11px;color:#fbbf24;border:1px solid rgba(251,191,36,.45);border-radius:6px;padding:1px 6px;opacity:.85}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:rgba(15,23,42,.55);border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:12px 14px;animation:fadein .6s both}
+.kpi .k{font-size:12px;color:#94a3b8}
+.kpi .n{font-size:26px;font-weight:700;color:#67e8f9;font-variant-numeric:tabular-nums;text-shadow:0 0 18px rgba(103,232,249,.45);white-space:nowrap}
+.kpi .n small{font-size:13px;color:#94a3b8;margin-left:3px;text-shadow:none}
+.kpi:nth-child(2) .n{color:#a5b4fc;text-shadow:0 0 18px rgba(165,180,252,.45)}
+.kpi:nth-child(3) .n{color:#6ee7b7;text-shadow:0 0 18px rgba(110,231,183,.45)}
+.kpi:nth-child(4) .n{color:#fcd34d;text-shadow:0 0 18px rgba(252,211,77,.4)}
+.pgrid{display:grid;grid-template-columns:1.6fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:720px){.pgrid{grid-template-columns:1fr}}
+.pnl{background:rgba(15,23,42,.55);border:1px solid rgba(56,189,248,.16);border-radius:14px;padding:12px 14px;min-width:0;animation:fadein .7s both}
+.pnl h4{margin:0 0 8px;font-size:13px;font-weight:600;color:#cbd5e1;display:flex;justify-content:space-between;align-items:center}
+.pnl svg{display:block;width:100%;height:auto}
+.ln{stroke-dasharray:1000;stroke-dashoffset:0;animation:draw 2.2s ease-out backwards}
+.bar{transform-box:fill-box;transform-origin:50% 100%;animation:grow 1.2s cubic-bezier(.2,.8,.2,1) backwards}
+.seg{animation:fadein 1s backwards}
+.pdot{transform-box:fill-box;transform-origin:center;animation:pulse 1.6s ease-in-out infinite}
+.nodraw .ln,.nodraw .bar{animation:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:#cbd5e1;margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend b{width:9px;height:9px;border-radius:3px;display:inline-block}
+.c0{background:#22d3ee}.c1{background:#818cf8}.c2{background:#34d399}.c3{background:#fbbf24}.c4{background:#f472b6}
+.donutwrap{display:flex;align-items:center;gap:12px}
+.donutwrap svg{width:150px;flex-shrink:0}
+.feed{list-style:none;margin:0;padding:0;font-size:12.5px;max-height:186px;overflow:hidden}
+.feed li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(148,163,184,.15);animation:fadein .5s both;color:#cbd5e1}
+.feed li em{font-style:normal;color:#64748b;font-variant-numeric:tabular-nums;white-space:nowrap}
+.feed li.clk{cursor:pointer}.feed li.clk:hover{color:#fff}
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hb{display:grid;grid-template-columns:78px 1fr 30px;align-items:center;gap:8px;font-size:12.5px;color:#cbd5e1;background:none;border:none;padding:0;text-align:left;width:100%}
+.hb .tr{height:10px;border-radius:99px;background:rgba(148,163,184,.15);overflow:hidden}
+.hb .fl{display:block;height:100%;border-radius:99px;transform-origin:left;animation:growx 1.1s cubic-bezier(.2,.8,.2,1) backwards}
+.hb .cn{text-align:right;font-variant-numeric:tabular-nums;color:#67e8f9;font-weight:600}
+.fin{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.fin div{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.fin .pos{color:#6ee7b7}.fin .neg{color:#fda4af}
+.enter{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px}
+.btn-enter{font-size:17px;font-weight:600;padding:14px 34px;border-radius:999px;border:1px solid rgba(103,232,249,.6);color:#fff;background:linear-gradient(90deg,#2563eb,#7c3aed);animation:glowbtn 2.4s ease-in-out infinite}
+.btn-enter:hover{filter:brightness(1.1)}
+.dnote{font-size:11.5px;color:#64748b;text-align:center}
+.dash.paused *,.dash.paused::before,.dash.paused::after{animation-play-state:paused!important}
+@media(max-width:480px){.dash{padding:14px;border-radius:16px}.kpi .n{font-size:22px}.dtitle{font-size:17px}.donutwrap svg{width:120px}}
+@media(prefers-reduced-motion:reduce){.dash *,.dash::before,.dash::after{animation:none!important;transition:none!important}.dash::after{display:none}}
 </style>
 </head>
 <body>
 <div id="toast" class="toast hidden"></div>
 
+<!-- 展示面板（演示数据） -->
+<section id="screen-showcase" class="screen hidden">
+  <div id="showcase" class="dash" aria-label="演示数据面板"></div>
+</section>
+
 <!-- 选择成员档案 -->
 <section id="screen-profiles" class="screen center hidden">
   <div class="card narrow">
     <div class="brand">🔐 家庭加密保险库</div>
-    <p class="muted small">数据只保存在这台电脑的浏览器里，平时不联网。每位成员有自己的主密码，互相看不到。</p>
+    <p class="muted small">数据只保存在这台设备的浏览器里，平时不联网。每位成员有自己的主密码，互相看不到。</p>
     <div id="profile-list" class="plist"></div>
     <div id="first-run" class="hidden">
       <p class="small">还没有<b>管理员</b>档案：请先创建（就是你自己）。上面列出的档案（如「示例」）可以直接点开。</p>
+      <p class="tip">💡 已经有备份？请先点下面的「📂 从备份文件恢复」或「☁️ 从云端恢复」，不要再新建管理员，否则会出现两个 👑。</p>
       <form id="form-owner">
         <label>你的称呼<input id="owner-name" required maxlength="20" placeholder="例如：爸爸"></label>
-        <label>主密码（至少 10 位）<input id="owner-mp1" type="password" required minlength="10" autocomplete="off"></label>
+        <label>主密码（至少 12 位）<input id="owner-mp1" type="password" required minlength="12" autocomplete="off"></label>
         <label>再输一次主密码<input id="owner-mp2" type="password" required autocomplete="off"></label>
         <button class="primary block" id="owner-submit" type="submit">创建保险库</button>
       </form>
       <p class="muted tiny">⚠️ 主密码忘了就再也解不开，任何人都无法找回。</p>
     </div>
+    <p id="ios-tip" class="tip hidden">📱 iPhone / iPad：请在 Safari 点「分享」→「添加到主屏幕」，以后从主屏幕图标打开，数据更不容易被系统清除。</p>
+    <p id="persist-tip" class="muted tiny"></p>
     <div class="row gap wrap mt">
       <button id="btn-import-start" type="button">📂 从备份文件恢复</button>
       <button id="btn-cloud-start" type="button">☁️ 从云端恢复</button>
@@ -186,7 +261,8 @@ const BUCKET = 'vault-files';
 const KEEP_VERSIONS = 10;
 const KDF_ITER = 600000;
 const IDLE_MS = 10 * 60 * 1000;
-const STALE_MS = 7 * 24 * 3600 * 1000;
+const STALE_MS = 3 * 24 * 3600 * 1000;
+const HIDDEN_LOCK_MS = 60 * 1000;
 const VERIFY_TAG = 'family-vault-v1';
 
 // ===== 工具 =====
@@ -202,7 +278,7 @@ const fmtTime = t => t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) 
 const nowISO = () => new Date().toISOString();
 const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
 let toastT; function toast(msg, ms = 2800) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hidden'), ms); }
-function show(id) { for (const s of ['#screen-profiles', '#screen-unlock', '#screen-app']) $(s).classList.toggle('hidden', s !== id); }
+function show(id) { for (const s of ['#screen-showcase', '#screen-profiles', '#screen-unlock', '#screen-app']) $(s).classList.toggle('hidden', s !== id); document.documentElement.classList.toggle('dk', id === '#screen-showcase'); if (id === '#screen-showcase') showcaseStart(); else showcaseStop(); }
 async function busy(btn, fn) { if (!btn) return fn(); const old = btn.textContent; btn.disabled = true; btn.textContent = '处理中…'; try { return await fn(); } finally { btn.disabled = false; btn.textContent = old; } }
 
 // ===== 本地数据库（IndexedDB）=====
@@ -238,6 +314,7 @@ const itemAAD = (pid, c) => `fv1|item|${pid}|${c}`;
 const fileAAD = (pid, id) => `fv1|file|${pid}|${id}`;
 const metaAAD = pid => `fv1|meta|${pid}`;
 async function wrapDEK(pid, rawDEK, password) {
+  if (String(password).length < 12) throw new Error('主密码至少 12 位');
   const salt = rnd(16); const kek = await deriveKEK(password, salt, KDF_ITER);
   const { ct, iv } = await aesEnc(kek, enc.encode(JSON.stringify({ check: VERIFY_TAG, dek: b64(rawDEK) })), metaAAD(pid));
   return { kdf_salt: b64(salt), kdf_iterations: KDF_ITER, wrap_ct: b64(ct), wrap_iv: b64(iv) };
@@ -285,9 +362,9 @@ let profile = null, dataKey = null, items = [], cur = 'login', lastActive = Date
 
 // ===== 成员档案 =====
 async function renderProfiles() {
-  const ps = (await getAll('profiles')).sort((a, b) => (b.isOwner - a.isOwner) || a.created_at.localeCompare(b.created_at));
+  const ps = (await getAll('profiles')).filter(p => !p.deleted_at).sort((a, b) => (b.isOwner - a.isOwner) || String(a.created_at || '').localeCompare(String(b.created_at || '')));
   $('#first-run').classList.toggle('hidden', ps.some(p => p.isOwner));
-  $('#profile-list').innerHTML = ps.map(p => `<button type="button" data-id="${p.id}"><span>${p.isOwner ? '👑' : '🙂'} ${esc(p.name)}</span>${p.isOwner ? '<span class="tag">管理员</span>' : ''}</button>`).join('');
+  $('#profile-list').innerHTML = ps.map(p => `<button type="button" data-id="${esc(p.id)}"><span>${p.isOwner ? '👑' : '🙂'} ${esc(p.name)}</span>${p.isOwner ? '<span class="tag">管理员</span>' : ''}</button>`).join('');
   $('#profile-list').querySelectorAll('button').forEach(b => b.onclick = () => { pendingProfile = ps.find(p => p.id === b.dataset.id); $('#unlock-name').textContent = pendingProfile.name; $('#mp1').value = ''; show('#screen-unlock'); $('#mp1').focus(); });
   show('#screen-profiles');
 }
@@ -295,7 +372,8 @@ $('#btn-back').onclick = () => renderProfiles();
 $('#form-owner').onsubmit = e => { e.preventDefault(); busy($('#owner-submit'), async () => {
   const name = $('#owner-name').value.trim(), p1 = $('#owner-mp1').value;
   if (p1 !== $('#owner-mp2').value) return toast('两次输入的主密码不一样');
-  if ((await getAll('profiles')).some(p => p.isOwner)) return toast('已经有管理员档案了');
+  if ((await getAll('profiles')).some(p => p.isOwner && !p.deleted_at)) return toast('已经有管理员档案了');
+  if (p1.length < 12) return toast('主密码至少 12 位');
   const p = await newProfile(name, p1, true); $('#owner-mp1').value = $('#owner-mp2').value = '';
   toast('保险库已创建 ✅ 请牢记主密码'); await unlockWith(p, p1);
 }); };
@@ -304,7 +382,7 @@ $('#form-unlock').onsubmit = e => { e.preventDefault(); busy($('#unlock-submit')
 }); };
 async function unlockWith(p, password) {
   const raw = await unwrapRaw(p, password); dataKey = await importDEK(raw); raw.fill(0);
-  profile = p; lastActive = Date.now(); cur = 'login';
+  profile = p; lastActive = Date.now(); cur = 'overview';
   await loadItems(); $('#who').textContent = p.name + (p.isOwner ? '（管理员）' : '');
   document.querySelectorAll('.owner-only').forEach(el => el.classList.toggle('hidden', !p.isOwner));
   show('#screen-app'); render();
@@ -318,13 +396,20 @@ function lock(msg) {
 $('#btn-lock').onclick = () => lock('已锁定');
 ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(ev => addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true }));
 setInterval(() => { if (dataKey && Date.now() - lastActive > IDLE_MS) lock('闲置 10 分钟，已自动锁定'); }, 10000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && dataKey && Date.now() - lastActive > IDLE_MS) lock('闲置 10 分钟，已自动锁定'); });
+let hiddenAt = 0, hideT = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { hiddenAt = Date.now(); clearTimeout(hideT); hideT = setTimeout(() => { if (document.hidden && dataKey) lock('页面在后台超过 1 分钟，已自动锁定'); }, HIDDEN_LOCK_MS); return; }
+  clearTimeout(hideT);
+  if (dataKey && hiddenAt && Date.now() - hiddenAt > HIDDEN_LOCK_MS) lock('页面在后台超过 1 分钟，已自动锁定');
+  else if (dataKey && Date.now() - lastActive > IDLE_MS) lock('闲置 10 分钟，已自动锁定');
+  hiddenAt = 0;
+});
 
 // ===== 记录 =====
 async function loadItems() {
-  const rows = await getAll('items', profile.id); const out = []; let bad = 0;
+  const rows = (await getAll('items', profile.id)).filter(r => !r.deleted_at); const out = []; let bad = 0;
   for (const r of rows) { try { out.push({ ...r, data: JSON.parse(dec.decode(await aesDec(dataKey, unb64(r.ct), unb64(r.iv), itemAAD(profile.id, r.category)))) }); } catch { bad++; } }
-  items = out.sort((a, b) => b.created_at.localeCompare(a.created_at)); if (bad) toast(`有 ${bad} 条记录无法解密，已跳过`);
+  items = out.sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))); if (bad) toast(`有 ${bad} 条记录无法解密，已跳过`);
 }
 async function saveItem(category, payload, existing, file) {
   const id = existing?.id || uuid(), pid = profile.id;
@@ -340,7 +425,8 @@ async function saveItem(category, payload, existing, file) {
   const rec = { ...row, data: payload };
   items = existing ? items.map(x => x.id === id ? rec : x) : [rec, ...items];
 }
-async function deleteItem(it) { await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').delete(it.id); t.objectStore('files').delete(it.id); }); items = items.filter(x => x.id !== it.id); }
+const tomb = r => ({ id: r.id, profileId: r.profileId, category: r.category, created_at: r.created_at || nowISO(), updated_at: nowISO(), deleted_at: nowISO() });
+async function deleteItem(it) { await tx(['items', 'files'], 'readwrite', t => { t.objectStore('items').put(tomb(it)); t.objectStore('files').delete(it.id); }); items = items.filter(x => x.id !== it.id); }
 async function openFile(it, download) {
   const f = await getOne('files', it.id); if (!f) throw new Error('找不到文件内容');
   const plain = await aesDec(dataKey, f.ct, unb64(f.iv), fileAAD(profile.id, it.id));
@@ -357,7 +443,7 @@ async function buildExport(scopeAll) {
   const its = (await getAll('items')).filter(i => ids.has(i.profileId));
   const fs = (await getAll('files')).filter(f => ids.has(f.profileId));
   const out = { format: 'family-vault', version: 1, exportedAt: nowISO(), scope: scopeAll ? 'all' : 'profile',
-    profiles: ps.map(({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at }) => ({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at })),
+    profiles: ps.map(({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at, deleted_at }) => ({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at, ...(deleted_at ? { deleted_at } : {}) })),
     items: its, files: fs.map(f => ({ id: f.id, profileId: f.profileId, iv: f.iv, ct: b64(f.ct) })) };
   return new Blob([JSON.stringify(out)], { type: 'application/octet-stream' });
 }
@@ -370,18 +456,43 @@ $('#m-export').onclick = async () => {
 };
 async function importVault(text) {
   let o; try { o = JSON.parse(text); } catch { throw new Error('不是有效的备份文件'); }
-  if (o.format !== 'family-vault' || !Array.isArray(o.profiles)) throw new Error('不是有效的备份文件');
+  if (!o || o.format !== 'family-vault' || !Array.isArray(o.profiles)) throw new Error('不是有效的备份文件');
+  const str = v => typeof v === 'string' && v.length > 0;
+  let skipped = 0;
+  const profs = [];
+  for (const p of o.profiles) {
+    if (!p || !str(p.id)) { skipped++; continue; }
+    if (p.deleted_at) { if (!str(p.updated_at)) { skipped++; continue; } profs.push({ id: p.id, name: String(p.name || ''), isOwner: false, created_at: p.created_at || p.updated_at, updated_at: p.updated_at, deleted_at: p.deleted_at }); continue; }
+    if (!str(p.name) || !str(p.kdf_salt) || !str(p.wrap_ct) || !str(p.wrap_iv) || !Number.isInteger(p.kdf_iterations) || p.kdf_iterations < KDF_ITER) { skipped++; continue; }
+    const created_at = str(p.created_at) ? p.created_at : (str(p.updated_at) ? p.updated_at : nowISO());
+    profs.push({ id: p.id, name: p.name.slice(0, 40), isOwner: p.isOwner === true, kdf_salt: p.kdf_salt, kdf_iterations: p.kdf_iterations, wrap_ct: p.wrap_ct, wrap_iv: p.wrap_iv, created_at, updated_at: str(p.updated_at) ? p.updated_at : created_at });
+  }
+  const its = [];
+  for (const it of Array.isArray(o.items) ? o.items : []) {
+    if (!it || !str(it.id) || !str(it.profileId)) { skipped++; continue; }
+    if (it.deleted_at) { its.push({ id: it.id, profileId: it.profileId, category: String(it.category || ''), created_at: it.created_at || it.updated_at || nowISO(), updated_at: it.updated_at || it.deleted_at, deleted_at: it.deleted_at }); continue; }
+    if (!Object.hasOwn(CATS, it.category) || !str(it.ct) || !str(it.iv)) { skipped++; continue; }
+    const created_at = str(it.created_at) ? it.created_at : (str(it.updated_at) ? it.updated_at : nowISO());
+    its.push({ id: it.id, profileId: it.profileId, category: it.category, ct: it.ct, iv: it.iv, hasFile: !!it.hasFile, created_at, updated_at: str(it.updated_at) ? it.updated_at : created_at });
+  }
+  const local = await getAll('profiles');
+  const localOwner = local.find(p => p.isOwner && !p.deleted_at);
+  const otherOwners = profs.filter(p => p.isOwner && localOwner && p.id !== localOwner.id && !local.some(l => l.id === p.id));
+  if (otherOwners.length && !confirm(`这台设备已经有管理员「${localOwner.name}」。\n这个备份里还有另一个管理员「${otherOwners.map(p => p.name).join('、')}」，继续导入会出现两个 👑 管理员。\n\n确定要继续导入吗？`)) throw new Error('已取消导入');
   let np = 0, ni = 0;
   await tx(['profiles', 'items', 'files'], 'readwrite', async t => {
     const P = t.objectStore('profiles'), I = t.objectStore('items'), F = t.objectStore('files');
-    for (const p of o.profiles) { const old = await req(P.get(p.id)); if (!old || p.updated_at > old.updated_at) { P.put({ lastExportAt: null, lastCloudAt: null, cloudEmail: '', ...(old || {}), ...p }); np++; } }
-    const filesById = new Map((o.files || []).map(f => [f.id, f]));
-    for (const it of o.items || []) { const old = await req(I.get(it.id)); if (!old || it.updated_at > old.updated_at) { I.put(it); const f = filesById.get(it.id); if (f) F.put({ id: f.id, profileId: f.profileId, iv: f.iv, ct: unb64(f.ct) }); ni++; } }
+    for (const p of profs) { const old = await req(P.get(p.id)); if (!old || p.updated_at > (old.updated_at || '')) { P.put(p.deleted_at ? p : { lastExportAt: null, lastCloudAt: null, cloudEmail: '', ...(old || {}), ...p, deleted_at: undefined }); np++; } }
+    const filesById = new Map((Array.isArray(o.files) ? o.files : []).filter(f => f && str(f.id) && str(f.ct) && str(f.iv)).map(f => [f.id, f]));
+    for (const it of its) { const old = await req(I.get(it.id)); if (!old || it.updated_at > (old.updated_at || '')) {
+      I.put(it); ni++;
+      if (it.deleted_at) F.delete(it.id); else { const f = filesById.get(it.id); if (f) F.put({ id: f.id, profileId: it.profileId, iv: f.iv, ct: unb64(f.ct) }); }
+    } }
   });
-  return { np, ni };
+  return { np, ni, skipped };
 }
 async function afterImport(r) {
-  toast(`恢复完成：更新 ${r.np} 个档案、${r.ni} 条记录`, 5000);
+  toast(`恢复完成：更新 ${r.np} 个档案、${r.ni} 条记录${r.skipped ? `，跳过 ${r.skipped} 条无效内容` : ''}`, 5000);
   if (dataKey) { profile = await getOne('profiles', profile.id) || profile; await loadItems(); render(); } else renderProfiles();
 }
 function pickImport() { $('#file-import').value = ''; $('#file-import').click(); }
@@ -396,7 +507,7 @@ function cloud() {
 }
 function cloudErr(e) {
   const m = e?.message || String(e), code = e?.code || '';
-  if (/Database error saving new user/i.test(m)) return '这个邮箱还没有被家族授权，请联系管理员';
+  if (/Database error/i.test(m)) return '该邮箱未获授权（不在家族名单里），请联系管理员';
   if (code === 'email_address_not_authorized' || /not authorized/i.test(m)) return '邮箱已授权，但云端暂时发不了确认邮件：请管理员在 Supabase 后台关闭「Confirm email」后再注册';
   if (/Invalid login credentials/i.test(m)) return '邮箱或登录密码不对';
   if (/Email not confirmed/i.test(m)) return '邮箱还没确认，请先点邮件里的确认链接';
@@ -479,10 +590,10 @@ $('#m-cloud').onclick = openCloud; $('#btn-cloud-start').onclick = openCloud;
 function renderStatus() {
   if (!profile) return;
   const e = profile.lastExportAt, c = profile.lastCloudAt, old = t => !t || Date.now() - new Date(t).getTime() > STALE_MS;
-  $('#backup-status').textContent = `本地备份文件：${fmtTime(e)} · 云端备份：${fmtTime(c)}`;
+  $('#backup-status').textContent = `本地备份文件：${fmtTime(e)} · 云端备份：${fmtTime(c)} · ${persistText()}`;
   const msgs = []; if (old(e)) msgs.push('本地备份文件'); if (old(c)) msgs.push('云端备份');
   $('#banner').classList.toggle('hidden', !msgs.length);
-  $('#banner').textContent = msgs.length ? `⚠️ ${msgs.join('和')}已超过 7 天（或从未）备份，建议点右上角「⋯」尽快备份。` : '';
+  $('#banner').textContent = msgs.length ? `⚠️ ${msgs.join('和')}已超过 3 天（或从未）备份，建议点右上角「⋯」尽快备份。` : '';
 }
 
 // ===== 界面 =====
@@ -490,11 +601,13 @@ function render() {
   renderStatus();
   const q = normQ($('#search').value);
   $('#screen-app').classList.toggle('searching', !!q); $('#search-clear').classList.toggle('hidden', !$('#search').value);
-  $('#cats').innerHTML = Object.entries(CATS).map(([k, c]) => `<button type="button" data-c="${k}" class="${k === cur && !q ? 'active' : ''}">${c.icon} ${c.label}<span class="count">${items.filter(i => i.category === k).length}</span></button>`).join('');
+  $('#screen-app').classList.toggle('ov', cur === 'overview' && !q);
+  $('#cats').innerHTML = `<button type="button" data-c="overview" class="${cur === 'overview' && !q ? 'active' : ''}">📊 数据面板</button>` + Object.entries(CATS).map(([k, c]) => `<button type="button" data-c="${k}" class="${k === cur && !q ? 'active' : ''}">${c.icon} ${c.label}<span class="count">${items.filter(i => i.category === k).length}</span></button>`).join('');
   $('#cats').querySelectorAll('button').forEach(b => b.onclick = () => { cur = b.dataset.c; $('#search').value = ''; render(); });
   let list = q ? items.filter(i => searchText(i).includes(q)) : items.filter(i => i.category === cur);
   if (q) list = [...list].sort((a, b) => Object.keys(CATS).indexOf(a.category) - Object.keys(CATS).indexOf(b.category));
   const info = $('#search-info'); info.classList.toggle('hidden', !q); info.textContent = q ? (list.length ? `在全部分类中找到 ${list.length} 条（只在本机内存中搜索，不保存、不上传）` : '') : '';
+  if (!q && cur === 'overview') { $('#summary').classList.add('hidden'); renderOverview(); return; }
   const c = CATS[cur];
   if (!q && c.sort) list = [...list].sort((a, b) => String(c.sort(b.data) || '').localeCompare(String(c.sort(a.data) || '')));
   const sum = $('#summary');
@@ -504,7 +617,7 @@ function render() {
     sum.classList.remove('hidden');
   } else sum.classList.add('hidden');
   if (!list.length) { $('#list').innerHTML = `<div class="empty">${q ? '没有找到' : `还没有${c.label}，点「＋ 新增」添加第一条`}</div>`; return; }
-  $('#list').innerHTML = list.map(i => { const cc = CATS[i.category]; return `<div class="item" data-id="${i.id}"><div class="ic">${cc.icon}</div><div class="tx"><div class="t">${q ? `<span class="badge">${cc.label}</span>` : ''}${esc(cc.title(i.data))}</div><div class="s">${esc(cc.sub(i.data))}</div></div>${cc.right ? `<div class="r">${esc(cc.right(i.data))}</div>` : ''}</div>`; }).join('');
+  $('#list').innerHTML = list.map(i => { const cc = CATS[i.category]; return `<div class="item" data-id="${esc(i.id)}"><div class="ic">${cc.icon}</div><div class="tx"><div class="t">${q ? `<span class="badge">${cc.label}</span>` : ''}${esc(cc.title(i.data))}</div><div class="s">${esc(cc.sub(i.data))}</div></div>${cc.right ? `<div class="r">${esc(cc.right(i.data))}</div>` : ''}</div>`; }).join('');
   $('#list').querySelectorAll('.item').forEach(el => el.onclick = () => viewItem(items.find(x => x.id === el.dataset.id)));
 }
 // 搜索：只在内存中对已解密数据搜索，不含密码字段，不保存、不发送
@@ -531,7 +644,12 @@ function closeModal() { $('#modal').classList.add('hidden'); $('#modal-body').in
 $('#modal-close').onclick = closeModal; $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
 
 function genPassword(n = 20) { const cs = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*-_=+?'; const r = crypto.getRandomValues(new Uint32Array(n)); return Array.from(r, x => cs[x % cs.length]).join(''); }
-async function copy(text) { try { await navigator.clipboard.writeText(text); toast('已复制'); } catch { toast('复制失败，请手动选择'); } }
+let clipT = null;
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast('已复制，30 秒后自动清除剪贴板'); } catch { toast('复制失败，请手动选择'); return; }
+  clearTimeout(clipT);
+  clipT = setTimeout(async () => { try { let now = null; try { now = await navigator.clipboard.readText(); } catch {} if (now === null || now === text) await navigator.clipboard.writeText(''); } catch {} }, 30000);
+}
 
 function viewItem(it) {
   const c = CATS[it.category], d = it.data;
@@ -574,22 +692,23 @@ function editItem(category, it) {
 $('#m-family').onclick = async () => {
   const ps = (await getAll('profiles')).filter(p => !p.isOwner);
   openModal('👨‍👩‍👧 家族成员档案', `<p class="muted small">每位成员用自己的主密码，互相（包括管理员）都看不到对方的内容。添加时请让成员本人输入主密码。</p>
-  <div class="vlist">${ps.map(p => `<div class="vrow"><span>🙂 ${esc(p.name)}</span><button type="button" class="danger" data-del="${p.id}">删除档案</button></div>`).join('') || '<p class="muted small">还没有其他成员</p>'}</div>
+  <div class="vlist">${ps.map(p => `<div class="vrow"><span>🙂 ${esc(p.name)}</span><button type="button" class="danger" data-del="${esc(p.id)}">删除档案</button></div>`).join('') || '<p class="muted small">还没有其他成员</p>'}</div>
   <form id="f-member" class="sec"><h3>添加成员</h3><label>称呼<input id="nm-name" required maxlength="20"></label>
-  <label>成员的主密码（至少 10 位，请成员本人输入）<input id="nm-mp1" type="password" required minlength="10" autocomplete="off"></label>
+  <label>成员的主密码（至少 12 位，请成员本人输入）<input id="nm-mp1" type="password" required minlength="12" autocomplete="off"></label>
   <label>再输一次<input id="nm-mp2" type="password" required autocomplete="off"></label><button class="primary block" id="nm-add" type="submit">添加成员档案</button></form>`);
   $('#modal-body').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const p = ps.find(x => x.id === b.dataset.del);
     if (prompt(`删除「${p.name}」的档案和全部内容？此操作无法撤销。请输入成员称呼确认：`) !== p.name) return;
-    busy(b, async () => { const its = await getAll('items', p.id); await tx(['profiles', 'items', 'files'], 'readwrite', t => { t.objectStore('profiles').delete(p.id); for (const i of its) { t.objectStore('items').delete(i.id); t.objectStore('files').delete(i.id); } }); toast('已删除'); $('#m-family').onclick(); }); });
+    busy(b, async () => { const its = await getAll('items', p.id); await tx(['profiles', 'items', 'files'], 'readwrite', t => { t.objectStore('profiles').put({ id: p.id, name: p.name, isOwner: false, created_at: p.created_at, updated_at: nowISO(), deleted_at: nowISO() }); for (const i of its) { if (!i.deleted_at) t.objectStore('items').put(tomb(i)); t.objectStore('files').delete(i.id); } }); toast('已删除'); $('#m-family').onclick(); }); });
   $('#f-member').onsubmit = e => { e.preventDefault(); busy($('#nm-add'), async () => {
     if ($('#nm-mp1').value !== $('#nm-mp2').value) return toast('两次输入的主密码不一样');
+    if ($('#nm-mp1').value.length < 12) return toast('主密码至少 12 位');
     await newProfile($('#nm-name').value.trim(), $('#nm-mp1').value, false); toast('成员档案已添加 ✅'); $('#m-family').onclick();
   }); };
 };
 
 // 修改主密码（只重新加密数据密钥）
 $('#m-mp').onclick = () => {
-  openModal('修改主密码', `<form id="f-mp"><label>当前主密码<input id="cmp0" type="password" required autocomplete="off"></label><label>新主密码（至少 10 位）<input id="cmp1" type="password" required minlength="10" autocomplete="off"></label><label>再输一次新主密码<input id="cmp2" type="password" required autocomplete="off"></label><div class="actions"><button type="submit" class="primary" id="cmp-save">确认修改</button></div></form>`);
+  openModal('修改主密码', `<form id="f-mp"><label>当前主密码<input id="cmp0" type="password" required autocomplete="off"></label><label>新主密码（至少 12 位）<input id="cmp1" type="password" required minlength="12" autocomplete="off"></label><label>再输一次新主密码<input id="cmp2" type="password" required autocomplete="off"></label><div class="actions"><button type="submit" class="primary" id="cmp-save">确认修改</button></div></form>`);
   $('#f-mp').onsubmit = e => { e.preventDefault(); busy($('#cmp-save'), async () => {
     try {
       if ($('#cmp1').value !== $('#cmp2').value) throw new Error('两次输入的新主密码不一样');
@@ -600,14 +719,147 @@ $('#m-mp').onclick = () => {
   }); };
 };
 
+
+// ===== 存储状态 =====
+let persisted = false;
+function persistText() { return persisted ? '存储：已设为持久保存 ✅' : '存储：浏览器未承诺持久保存，空间不足时可能被清除，请经常备份'; }
+
+// ===== 图表小工具（纯 SVG，无外部库）=====
+const PAL = ['#22d3ee', '#818cf8', '#34d399', '#fbbf24', '#f472b6'];
+let gid = 0;
+function lineChartSVG(series, labels, opt = {}) {
+  const W = 600, H = 220, L = 34, R = 10, T = 12, B = 26, n = series[0].length;
+  const max = Math.max(1, ...series.flat()) * 1.15, x = i => L + (W - L - R) * i / (n - 1), y = v => T + (H - T - B) * (1 - v / max);
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const yy = T + (H - T - B) * k / 4; g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="rgba(148,163,184,.12)"/><text x="${L - 6}" y="${yy + 4}" fill="#64748b" font-size="10" text-anchor="end">${Math.round(max * (1 - k / 4))}</text>`; }
+  labels.forEach((t, i) => { if (i % Math.ceil(n / 8) === 0 || i === n - 1) g += `<text x="${x(i)}" y="${H - 8}" fill="#64748b" font-size="10" text-anchor="middle">${esc(t)}</text>`; });
+  let defs = '', paths = '';
+  series.forEach((sv, si) => {
+    const id = `lg${++gid}`, c = PAL[si % PAL.length];
+    const pts = sv.map((v, i) => [x(i), y(v)]);
+    let d = `M${pts[0][0]},${pts[0][1]}`; for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], cx = (x0 + x1) / 2; d += ` C${cx},${y0} ${cx},${y1} ${x1},${y1}`; }
+    defs += `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".35"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient>`;
+    paths += `<path d="${d} L${x(n - 1)},${H - B} L${x(0)},${H - B} Z" fill="url(#${id})"/><path class="ln" pathLength="1000" d="${d}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/>`;
+    const [lx, ly] = pts[pts.length - 1]; paths += `<circle cx="${lx}" cy="${ly}" r="4" fill="${c}"/><circle class="pdot" cx="${lx}" cy="${ly}" r="7" fill="none" stroke="${c}" stroke-width="1.5"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.label || '折线图')}"><defs>${defs}</defs>${g}${paths}</svg>`;
+}
+function donutSVG(vals, center, sub) {
+  const tot = vals.reduce((a, b) => a + b, 0) || 1; let acc = 0, segs = '';
+  vals.forEach((v, i) => { const len = v / tot * 100; if (len > 0) segs += `<circle class="seg" cx="60" cy="60" r="44" fill="none" stroke="${PAL[i % PAL.length]}" stroke-width="14" pathLength="100" stroke-dasharray="${Math.max(0, len - .6)} ${100 - Math.max(0, len - .6)}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc += len; });
+  return `<svg viewBox="0 0 120 120" role="img" aria-label="环形图"><circle cx="60" cy="60" r="44" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="14"/>${segs}<text x="60" y="60" fill="#e2e8f0" font-size="20" font-weight="700" text-anchor="middle">${esc(center)}</text><text x="60" y="76" fill="#94a3b8" font-size="9" text-anchor="middle">${esc(sub)}</text></svg>`;
+}
+function barSVG(vals, labels) {
+  const W = 320, H = 170, B = 22, T = 14, n = vals.length, max = Math.max(1, ...vals) * 1.1, bw = (W - 20) / n * .56;
+  let out = `<defs><linearGradient id="bg${++gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>`;
+  vals.forEach((v, i) => { const cx = 10 + (W - 20) * (i + .5) / n, h = (H - B - T) * v / max;
+    out += `<rect class="bar" x="${cx - bw / 2}" y="${H - B - h}" width="${bw}" height="${h}" rx="4" fill="url(#bg${gid})"/><text x="${cx}" y="${H - B - h - 4}" fill="#94a3b8" font-size="10" text-anchor="middle">${v}</text><text x="${cx}" y="${H - 6}" fill="#64748b" font-size="10" text-anchor="middle">${esc(labels[i])}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="柱状图">${out}</svg>`;
+}
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+function countUp(el, to, dur = 1400, fmt = v => Math.round(v).toLocaleString('zh-CN')) {
+  if (!el) return; const from = +(el.dataset.v || 0); el.dataset.v = to;
+  if (reduceMotion() || document.hidden) { el.firstChild.textContent = fmt(to); return; }
+  const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.firstChild.textContent = fmt(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step);
+}
+const kpiHTML = (id, k, unit) => `<div class="kpi"><div class="k">${esc(k)}</div><div class="n" id="${id}">0${unit ? `<small>${esc(unit)}</small>` : ''}</div></div>`;
+
+// ===== 数据面板（真实数据：只在内存中由当前档案已解密的数据计算，不保存、不发送）=====
+function renderOverview() {
+  const keys = Object.keys(CATS), counts = keys.map(k => items.filter(i => i.category === k).length), total = items.length;
+  const month = today().slice(0, 7);
+  const newThisMonth = items.filter(i => String(i.created_at || '').slice(0, 7) === month).length;
+  const fileBytes = items.filter(i => i.category === 'file').reduce((a, i) => a + (+i.data.fileSize || 0), 0);
+  const recent = [...items].sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || ''))).slice(0, 5);
+  const fin = {}; for (const i of items.filter(i => i.category === 'finance')) { const d = i.data, cc = d.currency || 'CNY'; fin[cc] ??= { in: 0, out: 0 }; if (d.kind === '收入') fin[cc].in += +d.amount || 0; if (d.kind === '支出') fin[cc].out += +d.amount || 0; }
+  const maxc = Math.max(1, ...counts), n2 = v => v.toLocaleString('zh-CN', { maximumFractionDigits: 2 });
+  const safeTitle = i => { try { return CATS[i.category].title(i.data) || '（无标题）'; } catch { return '（无标题）'; } };
+  $('#list').innerHTML = `<div class="dash" id="ovdash">
+    <div class="dhead"><div><div class="dtitle">📊 ${esc(profile.name)} 的数据面板</div><div class="dsub">实时统计 · 只在本机内存中由已解密数据计算，不保存、不上传</div></div></div>
+    <div class="kpis">${kpiHTML('ov-total', '全部记录', '条')}${kpiHTML('ov-month', '本月新增', '条')}${kpiHTML('ov-files', '加密文件', '个')}<div class="kpi"><div class="k">文件总大小</div><div class="n">${esc(fmtSize(fileBytes))}</div></div></div>
+    <div class="pgrid">
+      <div class="pnl"><h4>分类数量</h4><div class="hbars">${keys.map((k, i) => `<button type="button" class="hb" data-go="${k}"><span>${CATS[k].icon} ${esc(CATS[k].label)}</span><span class="tr"><span class="fl c${i}" data-w="${Math.round(counts[i] / maxc * 100)}"></span></span><span class="cn">${counts[i]}</span></button>`).join('')}</div></div>
+      <div class="pnl"><h4>分类占比</h4><div class="donutwrap">${donutSVG(counts, String(total), '条记录')}<div class="legend">${keys.map((k, i) => `<span><b class="c${i}"></b>${esc(CATS[k].label)} ${total ? Math.round(counts[i] / total * 100) : 0}%</span>`).join('')}</div></div></div>
+    </div>
+    <div class="pgrid">
+      <div class="pnl"><h4>最近更新</h4><ul class="feed">${recent.map(i => `<li class="clk" data-id="${esc(i.id)}"><span>${CATS[i.category].icon} <span class="badge">${esc(CATS[i.category].label)}</span>${esc(safeTitle(i))}</span><em>${esc(String(i.updated_at || i.created_at || '').slice(0, 10))}</em></li>`).join('') || '<li>还没有记录，点上面的分类开始添加</li>'}</ul></div>
+      <div class="pnl"><h4>财务汇总</h4><div class="fin">${Object.entries(fin).map(([cc, v]) => `<div><b>${esc(cc)}</b><span class="pos">收入 ${n2(v.in)}</span><span class="neg">支出 ${n2(v.out)}</span><span>结余 ${n2(v.in - v.out)}</span></div>`).join('') || '<div class="dsub">还没有财务记录</div>'}</div></div>
+    </div></div>`;
+  // 横条宽度用 CSSOM 设置（不使用 style 属性，符合 CSP）
+  $('#list').querySelectorAll('.fl').forEach(el => { el.style.width = el.dataset.w + '%'; });
+  countUp($('#ov-total'), total, 900); countUp($('#ov-month'), newThisMonth, 900); countUp($('#ov-files'), counts[keys.indexOf('file')], 900);
+  $('#list').querySelectorAll('[data-go]').forEach(b => b.onclick = () => { cur = b.dataset.go; render(); });
+  $('#list').querySelectorAll('li[data-id]').forEach(el => el.onclick = () => viewItem(items.find(x => x.id === el.dataset.id)));
+}
+
+// ===== 展示面板（全部为随机生成的演示数据，与保险库内容无关）=====
+const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const SC = { timer: null, clock: null, built: false, line: null, labels: [], kpi: {} };
+const DEMO_EVENTS = ['AES-256-GCM 加密完成', '完整性校验通过', '密钥派生 PBKDF2 完成', '本地备份校验通过', '异常登录尝试已拦截', '自动锁定已触发', '数据分片加密完成'];
+const DEMO_CATS = ['账号密码', '联系人', '日记', '文件', '财务记录'];
+function hhmm(d) { const z = n => String(n).padStart(2, '0'); return `${z(d.getHours())}:${z(d.getMinutes())}`; }
+function buildShowcase() {
+  const now = new Date();
+  SC.labels = Array.from({ length: 24 }, (_, i) => hhmm(new Date(now - (23 - i) * 3600e3)).slice(0, 2) + '时');
+  SC.line = [Array.from({ length: 24 }, () => rint(120, 420)), Array.from({ length: 24 }, () => rint(40, 200))];
+  SC.kpi = { rec: rint(18000, 36000), ops: rint(80000, 160000), score: rint(92, 99), days: rint(300, 900) };
+  const cats = DEMO_CATS.map(() => rint(8, 40)), week = Array.from({ length: 7 }, () => rint(12, 90));
+  const wl = Array.from({ length: 7 }, (_, i) => { const d = new Date(now - (6 - i) * 864e5); return `${d.getMonth() + 1}/${d.getDate()}`; });
+  const ctot = cats.reduce((a, b) => a + b, 0);
+  $('#showcase').innerHTML = `
+    <div class="dhead"><div><div class="dtitle">🔐 家庭加密保险库 · 安全数据中心</div><div class="dsub">端到端加密 · 本地优先 · 家族授权 <span class="demo-tag">演示数据</span></div></div><span class="live"><i></i><span id="sc-clock"></span></span></div>
+    <div class="kpis">${kpiHTML('sc-rec', '加密记录', '条')}${kpiHTML('sc-ops', '今日加密运算', '次')}${kpiHTML('sc-score', '安全评分', '分')}${kpiHTML('sc-days', '安全守护', '天')}</div>
+    <div class="pgrid">
+      <div class="pnl"><h4>24 小时加密运算趋势 <span class="legend"><span><b class="c0"></b>加密</span><span><b class="c1"></b>解密</span></span></h4><div id="sc-line">${lineChartSVG(SC.line, SC.labels, { label: '24 小时加密运算趋势' })}</div></div>
+      <div class="pnl"><h4>数据分类占比</h4><div class="donutwrap">${donutSVG(cats, '100%', '已加密')}<div class="legend">${DEMO_CATS.map((c, i) => `<span><b class="c${i}"></b>${c} ${Math.round(cats[i] / ctot * 100)}%</span>`).join('')}</div></div></div>
+    </div>
+    <div class="pgrid">
+      <div class="pnl"><h4>实时安全事件</h4><ul class="feed" id="sc-feed"></ul></div>
+      <div class="pnl"><h4>近 7 天新增记录</h4>${barSVG(week, wl)}</div>
+    </div>
+    <div class="enter"><button type="button" id="btn-enter" class="btn-enter">进入保险库 →</button><div class="dnote">以上全部为随机生成的演示数据，与你的保险库内容无关</div></div>`;
+  for (let i = 0; i < 6; i++) addDemoEvent(new Date(now - (6 - i) * rint(20, 60) * 1000));
+  $('#btn-enter').onclick = () => renderProfiles();
+  SC.built = true;
+}
+function addDemoEvent(t = new Date()) {
+  const f = $('#sc-feed'); if (!f) return;
+  const li = document.createElement('li'); const a = document.createElement('span'); const b = document.createElement('em');
+  a.textContent = `${DEMO_EVENTS[rint(0, DEMO_EVENTS.length - 1)]} · ${DEMO_CATS[rint(0, 4)]}`; b.textContent = hhmm(t) + ':' + String(t.getSeconds()).padStart(2, '0');
+  li.append(a, b); f.prepend(li); while (f.children.length > 7) f.lastChild.remove();
+}
+function showcaseTick() {
+  if (document.hidden || $('#screen-showcase').classList.contains('hidden')) return;
+  SC.line.forEach((sv, i) => { sv.shift(); sv.push(i ? rint(40, 200) : rint(120, 420)); });
+  SC.labels.push(SC.labels.shift());
+  const box = $('#sc-line'); box.classList.add('nodraw'); box.innerHTML = lineChartSVG(SC.line, SC.labels, { label: '24 小时加密运算趋势' });
+  SC.kpi.rec += rint(0, 3); SC.kpi.ops += rint(20, 160);
+  countUp($('#sc-rec'), SC.kpi.rec, 800); countUp($('#sc-ops'), SC.kpi.ops, 800);
+  addDemoEvent();
+}
+function tickClock() { const c = $('#sc-clock'); if (c) c.textContent = new Date().toLocaleString('zh-CN', { hour12: false }); }
+function showcaseStart() {
+  if (!SC.built) { buildShowcase(); countUp($('#sc-rec'), SC.kpi.rec, 1600); countUp($('#sc-ops'), SC.kpi.ops, 1600); countUp($('#sc-score'), SC.kpi.score, 1600); countUp($('#sc-days'), SC.kpi.days, 1600); }
+  tickClock(); $('#showcase').classList.toggle('paused', document.hidden);
+  clearInterval(SC.clock); SC.clock = setInterval(tickClock, 1000);
+  clearInterval(SC.timer); if (!reduceMotion()) SC.timer = setInterval(showcaseTick, 3000);
+}
+function showcaseStop() { clearInterval(SC.timer); clearInterval(SC.clock); SC.timer = SC.clock = null; }
+document.addEventListener('visibilitychange', () => { const d = $('#showcase'); if (d) d.classList.toggle('paused', document.hidden); if (!document.hidden && !$('#screen-showcase').classList.contains('hidden')) tickClock(); });
+
 // ===== 启动 =====
 (async () => {
   if (!window.crypto?.subtle) { document.body.innerHTML = '<p style="padding:20px">当前浏览器不支持加密功能，请用最新版 Chrome 打开。</p>'; return; }
   try { db = await openDB(); } catch { document.body.innerHTML = '<p style="padding:20px">这个浏览器不允许本地文件保存数据。请用 <b>Google Chrome</b> 打开这个文件。</p>'; return; }
-  try { navigator.storage?.persist?.(); } catch {}
+  try { persisted = !!(await navigator.storage?.persisted?.()) || !!(await navigator.storage?.persist?.()); } catch { persisted = false; }
+  $('#persist-tip').textContent = persistText();
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  $('#ios-tip').classList.toggle('hidden', !(isIOS && !standalone));
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   await renderProfiles();
+  show('#screen-showcase');
 })();
-window.__vault = { get count() { return items.length; }, get unlocked() { return !!dataKey; } };
 })();
 </script>
 </body>
