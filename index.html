@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-XaZpWIHznltsU/6mDPLN14bHNWP9rnLx5bt0PcqJGKs='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-eylgUS8EhNDtw3tEq2oAryPtI+5iymLyjZv/jR4xSnY='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -299,7 +299,7 @@ html[data-theme=night] .rbad.high{background:#450a0a;color:#fecaca}html[data-the
     <p class="muted small">数据只保存在这台设备的浏览器里，平时不联网。每位成员有自己的主密码，互相看不到。</p>
     <div id="profile-list" class="plist"></div>
     <div id="first-run" class="hidden">
-      <p class="small">本机还没有用户：可以先创建一个<b>普通成员</b>（离线使用）。随便注册不能当管理员。</p>
+      <p class="small" id="first-run-lead">本机还没有用户：可以先创建一个<b>普通成员</b>（离线使用）。随便注册不能当管理员。</p>
       <p class="tip">💡 管理员身份不能靠本机随便创建。换机或清过浏览器后：有 <b>.vault</b> 备份就点「📂 从备份文件恢复」；做过云端备份就点「☁️ 从云端恢复」，用<b>已授权且完成邮箱验证</b>的云端管理员账号登录后选版本。只有云端家族名单里的 <b>owner</b> 登录后，才能把本机用户升为管理员，或从云端备份恢复管理员。</p>
       <form id="form-owner">
         <label>用户名<input id="owner-name" required maxlength="32" placeholder="例如：xiaoming" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"><small class="hint" id="owner-name-hint"></small></label>
@@ -519,7 +519,12 @@ let profile = null, dataKey = null, items = [], cur = 'login', lastActive = Date
 // ===== 成员档案 =====
 async function renderProfiles() {
   const ps = (await getAll('profiles')).filter(p => !p.deleted_at).sort((a, b) => (b.isOwner - a.isOwner) || String(a.created_at || '').localeCompare(String(b.created_at || '')));
-  $('#first-run').classList.toggle('hidden', ps.length > 0); // 空库才显示创建普通成员；禁止本机自建管理员
+  // 始终可注册本机普通成员（不能自建管理员）；有用户时也能再注册/切到其他账户
+  $('#first-run').classList.remove('hidden');
+  const lead = $('#first-run-lead');
+  if (lead) lead.innerHTML = ps.length
+    ? '点上面列表可切换已有用户。也可以再注册一个<b>本机普通成员</b>（随便注册不能当管理员）。'
+    : '本机还没有用户：可以先创建一个<b>普通成员</b>（离线使用）。随便注册不能当管理员。';
   $('#profile-list').innerHTML = ps.map(p => `<button type="button" data-id="${esc(p.id)}"><span>${p.isOwner ? '👑' : '🙂'} ${esc(p.name)}</span>${p.isOwner ? '<span class="tag">管理员</span>' : ''}</button>`).join('');
   $('#profile-list').querySelectorAll('button').forEach(b => b.onclick = () => { pendingProfile = ps.find(p => p.id === b.dataset.id); $('#unlock-name').textContent = pendingProfile.name; $('#mp1').value = ''; $('#unlock-err').classList.add('hidden'); show('#screen-unlock'); $('#mp1').focus(); showGuard(); });
   show('#screen-profiles');
@@ -528,11 +533,10 @@ $('#btn-back').onclick = () => renderProfiles();
 $('#form-owner').onsubmit = e => { e.preventDefault(); busy($('#owner-submit'), async () => {
   const name = $('#owner-name').value.trim(), p1 = $('#owner-mp1').value;
   if (p1 !== $('#owner-mp2').value) return toast('两次输入的主密码不一样');
-  if ((await getAll('profiles')).filter(p => !p.deleted_at).length) return toast('本机已有用户，请直接点上面列表解锁，或从备份/云端恢复');
   const ne = await nameError(name); if (ne) return toast(ne, 5000);
   if (p1.length < 12) return toast('主密码至少 12 位');
-  // 故意 isOwner:false — 随便注册只能是普通成员
-  const p = await newProfile(name, p1, false); $('#owner-mp1').value = $('#owner-mp2').value = '';
+  // 故意 isOwner:false — 随便注册 / 再注册都只能是普通成员
+  const p = await newProfile(name, p1, false); $('#owner-mp1').value = $('#owner-mp2').value = $('#owner-name').value = '';
   toast('已创建普通成员 ✅ 请牢记主密码（本机随便注册不能当管理员）', 6000); await unlockWith(p, p1);
 }, '正在创建…'); };
 $('#form-unlock').onsubmit = e => { e.preventDefault(); busy($('#unlock-submit'), async () => {
@@ -639,7 +643,8 @@ function lock(msg, reason = '手动锁定') {
   finishEditor(); // 锁定前先把正在写的日记加密存下来
   endSession(reason);
   clearTimeout(autoT); autoT = null;
-  dataKey = null; profile = null; items = []; $('#list').innerHTML = ''; $('#search').value = ''; closeModal(); unmountOwnerUI();
+  dataKey = null; profile = null; pendingProfile = null; items = []; $('#list').innerHTML = ''; $('#search').value = ''; closeModal(); unmountOwnerUI();
+  // 退出后回到用户列表，便于切换 / 再注册其他本机账户
   renderProfiles(); if (msg) toast(msg);
 }
 $('#btn-lock').onclick = () => lock('已锁定');
@@ -815,6 +820,12 @@ function cloud() {
   if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { storage: window.sessionStorage, storageKey: 'fv-cloud', persistSession: true, autoRefreshToken: false, detectSessionInUrl: false } });
   return sb;
 }
+async function clearCloudSession() {
+  try { if (sb) await sb.auth.signOut({ scope: 'local' }); } catch {}
+  try { sessionStorage.removeItem('fv-cloud'); } catch {}
+  sb = null;
+  srvRole = { tok: null, role: null };
+}
 function cloudErr(e) {
   const m = e?.message || String(e), code = e?.code || '';
   if (/Database error saving new user|Database error/i.test(m)) return '该邮箱未被授权（不在家族名单里），请联系管理员';
@@ -966,14 +977,13 @@ async function openCloud() {
       if (error) return toast('删除失败：' + cloudErr(error), 6000);
       if (!(data || []).length) return toast('删除失败：最新的 3 份云备份受服务器保护，不能删除', 6000);
       logActivity('删除', '', '云端备份 ' + nm); toast('已删除这份云端备份'); openCloud(); }); });
-  $('#c-logout').onclick = async () => { await cloud().auth.signOut({ scope: 'local' }); sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; refreshOwnerCloudUI(); renderStatus(); closeModal(); toast('已退出云端账号'); };
+  $('#c-logout').onclick = async () => { await clearCloudSession(); refreshOwnerCloudUI(); renderStatus(); toast('已退出云端账号，可换另一个邮箱登录'); cloudLoginForm(false, { clearEmail: true }); };
   if ($('#c-security')) $('#c-security').onclick = () => openCloudSecurity();
   refreshOwnerCloudUI();
   if (u) { const gate = await checkCloudAccess(); if (gate && gate.ok === false && gate.reason !== 'SESSION') {
     const ownerEscape = me?.role === 'owner' && (gate.reason === 'REGION_BLOCKED' || gate.reason === 'REGION_UNKNOWN');
     if (!ownerEscape) {
-      try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
-      sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; refreshOwnerCloudUI(); renderStatus();
+      await clearCloudSession(); refreshOwnerCloudUI(); renderStatus();
       return toast(gate.message || '云端访问被拒绝', 9000);
     }
     toast(gate.message + '（你是管理员，仍可打开「黑名单/地区锁」关闭限制）', 9000);
@@ -1052,20 +1062,21 @@ function emailVerified(user) {
 }
 async function rejectUnverifiedCloud(user) {
   if (emailVerified(user)) return false;
-  try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
-  sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null };
+  await clearCloudSession();
   toast('邮箱还没完成验证：请先打开注册邮件里的确认链接，再回来登录。未验证的邮箱不能当已注册用户使用。', 9000);
   refreshOwnerCloudUI();
   return true;
 }
-function cloudLoginForm(expired = false) {
-  openModal('☁️ 登录云端账号', `${expired && profile ? '<p class="bk-age warn">⏸️ 云端登录已过期，自动备份暂停。重新登录后会自动恢复。</p>' : ''}${cloudAgeHTML(profile?.lastCloudAt)}<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。</p>
+function cloudLoginForm(expired = false, opt = {}) {
+  const emailPrefill = opt.clearEmail ? '' : (profile?.cloudEmail || '');
+  openModal('☁️ 登录云端账号', `${expired && profile ? '<p class="bk-age warn">⏸️ 云端登录已过期，自动备份暂停。重新登录后会自动恢复。</p>' : ''}${cloudAgeHTML(profile?.lastCloudAt)}<p class="muted small">云端只存加密后的备份文件。只有点「登录」后才会联网；关闭浏览器后自动退出。退出后可换另一个已授权邮箱登录。</p>
   <p class="tip">只有管理员在「云端授权」里加过的邮箱才能注册；注册后必须点邮箱确认链接，验证完成才能登录使用。</p>
-  <form id="f-cloud"><label>邮箱<input id="c-email" type="email" required value="${esc(profile?.cloudEmail || '')}" autocomplete="username"></label>
+  <form id="f-cloud"><label>邮箱<input id="c-email" type="email" required value="${esc(emailPrefill)}" autocomplete="username"></label>
   <label>云端登录密码（不是主密码）<input id="c-pass" type="password" required minlength="8" autocomplete="current-password"></label>
   <div class="actions"><button type="submit" class="primary" id="c-login">登录</button><button type="button" id="c-signup">注册</button></div></form>`);
   $('#f-cloud').onsubmit = e => { e.preventDefault(); busy($('#c-login'), async () => {
     const email = $('#c-email').value.trim();
+    await clearCloudSession(); // 换号前清掉旧会话，避免切不上
     const { data, error } = await cloud().auth.signInWithPassword({ email, password: $('#c-pass').value });
     if (error) return toast(cloudErr(error), 6000);
     if (await rejectUnverifiedCloud(data?.user || data?.session?.user)) return;
@@ -1073,10 +1084,11 @@ function cloudLoginForm(expired = false) {
   }); };
   $('#c-signup').onclick = () => { if (!$('#f-cloud').reportValidity()) return; busy($('#c-signup'), async () => {
     const email = $('#c-email').value.trim();
+    await clearCloudSession();
     const { data, error } = await cloud().auth.signUp({ email, password: $('#c-pass').value });
     if (error) return toast(cloudErr(error), 7000);
     if (!data.session || !emailVerified(data.user)) {
-      if (data.session) { try { await cloud().auth.signOut({ scope: 'local' }); } catch {} sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null }; }
+      if (data.session) await clearCloudSession();
       return toast('注册请求已提交。请打开邮箱点确认链接完成验证后，再回来点「登录」。未验证的邮箱不能使用。（确认后网页若打不开可直接关掉）', 10000);
     }
     await afterCloudSignIn(email);
@@ -1546,8 +1558,7 @@ async function afterCloudSignIn(email) {
   if (gate && gate.ok === false) {
     const ownerEscape = gate.is_owner && (gate.reason === 'REGION_BLOCKED' || gate.reason === 'REGION_UNKNOWN');
     if (!ownerEscape) {
-      try { await cloud().auth.signOut({ scope: 'local' }); } catch {}
-      sessionStorage.removeItem('fv-cloud'); srvRole = { tok: null, role: null };
+      await clearCloudSession();
       refreshOwnerCloudUI();
       return toast(gate.message || '云端访问被拒绝', 9000);
     }
@@ -1558,7 +1569,7 @@ async function afterCloudSignIn(email) {
   const st = await mySettings();
   if (!st.two_step || verified) { if (verified) { try { localStorage.setItem('fv-trusted-' + email.toLowerCase(), '1'); } catch {} } flushLogs(); presenceBeat(true); autoOnUnlock(); renderStatus(); return openCloud(); }
   const sms = await smsEnabled();
-  try { await cloud().auth.signOut({ scope: 'local' }); } catch {} sessionStorage.removeItem('fv-cloud');
+  await clearCloudSession();
   openModal('📧 新设备验证', `<p class="muted small">你打开了两步验证，这台设备第一次登录云端账号 <b>${esc(email)}</b>，需要输入验证码，验证后这台设备才会被信任。</p>
   <div class="radio"><label><input type="radio" name="otpm" value="email" ${st.method !== 'sms' || !sms ? 'checked' : ''}> 邮箱验证码</label><label class="${sms ? '' : 'off'}"><input type="radio" name="otpm" value="sms" ${sms ? '' : 'disabled'} ${sms && st.method === 'sms' ? 'checked' : ''}> 短信验证码${sms ? '' : '（短信未配置）'}</label></div>
   <label id="otp-phone-l" class="hidden">手机号<input id="otp-phone" inputmode="tel" placeholder="+8613800000000"></label>
