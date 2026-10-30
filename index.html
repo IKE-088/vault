@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-bBJA3kRiUSrJLPStUpxMwT9+5HXZdKROCtX7b6TdRm4='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-NFZ8yxT626e86Pxz4Lby3CiIsCNHTkygaQl2pEPgmOc='; style-src 'sha256-4RCJMFjreNRLLnkRsEPedbuosahIDD1Dzf7D3SPO1B0='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -31,6 +31,9 @@ button:disabled{opacity:.6;cursor:wait}
 .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--fg);margin:0}
 .chip input{width:auto;margin:0}
+.chip{cursor:pointer}.chip:has(input:checked),.radio label:has(input:checked){border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri);font-weight:600}
+.radio label{border:1px solid transparent;cursor:pointer}
+.rl-now{margin:6px 0;padding:8px 12px;border-radius:10px;background:var(--bg);color:var(--fg)}.rl-now.on{color:#15803d;font-weight:600}html[data-theme=night] .rl-now.on{color:#86efac}
 .row{display:flex;align-items:center}.between{justify-content:space-between}.gap{gap:6px}
 .tabs2{display:flex;gap:6px;margin:16px 0 4px;background:var(--bg);padding:4px;border-radius:12px}
 .tabs2 button{flex:1;border:none;background:transparent}.tabs2 button.active{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.08);font-weight:600}
@@ -558,7 +561,7 @@ async function unlockWith(p, password) {
 }
 
 // 管理员专用入口：只在管理员解锁后才创建 DOM，成员/未登录访客的页面里根本不存在
-function unmountOwnerUI() { document.querySelectorAll('#m-logs,#m-notify,#m-claim-owner,#adash,#presence-box,#agrid,#td-box,#ov-online').forEach(el => el.remove()); clearInterval(presT); presT = null; const fam = $('#m-family'); if (fam) fam.classList.add('hidden'); }
+function unmountOwnerUI() { document.querySelectorAll('#m-logs,#m-notify,#m-security,#m-claim-owner,#adash,#presence-box,#agrid,#td-box,#ov-online').forEach(el => el.remove()); clearInterval(presT); presT = null; const fam = $('#m-family'); if (fam) fam.classList.add('hidden'); }
 function mountOwnerUI(p) {
   unmountOwnerUI();
   refreshOwnerCloudUI();
@@ -601,9 +604,11 @@ async function refreshOwnerCloudUI() {
   let logs = $('#m-logs');
   const has = $('#m-notify');
   let claim = $('#m-claim-owner');
+  const secM = $('#m-security');
   if (!menuOk) {
     if (logs) logs.remove();
     if (has) has.remove();
+    if (secM) secM.remove();
   } else {
     if (!logs) {
       logs = document.createElement('button'); logs.id = 'm-logs'; logs.type = 'button'; logs.textContent = '📜 访问日志 / 操作记录';
@@ -613,6 +618,10 @@ async function refreshOwnerCloudUI() {
     if (!has) {
       const b = document.createElement('button'); b.id = 'm-notify'; b.type = 'button'; b.textContent = '📧 家人登录/退出邮件提醒';
       b.addEventListener('click', () => openNotify()); (logs || $('#m-family')).after(b);
+    }
+    if (!secM) {
+      const sb = document.createElement('button'); sb.id = 'm-security'; sb.type = 'button'; sb.textContent = '🚫 云端黑名单 / 地区锁';
+      sb.addEventListener('click', () => openCloudSecurity()); ($('#m-notify') || logs || $('#m-family')).after(sb);
     }
   }
   const needClaim = cloudOk && profile && dataKey && !localOwner && !(await getAll('profiles')).some(p => p.isOwner && !p.deleted_at);
@@ -841,6 +850,7 @@ function cloudErr(e) {
   if (/EMAIL_BLACKLISTED|BLACKLISTED/i.test(m)) return '该账号已被管理员拉黑，无法使用云端（本机离线解锁不受影响）';
   if (/REGION_BLOCKED|REGION_UNKNOWN|REGION_LOCK_EMPTY/i.test(m)) return m.replace(/^[A-Z_]+:\s*/, '') || '当前登录地区不在允许名单内';
   if (/CANNOT_BLACKLIST_SELF/i.test(m)) return '不能拉黑当前登录的管理员邮箱';
+  if (/invalid ip\b|invalid input syntax for type inet/i.test(m)) return 'IP 格式不对，请填像 203.0.113.10 这样的地址，或者留空';
   if (/User already registered/i.test(m)) return '这个邮箱已经注册过了，请直接登录';
   if (/row-level security|Unauthorized|permission denied|403/i.test(m)) return '没有云端权限（可能还没授权，或已被管理员取消授权）';
   if (/Failed to fetch|NetworkError/i.test(m)) return '连不上云端，请检查网络';
@@ -873,19 +883,21 @@ async function openCloudSecurity() {
   const en = !!s.region_lock_enabled;
   $('#modal-body').innerHTML = `
   <div class="sec"><h3>🚫 云端黑名单</h3>
-  <p class="muted tiny">拉黑后立即无法云端登录/备份/恢复；本机主密码离线解锁不受影响。匹配邮箱，或（若填写）IP / 设备指纹。</p>
+  <p class="muted tiny">被拉黑的邮箱马上不能登录云端、备份或恢复；家人用主密码在本机离线解锁不受影响。一般只填邮箱就够了，IP 和设备指纹（在「访问日志」里能看到）可以不填。</p>
   <div id="bl-list" class="vlist">${rows.length ? rows.map(r => `<div class="vrow"><span>⛔ ${esc(r.email)}${r.ip ? ' · IP '+esc(r.ip) : ''}${r.fingerprint ? ' · 指纹 '+esc(String(r.fingerprint).slice(0,8))+'…' : ''}${r.reason ? ' · '+esc(r.reason) : ''}</span><button type="button" class="danger" data-blrm="${esc(r.id)}">移除</button></div>`).join('') : '<p class="muted small">暂无黑名单</p>'}</div>
-  <form id="f-bl" class="mt"><label>邮箱（必填）<input id="bl-email" type="email" required></label>
+  <form id="f-bl" class="mt"><label>邮箱（必填）<input id="bl-email" type="email" required placeholder="要拉黑的家人邮箱" autocomplete="off"></label>
   <label>IP（可选）<input id="bl-ip" placeholder="例如 203.0.113.10"></label>
   <label>设备指纹（可选）<input id="bl-fp" placeholder="访问日志里的 fp"></label>
   <label>原因（可选）<input id="bl-reason" maxlength="200"></label>
   <button class="primary block" id="bl-add" type="submit">加入黑名单</button></form></div>
   <div class="sec"><h3>🌏 登录地区锁（国家/地区白名单）</h3>
-  <p class="muted tiny">按登录 IP 识别国家（优先 Cloudflare 等边缘头）。白名单模式：只允许勾选的国家/地区使用云端。VPN 可能导致误判，可暂时关闭。</p>
+  <p class="muted tiny">按登录时的网络位置（IP）判断国家/地区：开启后，只有勾选的地区能使用云端。用 VPN 或出国时可能被误判，可以先关掉。</p>
+  <p class="small rl-now${en ? ' on' : ''}">当前状态：${en ? `已开启 · 允许 ${allowed.size} 个地区${allowed.size ? '（' + esc([...allowed].join('、')) + '）' : ''}` : '已关闭（所有地区都能使用云端）'}</p>
   <div class="radio"><label><input type="radio" name="rl" value="on" ${en ? 'checked' : ''}> 开启</label><label><input type="radio" name="rl" value="off" ${en ? '' : 'checked'}> 关闭</label></div>
   <div class="chiprow" id="rl-countries">${REGION_PRESETS.map(([c,n]) => `<label class="chip"><input type="checkbox" value="${c}" ${allowed.has(c)?'checked':''}> ${n} (${c})</label>`).join('')}</div>
   <label>额外国家代码（逗号分隔，ISO 两位）<input id="rl-extra" placeholder="例如 MY,TH" value="${esc([...allowed].filter(c => !REGION_PRESETS.some(([x]) => x===c)).join(','))}"></label>
-  <button class="primary block" id="rl-save" type="button">保存地区锁</button>
+  <p class="muted tiny">开启时请至少勾选一个地区，记得勾上你自己常在的地方。改完要点下面的按钮才会生效。</p>
+  <button class="primary block" id="rl-save" type="button">保存地区锁设置</button>
   <p class="muted tiny">管理员在名单外时仍可打开本页关闭地区锁；备份等敏感操作仍会按白名单拒绝。</p></div>`;
   $('#f-bl').onsubmit = e => { e.preventDefault(); busy($('#bl-add'), async () => {
     const r = await cloud().rpc('add_blacklist', { p_email: $('#bl-email').value.trim(), p_ip: $('#bl-ip').value.trim() || null, p_fingerprint: $('#bl-fp').value.trim() || null, p_reason: $('#bl-reason').value.trim() || null });
@@ -1180,6 +1192,7 @@ function renderStatus() {
   const e = profile.lastExportAt, c = profile.lastCloudAt, old = t => !t || Date.now() - new Date(t).getTime() > STALE_MS;
   if (!cloudToken()) {
     if ($('#m-notify')) $('#m-notify').remove();
+    if ($('#m-security')) $('#m-security').remove();
     if ($('#m-logs')) $('#m-logs').remove();
     if ($('#m-claim-owner')) $('#m-claim-owner').remove();
     const fam = $('#m-family'); if (fam) fam.classList.add('hidden');
