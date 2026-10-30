@@ -1,5 +1,5 @@
 // 家庭加密保险库 · 离线缓存（只缓存网页本身；保险库数据在 IndexedDB 里，不经过这里）
-const CACHE = 'vault-page-v5';
+const CACHE = 'vault-page-v6';
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

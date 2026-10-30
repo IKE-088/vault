@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-zHEy2Ps9w6c+Mw44EhI/ODMTlwNGodDPKotnoGjQRqU='; style-src 'sha256-mO4jzuVvicuqKFZMk8HbWrs12UsgUtjonIOTE5Ufejk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-NiVi+WUA/idGFPE9u4v6ZFGAT+WuvcwvR/StoJhGlgA='; style-src 'sha256-hZruF+aHkC/RyVgFICtVe/KlsA0OuLHrU1cuEGLTufw='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; frame-src blob:; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -70,6 +70,7 @@ button:disabled{opacity:.6;cursor:wait}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--card);padding:10px 16px;border-radius:10px;z-index:50;max-width:90vw;font-size:14px}
 .footer-note{text-align:center;margin-top:24px}
 .pv{max-width:100%;border-radius:10px;margin-top:10px}
+.pvpdf{display:block;width:100%;height:70vh;border:1px solid var(--line,#ccc);background:#fff}.pvlink{display:inline-block;margin-top:6px}
 .plist{display:flex;flex-direction:column;gap:8px;margin:14px 0}
 .plist button{display:flex;justify-content:space-between;align-items:center;padding:14px;text-align:left}
 .tag{font-size:11px;background:#dbeafe;color:#1d4ed8;border-radius:6px;padding:1px 6px}
@@ -1334,6 +1335,7 @@ function openModal(title, html) {
 function closeModal() {
   const wasOpen = !$('#modal').classList.contains('hidden');
   const fin = finishEditor(); if (fin && profile) fin.then(n => { if (n) toast('已自动加密保存 ✅'); });
+  const pvu = $('#preview')?.dataset.u; if (pvu) URL.revokeObjectURL(pvu);
   $('#modal').classList.add('hidden'); $('#modal-body').innerHTML = ''; $('#modal-title').textContent = ''; $('#modal .sheet').classList.remove('wide');
   if (wasOpen && modalPrev && document.contains(modalPrev) && modalPrev.offsetParent !== null) { try { modalPrev.focus({ preventScroll: true }); } catch {} } modalPrev = null; }
 $('#modal-close').onclick = closeModal;
@@ -1392,15 +1394,17 @@ function viewItem(it) {
   let html = c.fields.filter(f => d[f.k] !== undefined && d[f.k] !== '').map(f => { const secret = f.type === 'secret';
     return `<div class="field"><div class="k">${esc(f.l)}</div><div class="v"><span data-k="${f.k}">${secret ? '••••••••' : esc(d[f.k])}</span>${secret ? `<button type="button" data-show="${f.k}">显示</button>` : ''}<button type="button" data-copy="${f.k}">复制</button></div></div>`; }).join('');
   if (it.hasFile) html += `<div class="field"><div class="k">文件</div><div class="v"><span>${esc(d.fileName)}（${fmtSize(d.fileSize)}）</span></div>${canPreview(d) ? '' : '<p class="upwarn">⚠️ 这个文件只能下载，不能在页面里预览。打开前请确认来源可靠。</p>'}<div id="preview"></div></div>`;
-  html += `<p class="muted tiny">创建 ${fmtTime(it.created_at)} · 修改 ${fmtTime(it.updated_at)}</p><div class="actions">${it.hasFile ? '<button type="button" id="v-dl" class="primary">解密下载</button>' : ''}${it.hasFile && canPreview(d) ? `<button type="button" id="v-pv">${d.fileType === 'application/pdf' ? '打开 PDF' : '预览'}</button>` : ''}<button type="button" id="v-edit">编辑</button><button type="button" id="v-del" class="danger">删除</button></div>`;
+  html += `<p class="muted tiny">创建 ${fmtTime(it.created_at)} · 修改 ${fmtTime(it.updated_at)}</p><div class="actions">${it.hasFile ? '<button type="button" id="v-dl" class="primary">解密下载</button>' : ''}${it.hasFile && canPreview(d) ? `<button type="button" id="v-pv">${d.fileType === 'application/pdf' ? '预览 PDF' : '预览'}</button>` : ''}<button type="button" id="v-edit">编辑</button><button type="button" id="v-del" class="danger">删除</button></div>`;
   openModal(`${c.icon} ${c.title(d)}`, html);
   const body = $('#modal-body');
   body.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(String(d[b.dataset.copy])));
   body.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { const s = body.querySelector(`span[data-k="${b.dataset.show}"]`); const on = b.textContent === '显示'; s.textContent = on ? d[b.dataset.show] : '••••••••'; b.textContent = on ? '隐藏' : '显示'; });
   if ($('#v-dl')) $('#v-dl').onclick = () => busy($('#v-dl'), () => openFile(it, true).catch(e => toast('下载失败：' + e.message)));
   if ($('#v-pv')) $('#v-pv').onclick = () => busy($('#v-pv'), async () => { try { const u = await openFile(it, false);
-    if (d.fileType === 'application/pdf') { const a = document.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 120000); }
-    else { const img = document.createElement('img'); img.className = 'pv'; img.alt = ''; img.src = u; $('#preview').replaceChildren(img); } } catch (e) { toast('预览失败：' + e.message); } });
+    const box = $('#preview'); if (box.dataset.u) URL.revokeObjectURL(box.dataset.u); box.dataset.u = u; setTimeout(() => URL.revokeObjectURL(u), 600000);
+    if (d.fileType === 'application/pdf') { const fr = document.createElement('iframe'); fr.className = 'pv pvpdf'; fr.title = d.fileName || 'PDF'; fr.src = u;
+      const a = document.createElement('a'); a.className = 'pvlink tiny'; a.href = u; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '在新标签页打开（显示不出来请用「解密下载」）'; box.replaceChildren(fr, a); }
+    else { const img = document.createElement('img'); img.className = 'pv'; img.alt = ''; img.src = u; box.replaceChildren(img); } } catch (e) { toast('预览失败：' + e.message); } });
   $('#v-edit').onclick = () => editItem(it.category, it);
   $('#v-del').onclick = async () => { const t = (() => { try { return c.title(d) || ''; } catch { return ''; } })();
     if (!(await askConfirm(`删除「${t}」${it.hasFile ? '和里面的文件' : ''}？\n删除后无法撤销。`, { title: '🗑️ 删除这条记录？', ok: '删除', danger: true }))) return;
