@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-yEW1EdD53HM5HS68Ohc5UYRRgbTZFqFUNzTQmagIO4g='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-bBJA3kRiUSrJLPStUpxMwT9+5HXZdKROCtX7b6TdRm4='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -577,13 +577,14 @@ async function isCloudOwner() {
 async function requireCloudOwner(openLogin = true) {
   if (profile?.isOwner && (await isCloudOwner())) return true;
   refreshOwnerCloudUI();
+  if (cloudToken() && (await serverRole()) === 'owner') { toast(dataKey ? '云端已是管理员，但本机当前用户不是管理员：点「设为本机管理员」' : '云端管理员已登录，请先用主密码解锁本机管理员用户', 6000); return false; }
   toast('请先用授权过的云端管理员账号登录');
   if (openLogin) openCloud();
   return false;
 }
 async function claimLocalOwner() {
   if (!profile || !dataKey) return toast('请先解锁本机用户');
-  if (!(await isCloudOwner())) return toast('请先用授权过的云端管理员账号登录');
+  if (!(await isCloudOwner())) return toast(cloudToken() ? '当前云端账号不是管理员' : '请先用授权过的云端管理员账号登录');
   if ((await getAll('profiles')).some(p => p.isOwner && !p.deleted_at)) return toast('本机已有管理员');
   if (!(await reauth('把当前用户设为本机管理员'))) return;
   const p = await getOne('profiles', profile.id); p.isOwner = true; p.updated_at = nowISO(); await putOne('profiles', p); profile = p;
@@ -858,7 +859,9 @@ const REGION_PRESETS = [
   ['SG','新加坡'],['JP','日本'],['KR','韩国'],['US','美国'],['GB','英国'],['AU','澳大利亚'],['CA','加拿大'],['DE','德国']
 ];
 async function openCloudSecurity() {
-  if (!(await isCloudOwner())) return toast('请先用授权过的云端管理员账号登录');
+  // 黑名单/地区锁是纯云端设置，服务器端 RPC 自己校验 owner；只需云端管理员登录，不要求先解锁本机
+  if (!cloudToken()) return toast('请先用授权过的云端管理员账号登录');
+  if ((await serverRole()) !== 'owner') return toast('当前云端账号不是管理员，没有权限');
   openModal('🛡️ 云端黑名单 / 地区锁', '<p class="muted small">正在读取…</p>');
   const st = await cloud().rpc('get_owner_settings');
   const bl = await cloud().rpc('list_blacklist');
