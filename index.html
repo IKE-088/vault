@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-eylgUS8EhNDtw3tEq2oAryPtI+5iymLyjZv/jR4xSnY='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-yEW1EdD53HM5HS68Ohc5UYRRgbTZFqFUNzTQmagIO4g='; style-src 'sha256-+mgOgu59kdR/17Jz1eWw09BVp+219jywNu5v+ehFsEk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -1073,7 +1073,7 @@ function cloudLoginForm(expired = false, opt = {}) {
   <p class="tip">只有管理员在「云端授权」里加过的邮箱才能注册；注册后必须点邮箱确认链接，验证完成才能登录使用。</p>
   <form id="f-cloud"><label>邮箱<input id="c-email" type="email" required value="${esc(emailPrefill)}" autocomplete="username"></label>
   <label>云端登录密码（不是主密码）<input id="c-pass" type="password" required minlength="8" autocomplete="current-password"></label>
-  <div class="actions"><button type="submit" class="primary" id="c-login">登录</button><button type="button" id="c-signup">注册</button></div></form>`);
+  <div class="actions"><button type="submit" class="primary" id="c-login">登录</button><button type="button" id="c-signup">注册</button><button type="button" class="ghost small" id="c-forgot">忘记云端密码？</button></div></form>`);
   $('#f-cloud').onsubmit = e => { e.preventDefault(); busy($('#c-login'), async () => {
     const email = $('#c-email').value.trim();
     await clearCloudSession(); // 换号前清掉旧会话，避免切不上
@@ -1093,6 +1093,81 @@ function cloudLoginForm(expired = false, opt = {}) {
     }
     await afterCloudSignIn(email);
   }); };
+  $('#c-forgot').onclick = () => { const em = $('#c-email'); if (!em.reportValidity()) return; busy($('#c-forgot'), () => requestCloudReset(em.value.trim()), '发送中…'); };
+}
+
+// ===== 云端密码重置（邮件链接回到这里设新密码；只改云端登录密码，不碰主密码和本地加密数据）=====
+const VAULT_URL = location.protocol === 'https:' ? location.origin + location.pathname.replace(/index\.html$/, '') : 'https://ike-088.github.io/vault/';
+const RESET_GONE = '重置链接已失效，请重新申请';
+let resetCooldown = 0;
+async function authApi(path, { method = 'POST', tok = null, body = null } = {}) {
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, { method, headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  let j = null; try { j = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error(j?.msg || j?.message || j?.error_description || `HTTP ${r.status}`); e.status = r.status; e.code = j?.error_code || j?.code || ''; throw e; }
+  return j;
+}
+async function requestCloudReset(email) {
+  if (Date.now() < resetCooldown) return toast('刚刚已经发过了，请先查收邮件（也看看垃圾邮件），1 分钟后才能再发', 6000);
+  try { await authApi(`recover?redirect_to=${encodeURIComponent(VAULT_URL)}`, { body: { email } }); }
+  catch (e) { if (e.status === 429 || /rate limit/i.test(e.message)) return toast('发送太频繁了，请过一会儿再试', 6000); }
+  resetCooldown = Date.now() + 60000;
+  toast('如果这个邮箱已获授权，重置邮件马上会发过去（也看看垃圾邮件）。点邮件里的链接回到这里，就能设置新的云端密码。', 10000);
+}
+function jwtClaims(t) { try { return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(t.split('.')[1].length / 4) * 4, '=')), c => c.charCodeAt(0)))); } catch { return null; } }
+function takeAuthUrl() {
+  const h = new URLSearchParams(location.hash.replace(/^#/, '')), q = new URLSearchParams(location.search), g = k => h.get(k) ?? q.get(k);
+  const a = { access: h.get('access_token'), type: g('type'), err: g('error') || g('error_code'), errCode: g('error_code') || '', errDesc: g('error_description') || '', code: q.get('code'), tokenHash: g('token_hash') };
+  if (!(a.access || a.err || a.code || a.tokenHash)) return null;
+  try { history.replaceState(null, '', location.pathname); } catch {} // 立刻把令牌从地址栏和历史里清掉
+  return a;
+}
+function resetGoneModal(detail = '') {
+  openModal('🔑 云端密码重置', `<p class="bk-age warn">⚠️ ${RESET_GONE}</p><p class="muted small">邮件里的重置链接只能用一次，而且一段时间后会过期。请打开「☁️ 云端备份 / 恢复」，在登录框里点「忘记云端密码？」重新发一封，收到后尽快点开。</p>${detail ? `<p class="muted small">（${esc(detail)}）</p>` : ''}<div class="actions"><button type="button" class="primary" id="r-again">重新申请</button><button type="button" id="r-close">关闭</button></div>`);
+  $('#r-again').onclick = () => cloudLoginForm(false); $('#r-close').onclick = closeModal;
+}
+function resetErr(e) {
+  const m = e?.message || '', c = e?.code || '';
+  if (c === 'same_password' || /same.*password|different from the old/i.test(m)) return '新密码不能和原来的云端密码一样';
+  if (c === 'weak_password' || /weak|at least|characters/i.test(m)) return '密码太简单了，请换一个更长、更复杂的密码';
+  if (e?.status === 429 || /rate limit/i.test(m)) return '操作太频繁，请稍后再试';
+  if (e?.status === 401 || e?.status === 403 || /expired|invalid|session|jwt|token/i.test(m)) return RESET_GONE;
+  return '设置失败：' + (m || '网络错误，请稍后再试');
+}
+function recoveryModal(tok) {
+  const cl = jwtClaims(tok), email = cl?.email || '';
+  if (!cl || (cl.exp && cl.exp * 1000 < Date.now())) return resetGoneModal('链接已过期');
+  openModal('🔑 设置新的云端密码', `<p class="muted small">你是从邮件里的重置链接进来的。这里改的是<b>云端登录密码</b>，不是保险库主密码；主密码和本地数据都不会变。</p>
+  ${email ? `<p class="small">云端账号：<b>${esc(email)}</b></p>` : ''}
+  <form id="f-reset"><input type="email" class="hidden" autocomplete="username" value="${esc(email)}" readonly tabindex="-1" aria-hidden="true">
+  <label>新的云端密码（至少 8 位）<input id="r-pass" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label>
+  <label>再输入一次<input id="r-pass2" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label>
+  <p class="tip">建议不要和主密码相同。保存后会自动退出这次的重置登录，再用新密码正常登录云端（授权名单、黑名单、地区锁照常检查）。</p>
+  <div class="actions"><button type="submit" class="primary" id="r-save">保存新密码</button></div></form>`);
+  $('#f-reset').onsubmit = e => { e.preventDefault(); busy($('#r-save'), async () => {
+    const p1 = $('#r-pass').value, p2 = $('#r-pass2').value;
+    if (p1.length < 8) return toast('云端密码至少 8 位');
+    if (p1 !== p2) return toast('两次输入的密码不一样');
+    try { await authApi('user', { method: 'PUT', tok, body: { password: p1 } }); }
+    catch (err) { const m = resetErr(err); return m === RESET_GONE ? resetGoneModal(err.message) : toast(m, 7000); }
+    try { await authApi('logout?scope=local', { tok }); } catch {} // 用完就作废这次重置登录
+    tok = null; await clearCloudSession(); refreshOwnerCloudUI(); $('#toast').classList.add('hidden');
+    openModal('🔑 云端密码已更新', `<p class="bk-age">✅ 云端密码已更新，请用新密码登录云端</p><p class="muted small">这次重置用的临时登录已经退出。请用${email ? ` <b>${esc(email)}</b> 和` : ''}新密码重新登录。</p><div class="actions"><button type="button" class="primary" id="r-login">去登录云端</button><button type="button" id="r-close">关闭</button></div>`);
+    $('#r-login').onclick = () => cloudLoginForm(false); $('#r-close').onclick = closeModal;
+  }, '保存中…'); };
+}
+async function handleAuthUrl(a) {
+  if (!a) return;
+  if (a.err) return resetGoneModal(a.errCode === 'otp_expired' ? '链接已过期或已经用过' : (a.errDesc || a.err));
+  let tok = null;
+  try {
+    if (a.access) tok = a.access;
+    else if (a.tokenHash) tok = (await authApi('verify', { body: { type: a.type || 'recovery', token_hash: a.tokenHash } }))?.access_token || null;
+    else if (a.code) return resetGoneModal('链接格式不支持');
+  } catch (e) { return resetGoneModal(e.message); }
+  if (!tok) return resetGoneModal();
+  if (a.type === 'recovery') return recoveryModal(tok);
+  try { await authApi('logout?scope=local', { tok }); } catch {} // 其它邮件链接（如注册确认）不在这里保留登录
+  if (a.type === 'signup' || a.type === 'email') toast('邮箱已验证完成 ✅ 请回到「☁️ 云端备份 / 恢复」用邮箱和云端密码登录', 9000);
 }
 $('#m-cloud').onclick = openCloud; $('#btn-cloud-start').onclick = openCloud;
 
@@ -2164,6 +2239,7 @@ function showcaseStop() { clearInterval(SC.timer); clearInterval(SC.clock); SC.t
 document.addEventListener('visibilitychange', () => { const d = $('#showcase'); if (d) d.classList.toggle('paused', document.hidden); if (!document.hidden && !$('#screen-showcase').classList.contains('hidden')) tickClock(); });
 
 // ===== 启动 =====
+const AUTH_URL = takeAuthUrl();
 (async () => {
   if (!window.crypto?.subtle) { document.body.innerHTML = '<p class="fatal">当前浏览器不支持加密功能，请用最新版 Chrome 打开。</p>'; return; }
   try { db = await openDB(); } catch { document.body.innerHTML = '<p class="fatal">这个浏览器不允许本地文件保存数据。请用 <b>Google Chrome</b> 打开这个文件。</p>'; return; }
@@ -2176,6 +2252,7 @@ document.addEventListener('visibilitychange', () => { const d = $('#showcase'); 
   computeFP().catch(() => {});
   await renderProfiles();
   show('#screen-showcase');
+  handleAuthUrl(AUTH_URL).catch(() => resetGoneModal());
 })();
 })();
 </script>
