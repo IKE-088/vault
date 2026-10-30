@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-NFZ8yxT626e86Pxz4Lby3CiIsCNHTkygaQl2pEPgmOc='; style-src 'sha256-4RCJMFjreNRLLnkRsEPedbuosahIDD1Dzf7D3SPO1B0='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7jvo3hkrl8sdc9HpXWuCux9rZYwPl8TvdX/DMZlu09M=' 'sha256-zHEy2Ps9w6c+Mw44EhI/ODMTlwNGodDPKotnoGjQRqU='; style-src 'sha256-mO4jzuVvicuqKFZMk8HbWrs12UsgUtjonIOTE5Ufejk='; img-src blob: data:; connect-src https://ohuslweezdughgxhynxk.supabase.co; font-src 'none'; object-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>家庭加密保险库</title>
 <link rel="icon" href="data:,">
 <style>*{box-sizing:border-box}
@@ -75,6 +75,7 @@ button:disabled{opacity:.6;cursor:wait}
 .tag{font-size:11px;background:#dbeafe;color:#1d4ed8;border-radius:6px;padding:1px 6px}
 .wrap{flex-wrap:wrap}.mt{margin-top:14px}
 .banner{background:#fef3c7;color:#92400e;border-radius:12px;padding:10px 14px;font-size:13px;margin:4px 0}
+.shrinkb{position:fixed;left:12px;right:12px;bottom:16px;z-index:60;max-width:560px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}.shrinkb .row{flex-wrap:wrap;margin-top:8px}
 .status{margin:2px 2px 6px}
 .sec{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}
 .sec h3{font-size:15px;margin:0 0 6px}
@@ -589,10 +590,13 @@ async function claimLocalOwner() {
   if (!profile || !dataKey) return toast('请先解锁本机用户');
   if (!(await isCloudOwner())) return toast(cloudToken() ? '当前云端账号不是管理员' : '请先用授权过的云端管理员账号登录');
   if ((await getAll('profiles')).some(p => p.isOwner && !p.deleted_at)) return toast('本机已有管理员');
-  if (!(await reauth('把当前用户设为本机管理员'))) return;
+  const curPub = await cloudOwnerPub();
+  if (curPub === undefined) return toast('读取云端管理员密钥失败，请稍后再试', 6000);
+  if (curPub && !(await askConfirm(OWNER_KEY_WARN, { title: '⚠️ 替换云端管理员密钥？', ok: '我明白，继续', danger: true }))) return;
+  if (!(await reauth('把当前用户设为本机管理员' + (curPub ? '并替换云端管理员密钥' : '')))) return;
   const p = await getOne('profiles', profile.id); p.isOwner = true; p.updated_at = nowISO(); await putOne('profiles', p); profile = p;
   $('#who').textContent = p.name + '（管理员）';
-  ensureOwnerKeys().catch(() => {});
+  try { await ensureOwnerKeys(true); } catch (e) { toast('已设为本机管理员，但云端管理员密钥更新失败：' + cloudErr(e), 8000); }
   refreshOwnerCloudUI();
   toast('已设为本机管理员 ✅ 家族用户 / 访问日志现已可用', 6000);
 }
@@ -623,6 +627,12 @@ async function refreshOwnerCloudUI() {
       const sb = document.createElement('button'); sb.id = 'm-security'; sb.type = 'button'; sb.textContent = '🚫 云端黑名单 / 地区锁';
       sb.addEventListener('click', () => openCloudSecurity()); ($('#m-notify') || logs || $('#m-family')).after(sb);
     }
+  }
+  let rk = $('#m-replace-key');
+  if (!(menuOk && ownerPubMismatch)) { if (rk) rk.remove(); }
+  else if (!rk) {
+    rk = document.createElement('button'); rk.id = 'm-replace-key'; rk.type = 'button'; rk.textContent = '🔑 替换云端管理员密钥';
+    rk.addEventListener('click', () => replaceOwnerKey()); ($('#m-security') || $('#m-family'))?.after(rk);
   }
   const needClaim = cloudOk && profile && dataKey && !localOwner && !(await getAll('profiles')).some(p => p.isOwner && !p.deleted_at);
   if (!needClaim) { if (claim) claim.remove(); }
@@ -761,8 +771,17 @@ async function buildExport(scopeAll, pid = profile?.id) {
   const out = { format: 'family-vault', version: 1, exportedAt: nowISO(), scope: scopeAll ? 'all' : 'profile',
     profiles: ps.map(({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at, deleted_at, act_pub, act_priv_ct, act_priv_iv }) => ({ id, name, isOwner, kdf_salt, kdf_iterations, wrap_ct, wrap_iv, created_at, updated_at, ...(deleted_at ? { deleted_at } : {}), ...(act_pub ? { act_pub, act_priv_ct, act_priv_iv } : {}) })),
     items: its, files: fs.map(f => ({ id: f.id, profileId: f.profileId, iv: f.iv, ct: b64(f.ct) })) };
-  return new Blob([JSON.stringify(out)], { type: 'application/octet-stream' });
+  const blob = new Blob([JSON.stringify(out)], { type: 'application/octet-stream' });
+  const sample = new Set(ps.filter(p => p && isSampleProfile(p)).map(p => p.id));
+  const live = its.filter(i => !i.deleted_at);
+  const sigBytes = await crypto.subtle.digest('SHA-256', enc.encode(JSON.stringify({ ...out, exportedAt: '' })));
+  blob.stats = { items: live.length, real: live.filter(i => !sample.has(i.profileId)).length, profiles: ps.filter(p => p && !p.deleted_at).length,
+    sig: Array.from(new Uint8Array(sigBytes).slice(0, 12), b => b.toString(16).padStart(2, '0')).join('') };
+  return blob;
 }
+// 示例数据（示例数据.vault 导入的「示例」用户）不算真实数据
+const SAMPLE_IDS = new Set(['b941a8ce-bd68-44b1-9319-bcb98c00dec5']);
+function isSampleProfile(p) { return SAMPLE_IDS.has(p.id) || /^(示例|演示|demo|sample)/i.test(String(p.name || '').trim()); }
 const stamp = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`; };
 async function touchProfile(fields) { const p = await getOne('profiles', profile.id); Object.assign(p, fields); await putOne('profiles', p); profile = p; renderStatus(); }
 $('#m-export').onclick = async () => {
@@ -947,13 +966,43 @@ async function listVersions(uid) {
   const { data, error } = await cloud().storage.from(BUCKET).list(`${uid}/backups`, { limit: 100, sortBy: { column: 'name', order: 'desc' } });
   if (error) throw error; return (data || []).filter(f => f.name.endsWith('.vault'));
 }
-async function cloudBackup(u, p = profile, auto = false) {
-  const blob = await buildExport(p.isOwner, p.id);
+// 本机数据明显少于云端最新备份时返回差异信息（自动上传会暂停）；返回 { same:true } 表示和云端最新一份内容相同
+async function shrinkCheck(u, st, size) {
+  let vs; try { vs = await listVersions(u.id); } catch { return null; }
+  if (!vs.length) return st.real === 0 ? { quiet: true } : null;
+  const top = vs[0]; let ci = null, csig = null;
+  try { const { data } = await cloud().storage.from(BUCKET).info(`${u.id}/backups/${top.name}`);
+    const m = data?.metadata || data?.userMetadata || data?.user_metadata || {};
+    if (m.items != null && /^\d+$/.test(String(m.items))) ci = +m.items; if (typeof m.sig === 'string') csig = m.sig; } catch {}
+  if (csig && csig === st.sig) return { same: true };
+  const cs = +(top.metadata?.size || 0);
+  const small = st.real === 0 || (ci != null ? ci > 0 && st.items < ci * 0.5 : cs > 0 && size < cs * 0.5);
+  return small ? { name: top.name, ci, cs, li: st.items, real: st.real, ls: size } : null;
+}
+function shrinkText(g) {
+  const loc = g.real === 0 ? (g.li ? `本机只有示例数据（${g.li} 条）` : '本机没有任何记录') : `本机 ${g.li} 条记录（${fmtSize(g.ls)}）`;
+  const cl = g.ci != null ? `云端最新备份 ${g.ci} 条记录` : `云端最新备份 ${fmtSize(g.cs)}`;
+  return `${loc}，${cl}。`;
+}
+async function cloudBackup(u, p = profile, auto = false, opt = {}) {
+  const blob = await buildExport(p.isOwner, p.id), st = blob.stats;
+  if (auto && !opt.force) {
+    const done = () => { lsSet(autoKey('try', p.id), Date.now()); lsSet(autoKey('dirty', p.id), null); };
+    if (lsGet(autoKey('sig', p.id)) === st.sig) { done(); autoMsg = 'ok'; return { skipped: 'same' }; } // 自上次上传后没有变化
+    const g = await shrinkCheck(u, st, blob.size);
+    if (g?.same) { lsSet(autoKey('sig', p.id), st.sig); done(); autoMsg = 'ok'; return { skipped: 'same' }; }
+    if (g) { autoMsg = 'paused'; if (!g.quiet && profile?.id === p.id) showShrinkBanner(u, p, g, st.sig); return { skipped: 'shrink', g }; }
+  }
+  hideShrinkBanner();
   const path = `${u.id}/backups/vault-${stamp()}.vault`;
-  const { error } = await cloud().storage.from(BUCKET).upload(path, blob, { contentType: 'application/octet-stream', upsert: false });
+  const upOpt = { contentType: 'application/octet-stream', upsert: false };
+  let { error } = await cloud().storage.from(BUCKET).upload(path, blob, { ...upOpt, metadata: { items: String(st.items), profiles: String(st.profiles), sig: st.sig, v: '1' } });
+  if (error && !/exist|duplicate|row-level|policy|Unauthorized|403/i.test(error.message || '')) ({ error } = await cloud().storage.from(BUCKET).upload(path, blob, upOpt));
   if (error) throw error;
+  lsSet(autoKey('sig', p.id), st.sig);
   const vs = await listVersions(u.id);
-  const old = vs.slice(KEEP_VERSIONS).map(f => `${u.id}/backups/${f.name}`);
+  // 只清理第 KEEP_VERSIONS 份以后的旧版本；最新 PROTECTED_N 份永远不会被自动删除（服务器 RLS 也强制保护最新 3 份）
+  const old = vs.slice(Math.max(KEEP_VERSIONS, PROTECTED_N)).map(f => `${u.id}/backups/${f.name}`);
   if (old.length) await cloud().storage.from(BUCKET).remove(old);
   const q = await getOne('profiles', p.id); if (q) { Object.assign(q, { lastCloudAt: nowISO(), cloudEmail: u.email }); await putOne('profiles', q); if (profile?.id === p.id) { profile = q; } }
   lsSet(autoKey('try', p.id), Date.now()); lsSet(autoKey('dirty', p.id), null); autoMsg = 'ok';
@@ -983,7 +1032,10 @@ async function openCloud() {
   if (me?.role === 'owner' && profile?.isOwner) html += `<div class="sec"><h3>👨‍👩‍👧 云端授权</h3><p class="muted tiny">只有在这里授权过的邮箱才能注册云端账号；删除后立刻失去云端访问权限。</p><div id="allow-list" class="vlist"></div><form id="f-allow" class="mt"><label>家人邮箱<input id="a-email" type="email" required></label><label>称呼（可选）<input id="a-name" maxlength="20"></label><button class="primary block" id="a-add" type="submit">授权这个邮箱</button></form></div>`;
   html += `<div class="actions"><button id="c-logout" type="button">退出云端账号</button></div>`;
   openModal('☁️ 云端备份', html);
-  if ($('#c-backup')) $('#c-backup').onclick = () => busy($('#c-backup'), async () => { try { const r = await cloudBackup(u); toast(`云端备份完成 ✅（${fmtSize(r.size)}）`); openCloud(); } catch (e) { toast('备份失败：' + cloudErr(e), 6000); } });
+  if ($('#c-backup')) $('#c-backup').onclick = () => busy($('#c-backup'), async () => { try {
+    const bl = await buildExport(profile.isOwner, profile.id), g = await shrinkCheck(u, bl.stats, bl.size);
+    if (g && !g.same && !g.quiet && !(await askConfirm(`${shrinkText(g)}\n本机数据比云端最新备份少很多，确定用本机数据上传为最新的云端备份？云端较早的备份仍会保留。`, { title: '⚠️ 用本机数据覆盖云端？', ok: '仍然上传', danger: true }))) return;
+    const r = await cloudBackup(u, profile, false, { force: true }); toast(`云端备份完成 ✅（${fmtSize(r.size)}）`); openCloud(); } catch (e) { toast('备份失败：' + cloudErr(e), 6000); } });
   $('#modal-body').querySelectorAll('[data-restore]').forEach(b => b.onclick = async () => { if (!(await askConfirm(`用云端版本 ${b.dataset.restore} 恢复到本机？\n会合并：本机较新的记录保留。`, { title: '☁️ 从云端恢复？', ok: '恢复' }))) return; busy(b, async () => { try { const r = await cloudRestore(u, b.dataset.restore, me?.role === 'owner'); closeModal(); await afterImport(r); } catch (e) { toast('恢复失败：' + cloudErr(e), 6000); } }); });
   $('#modal-body').querySelectorAll('[data-vdel]').forEach(b => b.onclick = async () => { const nm = b.dataset.vdel;
     if (!(await askConfirm(`删除云端备份 ${nm}？\n删除后无法恢复这个版本。`, { title: '🗑️ 删除云端备份？', ok: '删除', danger: true }))) return;
@@ -1027,6 +1079,22 @@ async function renderAllow() {
     if (r.data === false) return toast('未找到这个邮箱'); toast('已取消授权'); renderAllow(); }); });
 }
 const PROTECTED_N = 3; // 服务器规则：每人最新 3 份云备份不能删除
+let shrinkDismissed = '';
+function hideShrinkBanner() { const b = $('#shrink-banner'); if (b) b.remove(); }
+function showShrinkBanner(u, p, g, sig) {
+  if (shrinkDismissed === sig) return;
+  hideShrinkBanner();
+  const d = document.createElement('div'); d.id = 'shrink-banner'; d.className = 'banner shrinkb'; d.setAttribute('role', 'alert');
+  d.innerHTML = `<b>⏸️ 本机数据比云端最新备份少很多，已暂停自动上传。确认要用本机数据覆盖吗？</b><p class="small">${esc(shrinkText(g))}云端已有的备份不会被删除。</p>
+  <div class="row gap"><button type="button" class="primary" id="sb-restore">☁️ 从云端恢复</button><button type="button" class="danger" id="sb-up">仍用本机数据上传</button><button type="button" class="ghost" id="sb-later">稍后</button></div>`;
+  document.body.appendChild(d);
+  $('#sb-later').onclick = () => { shrinkDismissed = sig; hideShrinkBanner(); };
+  $('#sb-restore').onclick = () => { shrinkDismissed = sig; hideShrinkBanner(); openCloud(); };
+  $('#sb-up').onclick = async () => {
+    if (!(await askConfirm(`${shrinkText(g)}\n确定用本机数据上传为最新的云端备份？云端较早的备份仍会保留（最新 ${PROTECTED_N} 份受保护）。`, { title: '⚠️ 用本机数据覆盖云端？', ok: '仍然上传', danger: true }))) return;
+    busy($('#sb-up'), async () => { try { const r = await cloudBackup(u, p, false, { force: true }); autoMsg = 'ok'; toast(`云端备份完成 ✅（${fmtSize(r.size)}）`); renderStatus(); } catch (e) { toast('备份失败：' + cloudErr(e), 6000); } });
+  };
+}
 const BACKUP_STMT = '<p class="stmt">ℹ️ 云备份在你的设备上用主密码加密后才上传，服务器只存密文；档案名、分类和时间为明文。每人云端保留最近 10 份，更旧的自动删除；最新 3 份不能自行删除。忘记主密码将无法恢复。如需删除全部云备份或注销，请联系管理员。</p>';
 // ===== 自动云端备份（管理员已同意）：登录云端时，最后一次修改后约 2 分钟上传；最多每 30 分钟 1 次；解锁时超过 24 小时没备份也会上传 =====
 // 不会自动弹出密码框；云端登录过期就跳过并提示。每次上传后仍只保留最近 KEEP_VERSIONS 份，远低于服务器每人 30 个文件的上限。
@@ -1055,12 +1123,13 @@ function autoText() {
   if (!cloudToken()) return cloudExpired() ? '⏸️ 云端登录已过期，自动备份暂停' : '';
   if (autoBusy) return '☁️ 自动备份中…';
   if (autoMsg === 'fail') return '⚠️ 自动备份失败，稍后重试';
+  if (autoMsg === 'paused') return '⏸️ 本机数据比云端少，自动上传已暂停';
   return '自动备份：开';
 }
 function autoLineHTML() {
   if (!profile) return '';
   const t = profile.lastCloudAt, a = +(lsGet(autoKey('try', profile.id)) || 0), dirty = !!lsGet(autoKey('dirty', profile.id));
-  return `<p class="autost">🔄 自动备份：开 · 上次 ${t ? esc(fmtTime(t)) : '从未'}${autoMsg === 'fail' ? ' · ⚠️ 上次自动备份失败' : ''}${dirty ? ' · 有未备份的修改' + (a && a + AUTO_GAP > Date.now() ? `（约 ${Math.ceil((a + AUTO_GAP - Date.now()) / 60000)} 分钟后自动上传）` : '（约 2 分钟内自动上传）') : ''}<small>登录云端期间，修改后约 2 分钟自动上传一份，最多每 30 分钟一次；解锁时超过 24 小时没备份也会自动备份。成功时不打扰，失败会提示。</small></p>`;
+  return `<p class="autost">🔄 自动备份：开 · 上次 ${t ? esc(fmtTime(t)) : '从未'}${autoMsg === 'fail' ? ' · ⚠️ 上次自动备份失败' : autoMsg === 'paused' ? ' · ⏸️ 本机数据比云端最新备份少很多，已暂停自动上传' : ''}${dirty ? ' · 有未备份的修改' + (a && a + AUTO_GAP > Date.now() ? `（约 ${Math.ceil((a + AUTO_GAP - Date.now()) / 60000)} 分钟后自动上传）` : '（约 2 分钟内自动上传）') : ''}<small>登录云端期间，修改后约 2 分钟自动上传一份，最多每 30 分钟一次；解锁时超过 24 小时没备份也会自动备份。成功时不打扰，失败会提示。</small></p>`;
 }
 // 云端备份对话框里显示「上次备份：X 天前」，超过 7 天用醒目的警告色（只是提示，不会自动备份）
 function cloudAgeHTML(t) {
@@ -1746,7 +1815,7 @@ const ACT_OK = new Set(['新增', '编辑', '删除', '删除文件', '上传文
 const CAT_OK = new Set(['账号密码', '联系人', '日记', '文件', '财务记录', '用户']);
 const actAAD = id => enc.encode(`fv1|activity|${id}`);
 const actKeyAAD = pid => `fv1|actkey|${pid}`;
-async function ensureOwnerKeys() {
+async function ensureOwnerKeys(force = false) {
   if (!profile?.isOwner || !dataKey) return;
   const p = await getOne('profiles', profile.id);
   if (!p.act_pub || !p.act_priv_ct) {
@@ -1756,15 +1825,34 @@ async function ensureOwnerKeys() {
     Object.assign(p, { act_pub: JSON.stringify({ kty: pub.kty, crv: pub.crv, x: pub.x, y: pub.y }), act_priv_ct: b64(ct), act_priv_iv: b64(iv), updated_at: nowISO() });
     await putOne('profiles', p); profile = p;
   }
+  if (force) return syncOwnerPub(true);
   syncOwnerPub().catch(() => {});
 }
-async function syncOwnerPub() {
+const OWNER_KEY_WARN = '云端已经登记了另一把管理员密钥（来自之前的设备）。继续后会用这台设备的新密钥替换它：\n· 旧设备上的管理员将无法读取之后新产生的家人操作记录；\n· 用旧密钥加密的历史操作记录在这台设备上可能无法读取；\n· 服务器会记录这次更换，并给管理员发邮件提醒。\n如果你只是换了设备，更推荐先「从云端恢复」管理员备份，而不是替换密钥。';
+let ownerPubMismatch = false;
+// 读取云端登记的管理员公钥：null = 还没有；undefined = 读取失败
+async function cloudOwnerPub() {
+  try { const { data, error } = await cloud().from('owner_pubkey').select('pub').eq('id', 1).maybeSingle(); if (error) return undefined; return data?.pub || null; } catch { return undefined; }
+}
+// force=true 只能在「再次确认 + 主密码验证」之后调用；否则绝不覆盖云端已有的不同密钥
+async function syncOwnerPub(force = false) {
   if (!cloudToken()) return;
   if (profile?.isOwner) {
     const p = await getOne('profiles', profile.id); if (!p?.act_pub) return;
-    const u = await cloud().from('owner_pubkey').update({ pub: p.act_pub, updated_at: nowISO() }).eq('id', 1).select('id');
-    if (!u.error && !(u.data || []).length) await cloud().from('owner_pubkey').insert({ id: 1, pub: p.act_pub });
+    const cur = await cloudOwnerPub(); if (cur === undefined) { if (force) throw new Error('读取云端管理员密钥失败'); return; }
+    if (cur === p.act_pub) { ownerPubMismatch = false; return; }
+    if (cur && !force) { if (!ownerPubMismatch) { ownerPubMismatch = true; toast('云端登记的管理员密钥和本机不同，已保留云端的，没有自动覆盖。如确需改用本机密钥，请在菜单里点「🔑 替换云端管理员密钥」', 9000); refreshOwnerCloudUI(); } return; }
+    if (cur) { const u = await cloud().from('owner_pubkey').update({ pub: p.act_pub, updated_at: nowISO() }).eq('id', 1).select('id'); if (u.error) throw u.error; if (!(u.data || []).length) throw new Error('没有权限更新云端管理员密钥'); }
+    else { const r = await cloud().from('owner_pubkey').insert({ id: 1, pub: p.act_pub }); if (r.error) throw r.error; }
+    ownerPubMismatch = false; refreshOwnerCloudUI();
+    if (cur) logActivity('修改设置', '', '替换云端管理员密钥');
   } else await cacheOwnerPub();
+}
+async function replaceOwnerKey() {
+  if (!(await requireCloudOwner(false))) return;
+  if (!(await askConfirm(OWNER_KEY_WARN, { title: '⚠️ 替换云端管理员密钥？', ok: '我明白，继续', danger: true }))) return;
+  if (!(await reauth('替换云端管理员密钥'))) return;
+  try { await syncOwnerPub(true); toast('云端管理员密钥已替换为本机密钥 ✅ 管理员会收到邮件提醒', 6000); } catch (e) { toast('替换失败：' + cloudErr(e), 6000); }
 }
 async function cacheOwnerPub() {
   if (!cloudToken()) return;
